@@ -22,7 +22,16 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { parentName, childName, childAge, pathId } = onboardingSchema.parse(body)
+    const { parentName, childName, childAge, pathId: pathSlug } = onboardingSchema.parse(body)
+
+    // Look up the path by slug to get the actual ID
+    const path = await prisma.path.findUnique({
+      where: { slug: pathSlug },
+    })
+
+    if (!path) {
+      return NextResponse.json({ error: 'Selected path not found' }, { status: 400 })
+    }
 
     // Update parent name
     const parent = await prisma.parent.update({
@@ -36,13 +45,13 @@ export async function POST(request: Request) {
         parentId: session.user.id,
         firstName: childName,
         age: childAge,
-        pathId,
+        pathId: path.id,
       },
     })
 
     // Create mission progress for all missions in the path
     const missions = await prisma.mission.findMany({
-      where: { pathId },
+      where: { pathId: path.id },
       orderBy: { sequenceNumber: 'asc' },
     })
 
@@ -76,7 +85,7 @@ export async function POST(request: Request) {
       eventName: 'path_selected',
       parentId: session.user.id,
       childId: child.id,
-      metadata: { pathId },
+      metadata: { pathId: path.id, pathSlug },
     })
 
     // Send welcome email
