@@ -66,6 +66,7 @@ export default async function MissionPage({ params }: Props) {
       resources={resources}
       isCompleted={progress.status === "COMPLETED"}
       childName={child.firstName}
+      childId={child.id}
     />
   );
 }

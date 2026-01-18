@@ -16,6 +16,7 @@ import {
   PartyPopper,
 } from "lucide-react";
 import { Confetti } from "@/components/confetti";
+import { CharacterConverter } from "@/components/CharacterConverter";
 
 interface MissionClientProps {
   missionId: string;
@@ -28,6 +29,7 @@ interface MissionClientProps {
   resources: string[] | null;
   isCompleted: boolean;
   childName: string;
+  childId: string;
 }
 
 const missionEmojis = ["🎨", "🏗️", "🏃", "⭐", "🔊", "🚧", "📋", "🚀"];
@@ -43,6 +45,7 @@ export function MissionClient({
   resources,
   isCompleted: initialCompleted,
   childName,
+  childId,
 }: MissionClientProps) {
   const router = useRouter();
   const [checkedSteps, setCheckedSteps] = useState<boolean[]>(
@@ -293,12 +296,37 @@ export function MissionClient({
           </div>
         </motion.div>
 
+        {/* Mission 1 Special Feature: Character Converter */}
+        {sequenceNumber === 1 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="card mb-8 bg-gradient-to-br from-[var(--color-cream)] to-white"
+          >
+            <div className="flex items-start gap-3 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-[var(--color-indigo)] to-[var(--color-violet)] rounded-2xl flex items-center justify-center text-2xl shrink-0">
+                🎨
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-[var(--color-navy)] mb-1">
+                  ✨ Bonus: Turn Your Drawing into a Game Sprite!
+                </h2>
+                <p className="text-gray-600 text-sm">
+                  Upload a photo of your hero drawing and our AI will transform it into a real game character sprite you can use later!
+                </p>
+              </div>
+            </div>
+            <CharacterConverter childId={childId} />
+          </motion.div>
+        )}
+
         {/* Resources */}
         {resources && resources.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.5 }}
             className="card mb-8"
           >
             <h2 className="text-lg font-bold text-[var(--color-navy)] mb-4">

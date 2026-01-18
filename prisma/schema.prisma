@@ -82,6 +82,7 @@ model Child {
   parent           Parent            @relation(fields: [parentId], references: [id], onDelete: Cascade)
   path             Path?             @relation(fields: [pathId], references: [id])
   missionProgress  MissionProgress[]
+  characters       Character[]
 
   @@map("children")
 }
@@ -182,4 +183,29 @@ model AnalyticsEvent {
   @@index([eventName])
   @@index([parentId])
   @@map("analytics_events")
+}
+
+// Character sprites for game development
+enum CharacterStatus {
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model Character {
+  id              String          @id @default(cuid())
+  childId         String          @map("child_id")
+  name            String?
+  originalImage   String?         @map("original_image") @db.Text // base64 encoded
+  spriteSheetUrl  String?         @map("sprite_sheet_url")
+  spriteSheetData String?         @map("sprite_sheet_data") @db.Text // base64 for persistence
+  style           String          @default("retro")
+  status          CharacterStatus @default(PROCESSING)
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  // Relations
+  child Child @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@map("characters")
 }

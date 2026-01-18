@@ -23,6 +23,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${nunito.variable} font-sans antialiased`}>
+        {/* Puter.js CDN - Required for AI features */}
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script src="https://js.puter.com/v2/puter.js" async />
         <Providers>
           {children}
         </Providers>
