@@ -90,14 +90,19 @@ export async function POST(
       })
 
       if (nextMission) {
-        await prisma.missionProgress.update({
+        await prisma.missionProgress.upsert({
           where: {
             childId_missionId: {
               childId: child.id,
               missionId: nextMission.id,
             },
           },
-          data: { status: 'AVAILABLE' },
+          update: { status: 'AVAILABLE' },
+          create: {
+            childId: child.id,
+            missionId: nextMission.id,
+            status: 'AVAILABLE',
+          },
         })
 
         // Send email about new mission

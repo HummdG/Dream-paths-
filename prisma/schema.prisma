@@ -132,13 +132,15 @@ enum MissionStatus {
 }
 
 model MissionProgress {
-  id          String        @id @default(cuid())
-  childId     String        @map("child_id")
-  missionId   String        @map("mission_id")
-  status      MissionStatus @default(LOCKED)
-  completedAt DateTime?     @map("completed_at")
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
+  id            String        @id @default(cuid())
+  childId       String        @map("child_id")
+  missionId     String        @map("mission_id")
+  status        MissionStatus @default(LOCKED)
+  currentStep   Int           @default(0) @map("current_step")
+  codeProgress  Json?         @map("code_progress") // Stores { stepIndex: codeString } for each step
+  completedAt   DateTime?     @map("completed_at")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
 
   // Relations
   child   Child   @relation(fields: [childId], references: [id], onDelete: Cascade)

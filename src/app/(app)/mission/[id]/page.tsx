@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { MissionClient } from "./mission-client";
+import type { LessonStepData } from "@/components/code-editor";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -51,8 +52,21 @@ export default async function MissionPage({ params }: Props) {
     redirect("/dashboard");
   }
 
-  const steps = mission.stepsJson as string[];
-  const resources = mission.resourcesJson as string[] | null;
+  // Parse the steps - they should now be LessonStepData objects
+  const steps = (mission.stepsJson as LessonStepData[]) || [];
+  const resources = (mission.resourcesJson as string[]) || null;
+  const codeProgress = (progress.codeProgress as Record<string, string>) || null;
+  
+  // Debug logging
+  console.log("Mission page data:", {
+    missionId: mission.id,
+    title: mission.title,
+    stepsLength: steps.length,
+    currentStep: progress.currentStep,
+    progressStatus: progress.status,
+    stepsType: typeof mission.stepsJson,
+    firstStep: steps[0]?.title,
+  });
 
   return (
     <MissionClient
@@ -66,7 +80,8 @@ export default async function MissionPage({ params }: Props) {
       resources={resources}
       isCompleted={progress.status === "COMPLETED"}
       childName={child.firstName}
+      currentStep={progress.currentStep ?? 0}
+      savedCodeProgress={codeProgress}
     />
   );
 }
-
