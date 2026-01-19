@@ -19,13 +19,16 @@ export default async function PlayPage({ params }: PlayPageProps) {
     redirect("/login");
   }
 
-  // Get parent and child
+  // Get parent and child with hero character
   const parent = await db.parent.findUnique({
     where: { email: session.user.email },
     include: {
       children: {
         take: 1,
         orderBy: { createdAt: "asc" },
+        include: {
+          heroCharacter: true,
+        },
       },
     },
   });
@@ -103,13 +106,18 @@ export default async function PlayPage({ params }: PlayPageProps) {
     }
   }
 
+  // Get hero pixels if available
+  const heroPixels = child.heroCharacter?.pixelData as string[][] | undefined;
+
   return (
     <PlayClient
       mission={mission}
+      childId={child.id}
       childName={child.firstName}
       projectId={project.id}
       completedStepIds={completedStepIds}
       initialStepIndex={currentStepIndex}
+      heroPixels={heroPixels}
     />
   );
 }

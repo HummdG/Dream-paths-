@@ -225,6 +225,38 @@ const platformerTemplate: GameTemplateConfig = {
 
 const missions: Mission[] = [
   // --------------------------------------------------------------------------
+  // MISSION 0: Design Your Hero
+  // --------------------------------------------------------------------------
+  {
+    missionId: 'm0_design_hero',
+    title: 'Mission 0: Design Your Hero',
+    missionType: 'creative',
+    purpose: 'Create a personal connection to the game by designing a custom character.',
+    storyIntro: "Welcome, future game developer! 🎨 Before we start coding, let's create YOUR hero! This pixel art character will be the star of all your games. Make them look however you want - they're uniquely yours!",
+    estimatedMinutes: 10,
+    learningOutcomes: ['creativity', 'pixel art basics', 'personalization'],
+    steps: [
+      {
+        stepId: 'm0_s1_design_hero',
+        concepts: ['pixel art', 'creativity'],
+        instruction: 'Design your hero using the pixel art editor! Choose colors and draw your character.',
+        detailedExplanation: "Pixel art is made of tiny squares called pixels. Click to color them in! You can start with a template and customize it, or create something totally new. This hero will appear in all your games!",
+        starterCode: '', // Not used for creative missions
+        hint: "Try starting with a template on the left for inspiration, then change the colors to make it your own!",
+        successCriteria: [
+          'Design a character with at least some colored pixels',
+          'Save your hero design'
+        ],
+        validation: {
+          type: 'runtime',
+          checks: [] // Creative missions have special validation
+        },
+        reward: { stars: 2, badge: 'Hero Designer' }
+      }
+    ]
+  },
+
+  // --------------------------------------------------------------------------
   // MISSION 1: Make Something Happen
   // --------------------------------------------------------------------------
   {

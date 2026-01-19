@@ -98,6 +98,9 @@ export interface Mission {
   
   // Learning outcomes for this mission
   learningOutcomes: string[];
+  
+  // Special mission type (default is 'coding')
+  missionType?: 'coding' | 'creative';
 }
 
 // =============================================================================

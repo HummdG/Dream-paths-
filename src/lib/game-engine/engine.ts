@@ -76,6 +76,9 @@ export class PlatformerEngine {
   private lastTime: number = 0;
   private theme: ThemeAssets = DEFAULT_THEME;
   
+  // Custom player sprite (pixel art)
+  private customPlayerPixels: string[][] | null = null;
+  
   // Canvas dimensions
   private width: number = 800;
   private height: number = 400;
@@ -432,6 +435,12 @@ export class PlatformerEngine {
   }
 
   private drawPlayer(ctx: CanvasRenderingContext2D, player: Player): void {
+    // If custom pixel art is available, draw it
+    if (this.customPlayerPixels && this.customPlayerPixels.length > 0) {
+      this.drawCustomPixelPlayer(ctx, player);
+      return;
+    }
+    
     const spriteColor = this.theme.playerSprites[player.sprite] || this.theme.playerSprites.default || '#00ff88';
     
     // Body
@@ -463,6 +472,38 @@ export class PlatformerEngine {
     ctx.fillStyle = spriteColor;
     ctx.fillRect(player.x + 8, player.y + player.height - 8, 6, 8 + legOffset);
     ctx.fillRect(player.x + player.width - 14, player.y + player.height - 8, 6, 8 - legOffset);
+  }
+
+  private drawCustomPixelPlayer(ctx: CanvasRenderingContext2D, player: Player): void {
+    if (!this.customPlayerPixels) return;
+    
+    const gridSize = this.customPlayerPixels.length; // Usually 16x16
+    const pixelSize = Math.floor(player.height / gridSize); // Scale to fit player height
+    const spriteWidth = gridSize * pixelSize;
+    const spriteHeight = gridSize * pixelSize;
+    
+    // Center the sprite on the player position
+    const startX = player.x + (player.width - spriteWidth) / 2;
+    const startY = player.y + (player.height - spriteHeight) / 2;
+    
+    // Add a subtle bounce animation when moving
+    const bounceOffset = player.vx !== 0 ? Math.sin(Date.now() / 100) * 2 : 0;
+    
+    // Draw each pixel
+    for (let y = 0; y < gridSize; y++) {
+      for (let x = 0; x < gridSize; x++) {
+        const color = this.customPlayerPixels[y]?.[x];
+        if (color && color !== 'transparent') {
+          ctx.fillStyle = color;
+          // Flip horizontally if facing left
+          const drawX = player.facingRight 
+            ? startX + x * pixelSize 
+            : startX + (gridSize - 1 - x) * pixelSize;
+          const drawY = startY + y * pixelSize + bounceOffset;
+          ctx.fillRect(drawX, drawY, pixelSize, pixelSize);
+        }
+      }
+    }
   }
 
   private drawUI(ctx: CanvasRenderingContext2D): void {
@@ -663,6 +704,11 @@ export class PlatformerEngine {
   public setPlayerSprite(spriteId: string): void {
     this.state.player.sprite = spriteId;
     this.emitEvent('sprite_set', { spriteId });
+  }
+
+  public setCustomPlayerSprite(pixels: string[][]): void {
+    this.customPlayerPixels = pixels;
+    this.emitEvent('custom_sprite_set', {});
   }
 
   public setPlayerPosition(x: number, y: number): void {
@@ -917,12 +963,18 @@ export class PlatformerEngine {
   }
 
   public restart(): void {
+    // Preserve custom player pixels
+    const savedPixels = this.customPlayerPixels;
+    
     // Reset state
     this.state = this.createInitialState();
     this.events = [];
     this.callbacks.onUpdate = [];
     this.callbacks.onKeyDown.clear();
     this.callbacks.onKeyUp.clear();
+    
+    // Restore custom player pixels
+    this.customPlayerPixels = savedPixels;
     
     // Re-apply theme
     this.setTheme(this.state.theme);

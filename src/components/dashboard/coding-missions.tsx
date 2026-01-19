@@ -38,7 +38,8 @@ export function CodingMissions({
     return 'locked';
   };
 
-  const missionIcons = ['🎮', '📍', '🏃', '⌨️', '🧱', '🦘', '💥', '🪙', '👾', '🏁'];
+  // Icons for each mission (index 0 = Mission 0: Design Hero)
+  const missionIcons = ['🎨', '🎮', '📍', '🏃', '⌨️', '🧱', '🦘', '💥', '🪙', '👾', '🏁'];
 
   return (
     <motion.div
@@ -128,7 +129,7 @@ export function CodingMissions({
 
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-gray-500 mb-0.5">
-                  Mission {index + 1}
+                  {mission.missionType === 'creative' ? '✨ Creative Mission' : `Mission ${index}`}
                 </p>
                 <h3
                   className={`font-semibold truncate ${
@@ -143,7 +144,7 @@ export function CodingMissions({
                   </span>
                   <span className="text-xs text-gray-300">•</span>
                   <span className="text-xs text-gray-500">
-                    {mission.steps.length} steps
+                    {mission.missionType === 'creative' ? '🎨 Design' : `${mission.steps.length} steps`}
                   </span>
                 </div>
               </div>
@@ -153,8 +154,17 @@ export function CodingMissions({
                   href={`/play/${mission.missionId}`}
                   className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold px-4 py-2 rounded-xl hover:from-violet-700 hover:to-indigo-700 transition-all shrink-0"
                 >
-                  <Gamepad2 className="w-4 h-4" />
-                  Play
+                  {mission.missionType === 'creative' ? (
+                    <>
+                      <span className="text-sm">🎨</span>
+                      Create
+                    </>
+                  ) : (
+                    <>
+                      <Gamepad2 className="w-4 h-4" />
+                      Play
+                    </>
+                  )}
                 </Link>
               )}
 

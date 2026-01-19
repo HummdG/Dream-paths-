@@ -83,8 +83,24 @@ model Child {
   path             Path?             @relation(fields: [pathId], references: [id])
   missionProgress  MissionProgress[]
   projects         Project[]
+  heroCharacter    HeroCharacter?
 
   @@map("children")
+}
+
+// Hero character pixel art model
+model HeroCharacter {
+  id          String   @id @default(cuid())
+  childId     String   @unique @map("child_id")
+  name        String   @default("My Hero")
+  pixelData   Json     @map("pixel_data")  // 16x16 array of colors
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  child       Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@map("hero_characters")
 }
 
 model Path {

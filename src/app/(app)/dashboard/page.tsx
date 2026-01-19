@@ -19,6 +19,7 @@ export default async function DashboardPage() {
       children: {
         include: {
           path: true,
+          heroCharacter: true,
           missionProgress: {
             include: {
               mission: true,
@@ -127,6 +128,14 @@ export default async function DashboardPage() {
         totalStars: codingProject?.totalStars || 0,
         badges: (codingProject?.badgesJson as string[]) || [],
       }}
+      heroCharacter={
+        child.heroCharacter
+          ? {
+              name: child.heroCharacter.name,
+              pixels: child.heroCharacter.pixelData as string[][],
+            }
+          : null
+      }
     />
   );
 }

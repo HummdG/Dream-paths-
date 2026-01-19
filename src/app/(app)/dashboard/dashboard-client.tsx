@@ -16,6 +16,8 @@ import {
   Star,
   Crown,
   Code2,
+  Sparkles,
+  Pencil,
 } from "lucide-react";
 import { CodingMissions } from "@/components/dashboard/coding-missions";
 
@@ -54,6 +56,10 @@ interface DashboardClientProps {
     totalStars: number;
     badges: string[];
   };
+  heroCharacter?: {
+    name: string;
+    pixels: string[][];
+  } | null;
 }
 
 const missionEmojis = ["🎨", "🏗️", "🏃", "⭐", "🔊", "🚧", "📋", "🚀"];
@@ -70,6 +76,7 @@ export function DashboardClient({
   lastCompleted,
   subscriptionPlan,
   codingMissions,
+  heroCharacter,
 }: DashboardClientProps) {
   const progressPercent = totalMissions > 0 ? (completedMissions / totalMissions) * 100 : 0;
   const isFree = subscriptionPlan === "free";
@@ -329,6 +336,74 @@ export function DashboardClient({
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Hero Character Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35 }}
+              className="card"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-bold text-[var(--color-navy)] flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-violet-500" />
+                  My Hero
+                </h3>
+                {heroCharacter && (
+                  <Link
+                    href="/play/m0_design_hero"
+                    className="text-violet-600 hover:text-violet-700 transition-colors"
+                    title="Edit Hero"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </Link>
+                )}
+              </div>
+
+              {heroCharacter ? (
+                <div className="flex flex-col items-center">
+                  <div className="bg-gradient-to-br from-violet-100 to-indigo-100 p-4 rounded-xl mb-3">
+                    <div
+                      className="grid"
+                      style={{
+                        gridTemplateColumns: `repeat(16, 5px)`,
+                        imageRendering: "pixelated",
+                      }}
+                    >
+                      {heroCharacter.pixels.map((row, y) =>
+                        row.map((color, x) => (
+                          <div
+                            key={`${x}-${y}`}
+                            style={{
+                              width: 5,
+                              height: 5,
+                              backgroundColor:
+                                color === "transparent" ? "transparent" : color,
+                            }}
+                          />
+                        ))
+                      )}
+                    </div>
+                  </div>
+                  <p className="font-medium text-[var(--color-navy)]">
+                    {heroCharacter.name}
+                  </p>
+                </div>
+              ) : (
+                <Link
+                  href="/play/m0_design_hero"
+                  className="block text-center py-6 bg-gradient-to-br from-violet-50 to-indigo-50 rounded-xl border-2 border-dashed border-violet-200 hover:border-violet-400 transition-all group"
+                >
+                  <div className="text-4xl mb-2">🎨</div>
+                  <p className="text-violet-700 font-medium group-hover:text-violet-900">
+                    Start Mission 0!
+                  </p>
+                  <p className="text-xs text-violet-500 mt-1">
+                    Design your pixel art hero
+                  </p>
+                </Link>
+              )}
+            </motion.div>
+
             {/* Upgrade Card (if free) */}
             {isFree && (
               <motion.div

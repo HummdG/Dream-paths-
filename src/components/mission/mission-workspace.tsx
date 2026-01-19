@@ -22,6 +22,7 @@ import { Mission, MissionStep } from "@/lib/missions/schema";
 import { PlatformerEngine, resetEngine } from "@/lib/game-engine";
 import { wrapUserCode } from "@/lib/game-engine/python-api";
 import { validateStep, ValidationResult, friendlyError } from "@/lib/validation";
+import { CharacterCreator } from "@/components/character-creator";
 
 // Simple syntax highlighting for Python
 function highlightPython(code: string): string {
@@ -106,16 +107,22 @@ interface MissionWorkspaceProps {
   mission: Mission;
   initialStepIndex?: number;
   childName: string;
+  childId: string;
   onStepComplete?: (stepId: string, stars: number, badge?: string) => void;
   onMissionComplete?: (missionId: string) => void;
+  heroPixels?: string[][];
+  onHeroSaved?: (pixels: string[][]) => void;
 }
 
 export function MissionWorkspace({
   mission,
   initialStepIndex = 0,
   childName,
+  childId,
   onStepComplete,
-  onMissionComplete
+  onMissionComplete,
+  heroPixels,
+  onHeroSaved
 }: MissionWorkspaceProps) {
   const [currentStepIndex, setCurrentStepIndex] = useState(initialStepIndex);
   const [code, setCode] = useState("");
@@ -144,9 +151,13 @@ export function MissionWorkspace({
       
       // Reset engine for new step
       const newEngine = resetEngine();
+      // Set hero pixels if available
+      if (heroPixels) {
+        newEngine.setCustomPlayerSprite(heroPixels);
+      }
       setEngine(newEngine);
     }
-  }, [currentStep]);
+  }, [currentStep, heroPixels]);
 
   const syncScroll = useCallback(() => {
     if (textareaRef.current && highlightRef.current) {
@@ -181,6 +192,10 @@ export function MissionWorkspace({
     try {
       // Reset and reinitialize engine
       const newEngine = resetEngine();
+      // Set hero pixels if available
+      if (heroPixels) {
+        newEngine.setCustomPlayerSprite(heroPixels);
+      }
       setEngine(newEngine);
       
       // Wait a bit for engine to initialize
@@ -279,6 +294,50 @@ __captured_output__
       setValidationResult(null);
     }
   };
+
+  // Handle hero save for creative missions
+  const handleHeroSave = async (data: { name: string; pixels: string[][] }) => {
+    try {
+      const response = await fetch("/api/characters/hero", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          childId,
+          name: data.name,
+          pixelData: data.pixels,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save hero");
+      }
+
+      // Notify parent component
+      onHeroSaved?.(data.pixels);
+
+      // Mark step as complete
+      if (currentStep && !completedSteps.has(currentStep.stepId)) {
+        const newCompleted = new Set(completedSteps);
+        newCompleted.add(currentStep.stepId);
+        setCompletedSteps(newCompleted);
+
+        onStepComplete?.(
+          currentStep.stepId,
+          currentStep.reward.stars,
+          currentStep.reward.badge
+        );
+
+        // Show celebration for mission complete
+        setShowCelebration(true);
+        onMissionComplete?.(mission.missionId);
+      }
+    } catch (error) {
+      console.error("Failed to save hero:", error);
+    }
+  };
+
+  // Check if this is a creative mission
+  const isCreativeMission = mission.missionType === 'creative';
 
   const goToPrevStep = () => {
     if (currentStepIndex > 0) {
@@ -415,6 +474,15 @@ __captured_output__
 
       {/* Main content */}
       <main className="max-w-[1800px] mx-auto p-4">
+        {/* Creative Mission - Character Creator */}
+        {isCreativeMission ? (
+          <CharacterCreator
+            initialPixels={heroPixels}
+            initialName="My Hero"
+            onSave={handleHeroSave}
+            childName={childName}
+          />
+        ) : (
         <div className="grid lg:grid-cols-[1fr_400px] gap-4 h-[calc(100vh-80px)]">
           {/* Left side: Code editor + Game preview */}
           <div className="flex flex-col gap-4 min-h-0">
@@ -577,6 +645,7 @@ __captured_output__
             />
           </div>
         </div>
+        )}
       </main>
     </div>
   );

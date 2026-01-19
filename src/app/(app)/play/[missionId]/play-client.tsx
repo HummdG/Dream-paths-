@@ -8,21 +8,29 @@ import { Mission } from "@/lib/missions/schema";
 
 interface PlayClientProps {
   mission: Mission;
+  childId: string;
   childName: string;
   projectId: string;
   completedStepIds: string[];
   initialStepIndex: number;
+  heroPixels?: string[][];
 }
 
 export function PlayClient({
   mission,
+  childId,
   childName,
   projectId,
   completedStepIds,
   initialStepIndex,
+  heroPixels: initialHeroPixels,
 }: PlayClientProps) {
   const [pyodideReady, setPyodideReady] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState("Loading Python...");
+  const [heroPixels, setHeroPixels] = useState<string[][] | undefined>(initialHeroPixels);
+
+  // For creative missions, we don't need Pyodide
+  const isCreativeMission = mission.missionType === 'creative';
 
   useEffect(() => {
     // Check if Pyodide is already loaded
@@ -77,6 +85,22 @@ export function PlayClient({
     }
   };
 
+  // For creative missions, render directly without waiting for Pyodide
+  if (isCreativeMission) {
+    return (
+      <MissionWorkspace
+        mission={mission}
+        childId={childId}
+        childName={childName}
+        initialStepIndex={initialStepIndex}
+        onStepComplete={handleStepComplete}
+        onMissionComplete={handleMissionComplete}
+        heroPixels={heroPixels}
+        onHeroSaved={(pixels) => setHeroPixels(pixels)}
+      />
+    );
+  }
+
   return (
     <>
       {/* Load Pyodide */}
@@ -112,10 +136,13 @@ export function PlayClient({
       ) : (
         <MissionWorkspace
           mission={mission}
+          childId={childId}
           childName={childName}
           initialStepIndex={initialStepIndex}
           onStepComplete={handleStepComplete}
           onMissionComplete={handleMissionComplete}
+          heroPixels={heroPixels}
+          onHeroSaved={(pixels) => setHeroPixels(pixels)}
         />
       )}
     </>
