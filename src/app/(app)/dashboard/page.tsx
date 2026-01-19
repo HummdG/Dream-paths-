@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import { db } from "@/lib/db";
 import { DashboardClient } from "./dashboard-client";
+import { platformerMissionPack } from "@/lib/missions";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -12,7 +13,7 @@ export default async function DashboardPage() {
   }
 
   // Get parent with child and mission progress
-  const parent = await prisma.parent.findUnique({
+  const parent = await db.parent.findUnique({
     where: { id: session.user.id },
     include: {
       children: {
@@ -26,6 +27,14 @@ export default async function DashboardPage() {
               mission: {
                 sequenceNumber: "asc",
               },
+            },
+          },
+          projects: {
+            where: {
+              packId: platformerMissionPack.packId,
+            },
+            include: {
+              stepProgress: true,
             },
           },
         },
@@ -52,6 +61,29 @@ export default async function DashboardPage() {
   const lastCompleted = missions
     .filter((m) => m.status === "COMPLETED" && m.completedAt)
     .sort((a, b) => new Date(b.completedAt!).getTime() - new Date(a.completedAt!).getTime())[0];
+
+  // Get coding project data
+  const codingProject = child.projects[0];
+  const completedCodingMissionIds: string[] = [];
+  
+  if (codingProject) {
+    // Group completed steps by mission
+    const completedSteps = codingProject.stepProgress.filter(
+      (sp) => sp.status === "COMPLETED"
+    );
+    
+    // Check which missions have all steps completed
+    for (const mission of platformerMissionPack.missions) {
+      const missionStepIds = mission.steps.map((s) => s.stepId);
+      const completedStepIds = completedSteps
+        .filter((sp) => sp.missionId === mission.missionId)
+        .map((sp) => sp.stepId);
+      
+      if (missionStepIds.every((id) => completedStepIds.includes(id))) {
+        completedCodingMissionIds.push(mission.missionId);
+      }
+    }
+  }
 
   return (
     <DashboardClient
@@ -90,6 +122,11 @@ export default async function DashboardPage() {
           : null
       }
       subscriptionPlan={parent.subscription?.planId || "free"}
+      codingMissions={{
+        completedMissionIds: completedCodingMissionIds,
+        totalStars: codingProject?.totalStars || 0,
+        badges: (codingProject?.badgesJson as string[]) || [],
+      }}
     />
   );
 }

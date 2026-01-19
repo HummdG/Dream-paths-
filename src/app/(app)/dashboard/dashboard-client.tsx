@@ -15,7 +15,9 @@ import {
   LogOut,
   Star,
   Crown,
+  Code2,
 } from "lucide-react";
+import { CodingMissions } from "@/components/dashboard/coding-missions";
 
 interface Mission {
   id: string;
@@ -47,6 +49,11 @@ interface DashboardClientProps {
     completedAt: string;
   } | null;
   subscriptionPlan: string;
+  codingMissions?: {
+    completedMissionIds: string[];
+    totalStars: number;
+    badges: string[];
+  };
 }
 
 const missionEmojis = ["🎨", "🏗️", "🏃", "⭐", "🔊", "🚧", "📋", "🚀"];
@@ -62,6 +69,7 @@ export function DashboardClient({
   nextMission,
   lastCompleted,
   subscriptionPlan,
+  codingMissions,
 }: DashboardClientProps) {
   const progressPercent = totalMissions > 0 ? (completedMissions / totalMissions) * 100 : 0;
   const isFree = subscriptionPlan === "free";
@@ -158,6 +166,21 @@ export function DashboardClient({
                 </div>
               )}
             </motion.div>
+
+            {/* Coding Missions Section */}
+            {codingMissions && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
+              >
+                <CodingMissions
+                  completedMissionIds={codingMissions.completedMissionIds}
+                  totalStars={codingMissions.totalStars}
+                  badges={codingMissions.badges}
+                />
+              </motion.div>
+            )}
 
             {/* Next Mission Card */}
             {nextMission && (

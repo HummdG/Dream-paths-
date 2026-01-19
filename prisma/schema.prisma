@@ -82,6 +82,7 @@ model Child {
   parent           Parent            @relation(fields: [parentId], references: [id], onDelete: Cascade)
   path             Path?             @relation(fields: [pathId], references: [id])
   missionProgress  MissionProgress[]
+  projects         Project[]
 
   @@map("children")
 }
@@ -182,4 +183,116 @@ model AnalyticsEvent {
   @@index([eventName])
   @@index([parentId])
   @@map("analytics_events")
+}
+
+// =============================================================================
+// CODE PROJECT & PROGRESS MODELS
+// =============================================================================
+
+// A child's game project (their code + customizations)
+model Project {
+  id        String   @id @default(cuid())
+  childId   String   @map("child_id")
+  packId    String   @map("pack_id")  // e.g. "platformer_v1"
+  name      String   @default("My Game")
+  
+  // Current progress tracking
+  currentMissionId String  @map("current_mission_id")
+  currentStepId    String  @map("current_step_id")
+  
+  // User's customization config (THEME, PLAYER, etc.)
+  gameConfigJson   Json    @map("game_config_json")
+  
+  // Aggregated stats
+  totalStars       Int     @default(0) @map("total_stars")
+  badgesJson       Json    @default("[]") @map("badges_json")
+  
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  child           Child             @relation(fields: [childId], references: [id], onDelete: Cascade)
+  stepProgress    StepProgress[]
+  codeSnapshots   CodeSnapshot[]
+  
+  @@unique([childId, packId])
+  @@index([childId])
+  @@map("projects")
+}
+
+// Progress for each step within a mission
+model StepProgress {
+  id          String   @id @default(cuid())
+  projectId   String   @map("project_id")
+  missionId   String   @map("mission_id")
+  stepId      String   @map("step_id")
+  
+  // Current code for this step
+  currentCode String   @db.Text @map("current_code")
+  
+  // Status
+  status      StepStatus @default(NOT_STARTED)
+  
+  // Stars earned for this step
+  starsEarned Int       @default(0) @map("stars_earned")
+  
+  // Number of times code was run
+  runCount    Int       @default(0) @map("run_count")
+  
+  // Number of times hint was viewed
+  hintViews   Int       @default(0) @map("hint_views")
+  
+  // First and last completion timestamps
+  startedAt   DateTime? @map("started_at")
+  completedAt DateTime? @map("completed_at")
+  
+  // Timestamps
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  
+  // Relations
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  @@unique([projectId, stepId])
+  @@index([projectId])
+  @@index([missionId])
+  @@map("step_progress")
+}
+
+enum StepStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+// Code snapshots for version history
+model CodeSnapshot {
+  id          String   @id @default(cuid())
+  projectId   String   @map("project_id")
+  stepId      String   @map("step_id")
+  
+  // The code at this point
+  code        String   @db.Text
+  
+  // What triggered this snapshot
+  triggerType SnapshotTrigger @map("trigger_type")
+  
+  // Timestamp
+  createdAt   DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  @@index([projectId, stepId])
+  @@index([createdAt])
+  @@map("code_snapshots")
+}
+
+enum SnapshotTrigger {
+  AUTO_SAVE      // Periodic auto-save
+  MANUAL_SAVE    // User clicked save
+  RUN_CODE       // Before running code
+  STEP_COMPLETE  // When step is completed
+  STEP_START     // When starting a step
 }

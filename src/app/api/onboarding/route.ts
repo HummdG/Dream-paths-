@@ -33,10 +33,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Selected path not found' }, { status: 400 })
     }
 
-    // Update parent name
-    const parent = await prisma.parent.update({
+    // Upsert parent (create if doesn't exist from migration, update if exists)
+    const parent = await prisma.parent.upsert({
       where: { id: session.user.id },
-      data: { name: parentName },
+      update: { name: parentName },
+      create: {
+        id: session.user.id,
+        email: session.user.email!,
+        name: parentName,
+      },
     })
 
     // Create child with selected path
@@ -64,9 +69,11 @@ export async function POST(request: Request) {
       })),
     })
 
-    // Create free subscription
-    await prisma.subscription.create({
-      data: {
+    // Upsert free subscription
+    await prisma.subscription.upsert({
+      where: { parentId: session.user.id },
+      update: {},
+      create: {
         parentId: session.user.id,
         planId: 'free',
         status: 'TRIALING',
