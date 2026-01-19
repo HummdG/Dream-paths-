@@ -17,21 +17,48 @@ export const PYTHON_GAME_API = `
 
 import js
 from js import window
+import builtins
 
 # Get the game engine from JavaScript
 def _get_engine():
     return window.gameEngine
+
+# Store the original print function
+_original_print = builtins.print
+
+# Override print to also show speech bubble
+def print(*args, **kwargs):
+    """Print to console AND show speech bubble on character"""
+    # Call original print
+    _original_print(*args, **kwargs)
+    
+    # Also show speech bubble if engine exists
+    text = ' '.join(str(arg) for arg in args)
+    if text and not text.startswith('['):  # Skip internal messages
+        engine = _get_engine()
+        if engine:
+            engine.showSpeechBubble(str(text), 3000)
+
+# Replace builtin print
+builtins.print = print
 
 # =============================================================================
 # DISPLAY FUNCTIONS
 # =============================================================================
 
 def show_message(text):
-    """Show a message on the game screen"""
+    """Show a message on the game screen (centered)"""
     engine = _get_engine()
     if engine:
         engine.showMessage(str(text))
-    print(f"[Game] {text}")
+    _original_print(f"[Game] {text}")
+
+def say(text):
+    """Make your character say something in a speech bubble"""
+    engine = _get_engine()
+    if engine:
+        engine.showSpeechBubble(str(text), 3000)
+    _original_print(f"💬 {text}")
 
 def show_score(score):
     """Update the score display"""

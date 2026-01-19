@@ -76,6 +76,7 @@ export interface GameState {
   // Visual state
   theme: string;
   messageQueue: GameMessage[];
+  speechBubble: SpeechBubble | null;
   
   // Physics settings
   gravity: number;
@@ -89,6 +90,12 @@ export interface GameMessage {
   text: string;
   duration: number;
   createdAt: number;
+}
+
+export interface SpeechBubble {
+  text: string;
+  createdAt: number;
+  duration: number;
 }
 
 // =============================================================================

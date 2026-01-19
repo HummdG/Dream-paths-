@@ -8,7 +8,6 @@
 import {
   GameState,
   GameEvent,
-  GameConfig,
   Player,
   Platform,
   Coin,
@@ -96,17 +95,20 @@ export class PlatformerEngine {
         id: 'player',
         type: 'player',
         x: 100,
-        y: 200,
+        y: 300,  // Start on ground
         width: 32,
         height: 48,
         vx: 0,
         vy: 0,
         sprite: 'robot',
-        isOnGround: false,
+        isOnGround: true,
         facingRight: true,
         active: true
       },
-      platforms: [],
+      // Default ground platform so player doesn't fall off
+      platforms: [
+        { id: 'ground', type: 'platform', x: 0, y: 360, width: 800, height: 40, active: true }
+      ],
       coins: [],
       enemies: [],
       goal: null,
@@ -118,6 +120,7 @@ export class PlatformerEngine {
       hasWon: false,
       theme: 'space',
       messageQueue: [],
+      speechBubble: null,
       gravity: 0.8,
       keysPressed: new Set()
     };
@@ -282,7 +285,7 @@ export class PlatformerEngine {
 
   private resetPlayerPosition(): void {
     this.state.player.x = 100;
-    this.state.player.y = 200;
+    this.state.player.y = 300;  // On ground level
     this.state.player.vx = 0;
     this.state.player.vy = 0;
     this.emitEvent('level_restart', {});
@@ -328,6 +331,9 @@ export class PlatformerEngine {
     
     // Draw player
     this.drawPlayer(ctx, this.state.player);
+    
+    // Draw speech bubble near player
+    this.drawSpeechBubble(ctx);
     
     // Draw UI
     this.drawUI(ctx);
@@ -500,6 +506,85 @@ export class PlatformerEngine {
     ctx.textAlign = 'center';
     ctx.fillText(text, this.width / 2, this.height / 2 + yOffset);
     ctx.textAlign = 'left';
+  }
+
+  private drawSpeechBubble(ctx: CanvasRenderingContext2D): void {
+    const bubble = this.state.speechBubble;
+    if (!bubble) return;
+    
+    const now = Date.now();
+    const age = now - bubble.createdAt;
+    if (age > bubble.duration) {
+      this.state.speechBubble = null;
+      return;
+    }
+    
+    // Fade out effect
+    const alpha = Math.max(0, 1 - (age / bubble.duration) * 0.5);
+    ctx.globalAlpha = alpha;
+    
+    const player = this.state.player;
+    const padding = 12;
+    const fontSize = 14;
+    const maxWidth = 200;
+    
+    ctx.font = `${fontSize}px system-ui, sans-serif`;
+    
+    // Word wrap the text
+    const words = bubble.text.split(' ');
+    const lines: string[] = [];
+    let currentLine = '';
+    
+    for (const word of words) {
+      const testLine = currentLine ? `${currentLine} ${word}` : word;
+      const metrics = ctx.measureText(testLine);
+      if (metrics.width > maxWidth && currentLine) {
+        lines.push(currentLine);
+        currentLine = word;
+      } else {
+        currentLine = testLine;
+      }
+    }
+    if (currentLine) lines.push(currentLine);
+    
+    // Calculate bubble size
+    const lineHeight = fontSize + 4;
+    const bubbleWidth = Math.min(maxWidth, Math.max(...lines.map(l => ctx.measureText(l).width))) + padding * 2;
+    const bubbleHeight = lines.length * lineHeight + padding * 2;
+    
+    // Position bubble above player
+    const bubbleX = Math.max(10, Math.min(this.width - bubbleWidth - 10, player.x + player.width / 2 - bubbleWidth / 2));
+    const bubbleY = player.y - bubbleHeight - 20;
+    
+    // Draw bubble background
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.roundRect(bubbleX, bubbleY, bubbleWidth, bubbleHeight, 8);
+    ctx.fill();
+    
+    // Draw bubble tail
+    ctx.beginPath();
+    ctx.moveTo(player.x + player.width / 2 - 8, bubbleY + bubbleHeight);
+    ctx.lineTo(player.x + player.width / 2, bubbleY + bubbleHeight + 10);
+    ctx.lineTo(player.x + player.width / 2 + 8, bubbleY + bubbleHeight);
+    ctx.closePath();
+    ctx.fill();
+    
+    // Draw border
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(bubbleX, bubbleY, bubbleWidth, bubbleHeight, 8);
+    ctx.stroke();
+    
+    // Draw text
+    ctx.fillStyle = '#333';
+    ctx.textAlign = 'left';
+    lines.forEach((line, i) => {
+      ctx.fillText(line, bubbleX + padding, bubbleY + padding + fontSize + i * lineHeight);
+    });
+    
+    ctx.globalAlpha = 1;
   }
 
   // ==========================================================================
@@ -803,6 +888,14 @@ export class PlatformerEngine {
     this.emitEvent('message_shown', { text });
   }
 
+  public showSpeechBubble(text: string, duration: number = 3000): void {
+    this.state.speechBubble = {
+      text,
+      duration,
+      createdAt: Date.now()
+    };
+  }
+
   public playSound(_name: string): void {
     // TODO: Implement sound system
     console.log(`[Sound] ${_name}`);
@@ -837,8 +930,11 @@ export class PlatformerEngine {
     this.emitEvent('level_restart', {});
   }
 
-  public resetPlayerPosition(): void {
-    this.resetPlayerPosition();
+  public doResetPlayerPosition(): void {
+    this.state.player.x = 100;
+    this.state.player.y = 300;
+    this.state.player.vx = 0;
+    this.state.player.vy = 0;
   }
 
   public unlockNextLevel(): void {
