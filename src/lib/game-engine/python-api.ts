@@ -347,10 +347,297 @@ def is_key_pressed(key):
     return False
 
 # =============================================================================
+# 🌟 SIMPLIFIED KID-FRIENDLY HELPERS
+# =============================================================================
+
+class Hero:
+    """Easy-to-use hero controller"""
+    
+    def __init__(self):
+        self._speed = 5
+        self._jump_power = 15
+    
+    @property
+    def x(self):
+        """Get hero's X position"""
+        return get_player_x()
+    
+    @property
+    def y(self):
+        """Get hero's Y position"""
+        return get_player_y()
+    
+    @property
+    def speed(self):
+        return self._speed
+    
+    @speed.setter
+    def speed(self, value):
+        self._speed = value
+    
+    def move_right(self, speed=None):
+        """Move the hero to the right"""
+        move(speed or self._speed)
+    
+    def move_left(self, speed=None):
+        """Move the hero to the left"""
+        move(-(speed or self._speed))
+    
+    def jump(self, power=None):
+        """Make the hero jump (only works on ground)"""
+        if is_on_ground():
+            set_player_vy(-(power or self._jump_power))
+            play_sound('jump')
+            return True
+        return False
+    
+    def stop(self):
+        """Stop the hero's movement"""
+        pass  # Will be implemented with velocity control
+    
+    def say(self, text):
+        """Make the hero say something"""
+        say(str(text))
+    
+    def is_touching(self, what):
+        """Check if hero is touching something: 'coin', 'enemy', 'goal'"""
+        return collides_with(what.upper())
+
+# Create a global hero instance
+hero = Hero()
+
+# =============================================================================
+# 🎮 SIMPLE EVENT HANDLERS
+# =============================================================================
+
+def when_key_pressed(key, action):
+    """Do something when a key is pressed
+    
+    Example:
+        when_key_pressed('right', hero.move_right)
+        when_key_pressed('space', hero.jump)
+    """
+    key = str(key).upper()
+    # Map friendly names
+    key_map = {
+        'RIGHT': 'RIGHT',
+        'LEFT': 'LEFT',
+        'UP': 'UP',
+        'DOWN': 'DOWN',
+        'SPACE': 'SPACE',
+        'JUMP': 'SPACE',
+    }
+    key = key_map.get(key, key)
+    on_key_down(key, action)
+
+def when_touching(what, action):
+    """Do something when touching an object
+    
+    Example:
+        when_touching('coin', collect_coin)
+        when_touching('enemy', lose_life)
+    """
+    what = str(what).upper()
+    def check_and_run():
+        if collides_with(what):
+            action()
+    on_update(check_and_run)
+
+def collect_coin():
+    """Helper: Collect a coin and add to score"""
+    if collides_with('COIN'):
+        remove_colliding('COIN')
+        global score
+        try:
+            score += 1
+        except:
+            score = 1
+        show_score(score)
+        play_sound('coin')
+        print(f'Got a coin! Score: {score}')
+
+def lose_life():
+    """Helper: Lose a life when touching enemy"""
+    global lives
+    try:
+        lives -= 1
+    except:
+        lives = 2
+    show_lives(lives)
+    play_sound('hurt')
+    reset_player_position()
+    if lives <= 0:
+        show_message('💀 GAME OVER!')
+        play_sound('game_over')
+        restart_level()
+
+# =============================================================================
+# 🎯 GOAL HELPERS
+# =============================================================================
+
+def set_goal_type(goal_type):
+    """Set how to win: 'reach_flag', 'collect_all_coins', 'defeat_enemies'
+    
+    Example:
+        set_goal_type('reach_flag')
+        set_goal_type('collect_all_coins')
+    """
+    global _win_goal
+    _win_goal = goal_type
+    print(f"[Goal] Win by: {goal_type}")
+
+def check_win():
+    """Check if the player has won based on goal type"""
+    global _win_goal
+    try:
+        goal = _win_goal
+    except:
+        goal = 'reach_flag'
+    
+    if goal == 'reach_flag' or goal == 'reach_goal':
+        if collides_with('GOAL'):
+            return True
+    elif goal == 'collect_all_coins':
+        # Check if all coins collected
+        pass
+    
+    return False
+
+# =============================================================================
+# 🎨 USER CONTENT LOADING
+# =============================================================================
+
+# Store for user's custom content (loaded from database)
+_user_levels = {}
+_user_sprites = {}
+_user_enemies = {}
+
+def load_my_level(level_name):
+    """Load one of your custom levels by name
+    
+    Example:
+        load_my_level("My Space Level")
+    """
+    engine = _get_engine()
+    if engine and level_name in _user_levels:
+        level = _user_levels[level_name]
+        # Clear existing objects
+        engine.restart()
+        # Load platforms
+        for p in level.get('platforms', []):
+            add_platform(p['x'], p['y'], p['width'], p['height'])
+        # Load coins
+        for c in level.get('coins', []):
+            add_coin(c['x'], c['y'])
+        # Load enemies
+        for e in level.get('enemies', []):
+            add_enemy(e.get('type', 'slime'), e['x'], e['y'])
+        # Load goal
+        goal = level.get('goal')
+        if goal:
+            add_goal(goal['x'], goal['y'])
+        # Set theme
+        if level.get('theme'):
+            set_theme(level['theme'])
+        print(f"[Level] Loaded '{level_name}'!")
+        return True
+    print(f"[Level] '{level_name}' not found. Create it in the Level Designer!")
+    return False
+
+def load_my_enemy(enemy_name):
+    """Load one of your custom enemies by name
+    
+    Example:
+        load_my_enemy("Scary Monster")
+    """
+    if enemy_name in _user_enemies:
+        enemy_data = _user_enemies[enemy_name]
+        print(f"[Enemy] Loaded '{enemy_name}'!")
+        return enemy_data
+    print(f"[Enemy] '{enemy_name}' not found. Create it in the Sprite Designer!")
+    return None
+
+def add_my_enemy(enemy_name, x, y):
+    """Add one of your custom enemies at a position
+    
+    Example:
+        add_my_enemy("Scary Monster", 400, 260)
+    """
+    if enemy_name in _user_enemies:
+        enemy_data = _user_enemies[enemy_name]
+        # Add enemy with custom behavior
+        engine = _get_engine()
+        if engine:
+            engine.addEnemy('custom', float(x), float(y))
+            # The engine will use the custom sprite
+        print(f"[Enemy] Added '{enemy_name}' at ({x}, {y})")
+        return True
+    print(f"[Enemy] '{enemy_name}' not found!")
+    return False
+
+def list_my_levels():
+    """Show all your custom levels"""
+    if _user_levels:
+        print("📂 Your Levels:")
+        for name in _user_levels:
+            print(f"  - {name}")
+    else:
+        print("No custom levels yet! Create one in the Level Designer.")
+
+def list_my_enemies():
+    """Show all your custom enemies"""
+    if _user_enemies:
+        print("👾 Your Enemies:")
+        for name in _user_enemies:
+            print(f"  - {name}")
+    else:
+        print("No custom enemies yet! Create one in the Sprite Designer.")
+
+# Internal function to register user content (called from JavaScript)
+def _register_user_level(name, data):
+    _user_levels[name] = data
+
+def _register_user_enemy(name, data):
+    _user_enemies[name] = data
+
+# =============================================================================
+# 🚀 QUICK START HELPERS
+# =============================================================================
+
+def setup_controls():
+    """Set up basic arrow key controls for the hero
+    
+    Just call this to get started:
+        setup_controls()
+    """
+    when_key_pressed('right', hero.move_right)
+    when_key_pressed('left', hero.move_left)
+    when_key_pressed('space', hero.jump)
+    print("⌨️ Controls ready! Arrow keys to move, SPACE to jump!")
+
+def setup_simple_game():
+    """Set up a simple game with controls, coins, and enemies
+    
+    Example:
+        setup_simple_game()
+    """
+    setup_controls()
+    when_touching('coin', collect_coin)
+    when_touching('enemy', lose_life)
+    when_touching('goal', you_win)
+    print("🎮 Simple game setup complete!")
+
+# =============================================================================
 # INITIALIZATION
 # =============================================================================
 
+# Initialize global variables
+score = 0
+lives = 3
+_win_goal = 'reach_flag'
+
 print("🎮 Game API loaded! Let's make a game!")
+print("💡 Tip: Call setup_simple_game() for quick start!")
 `;
 
 /**

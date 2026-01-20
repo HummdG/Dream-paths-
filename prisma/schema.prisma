@@ -84,6 +84,9 @@ model Child {
   missionProgress  MissionProgress[]
   projects         Project[]
   heroCharacter    HeroCharacter?
+  userSprites      UserSprite[]
+  userLevels       UserLevel[]
+  gameProjects     GameProject[]
 
   @@map("children")
 }
@@ -311,4 +314,75 @@ enum SnapshotTrigger {
   RUN_CODE       // Before running code
   STEP_COMPLETE  // When step is completed
   STEP_START     // When starting a step
+}
+
+// =============================================================================
+// USER-CREATED CONTENT MODELS (Level Designer & Sprite Designer)
+// =============================================================================
+
+// User-created sprites (obstacles, enemies, items)
+model UserSprite {
+  id          String   @id @default(cuid())
+  childId     String   @map("child_id")
+  type        SpriteType
+  name        String
+  pixelData   Json     @map("pixel_data")  // 16x16 or 32x32 array of colors
+  behavior    Json?    // For enemies: { type, speed, range, pattern }
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  child       Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@index([childId])
+  @@index([type])
+  @@map("user_sprites")
+}
+
+enum SpriteType {
+  OBSTACLE
+  ENEMY
+  ITEM
+  DECORATION
+}
+
+// User-created levels
+model UserLevel {
+  id          String   @id @default(cuid())
+  childId     String   @map("child_id")
+  name        String
+  theme       String   // 'space', 'jungle', 'city', etc.
+  gridData    Json     @map("grid_data")   // 2D array of tile data
+  objects     Json     // Array of placed objects with positions
+  settings    Json     // { winCondition, difficulty, timeLimit, etc. }
+  thumbnail   String?  // Base64 mini preview
+  isPublished Boolean  @default(false) @map("is_published")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  child       Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@index([childId])
+  @@index([theme])
+  @@map("user_levels")
+}
+
+// Game project that combines hero, levels, and sprites
+model GameProject {
+  id          String   @id @default(cuid())
+  childId     String   @map("child_id")
+  name        String   @default("My Game")
+  heroId      String?  @map("hero_id")  // Reference to HeroCharacter
+  levelIds    Json     @default("[]") @map("level_ids")   // Array of UserLevel IDs
+  spriteIds   Json     @default("[]") @map("sprite_ids")  // Array of UserSprite IDs
+  settings    Json?    // Game-wide settings
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  child       Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@index([childId])
+  @@map("game_projects")
 }

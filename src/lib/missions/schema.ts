@@ -44,7 +44,18 @@ export type ValidationCheck =
   | { type: 'platforms_modified_from_preset' }
   | { type: 'jump_style_enabled' }
   | { type: 'win_rule_switchable' }
-  | { type: 'enemy_behavior_matches_type' };
+  | { type: 'enemy_behavior_matches_type' }
+  
+  // Level design checks
+  | { type: 'level_has_spawn' }
+  | { type: 'level_has_goal' }
+  | { type: 'level_has_platforms'; count: number }
+  | { type: 'level_saved' }
+  
+  // Sprite design checks  
+  | { type: 'sprite_has_pixels' }
+  | { type: 'sprite_saved' }
+  | { type: 'enemy_has_behavior' };
 
 export interface ValidationConfig {
   type: 'ast' | 'runtime' | 'ast_and_runtime';
@@ -100,7 +111,7 @@ export interface Mission {
   learningOutcomes: string[];
   
   // Special mission type (default is 'coding')
-  missionType?: 'coding' | 'creative';
+  missionType?: 'coding' | 'creative' | 'level_design' | 'sprite_design';
 }
 
 // =============================================================================

@@ -298,80 +298,139 @@ show_message('Welcome to my game!')`,
   },
 
   // --------------------------------------------------------------------------
-  // MISSION 2: Player Position
+  // MISSION 2: Build Your First Scene
   // --------------------------------------------------------------------------
   {
-    missionId: 'm2_player_state',
-    title: 'Mission 2: Player Position',
-    purpose: 'Introduce variables and changing state.',
-    storyIntro: "Great job! 🌟 Now let's bring a player into the game. Every game character has a position - that's where they are on the screen. We use variables to remember this!",
-    estimatedMinutes: 15,
-    learningOutcomes: ['variables', 'numbers', 'x/y coordinates'],
+    missionId: 'm2_build_scene',
+    title: 'Mission 2: Build Your First Scene',
+    missionType: 'level_design',
+    purpose: 'Learn game design by creating levels, obstacles, and enemies visually.',
+    storyIntro: "Welcome to the Level Designer! 🎨🏗️ Now that you have a hero, let's build the WORLD they'll explore! You'll design platforms to jump on, create obstacles to avoid, and even make your own enemies!",
+    estimatedMinutes: 30,
+    learningOutcomes: ['level design', 'game objects', 'spatial thinking', 'creativity'],
     steps: [
       {
-        stepId: 'm2_s1_create_position',
-        concepts: ['variables', 'numbers'],
-        instruction: 'Create x and y variables to place your player on the screen.',
-        detailedExplanation: "Variables are like boxes that hold information. We'll use `x` for left-right position and `y` for up-down position. Try changing the numbers and see what happens!",
-        starterCode: `# Position variables - change these numbers!
-x = 100
-y = 200
-
-# This puts your player at position (x, y)
-set_player_position(x, y)
-
-# Try changing x to 300 and run again!
-`,
-        hint: "x controls left-right (bigger = more right). y controls up-down (bigger = lower). Try x = 400!",
+        stepId: 'm2_s1_explore_level_designer',
+        concepts: ['level design', 'UI tools'],
+        instruction: "Let's explore the Level Designer! Pick a theme and place some platforms.",
+        detailedExplanation: "The Level Designer is like a sandbox - you can place platforms, coins, and more by clicking and dragging. Start by choosing a theme that matches the adventure you want to create!",
+        starterCode: '', // Not used for level_design missions
+        hint: "Try picking a template on the left for inspiration, then change it to make it yours!",
         successCriteria: [
-          'Player appears at your chosen position',
-          'Changing x or y moves the player'
-        ],
-        validation: {
-          type: 'ast_and_runtime',
-          checks: [
-            { type: 'ast_has_assignment', variable: 'x' },
-            { type: 'ast_has_assignment', variable: 'y' },
-            { type: 'player_position_set' }
-          ]
-        },
-        reward: { stars: 1, badge: 'Variables Wizard' }
-      },
-      {
-        stepId: 'm2_s2_choose_sprite_and_theme',
-        concepts: ['strings', 'variables'],
-        instruction: "Pick a theme and player sprite so your game looks different from everyone else's!",
-        detailedExplanation: "We use string variables to choose things. A string is text inside quotes. Try the different options!",
-        starterCode: `# 🎨 CUSTOMIZE YOUR GAME!
-# Try different themes: 'space', 'jungle', or 'city'
-THEME = 'space'
-
-# Try different characters: 'robot', 'cat', 'knight', or 'astronaut'
-PLAYER_SPRITE = 'robot'
-
-# Apply your choices
-set_theme(THEME)
-set_player_sprite(PLAYER_SPRITE)
-
-# Now your game looks unique! 🌟
-`,
-        hint: "Try THEME = 'jungle' and PLAYER_SPRITE = 'cat' for a jungle adventure!",
-        successCriteria: [
-          'Theme changes the background and tiles',
-          'Player sprite changes visually'
+          'Choose a theme for your level',
+          'Place at least 3 platforms',
+          'Your level has a spawn point and goal'
         ],
         validation: {
           type: 'runtime',
           checks: [
             { type: 'theme_applied' },
-            { type: 'player_sprite_applied' }
+            { type: 'level_has_spawn' },
+            { type: 'level_has_goal' },
+            { type: 'level_has_platforms', count: 3 }
           ]
         },
-        reward: { stars: 1, badge: 'My Style' },
+        reward: { stars: 2, badge: 'Scene Starter' }
+      },
+      {
+        stepId: 'm2_s2_design_obstacle',
+        concepts: ['pixel art', 'obstacles', 'creativity'],
+        instruction: "Design your first obstacle! Create something dangerous for your hero to avoid.",
+        detailedExplanation: "In the Sprite Designer, you can create obstacles using pixel art. Think about what makes something look dangerous - spikes, fire, or something totally new you invent!",
+        starterCode: '',
+        hint: "Start with a template like spikes, then change the colors to make it unique!",
+        successCriteria: [
+          'Create an obstacle sprite',
+          'Give it a name',
+          'Save your obstacle'
+        ],
+        validation: {
+          type: 'runtime',
+          checks: [
+            { type: 'sprite_has_pixels' },
+            { type: 'sprite_saved' }
+          ]
+        },
+        reward: { stars: 2, badge: 'Obstacle Creator' }
+      },
+      {
+        stepId: 'm2_s3_design_enemy',
+        concepts: ['pixel art', 'enemy design', 'behaviors'],
+        instruction: "Now create an ENEMY! Design how it looks AND how it moves.",
+        detailedExplanation: "Enemies are like obstacles that MOVE! You'll design what your enemy looks like with pixel art, then choose its behavior - does it patrol back and forth? Chase the player? Fly around?",
+        starterCode: '',
+        hint: "Try the 'patrol' behavior first - it's fun to watch enemies walk back and forth!",
+        successCriteria: [
+          'Create an enemy sprite',
+          'Choose a movement behavior',
+          'Save your enemy'
+        ],
+        validation: {
+          type: 'runtime',
+          checks: [
+            { type: 'sprite_has_pixels' },
+            { type: 'enemy_has_behavior' },
+            { type: 'sprite_saved' }
+          ]
+        },
+        reward: { stars: 3, badge: 'Enemy Designer' }
+      },
+      {
+        stepId: 'm2_s4_complete_level',
+        concepts: ['level design', 'game balance', 'playtesting'],
+        instruction: "Finish your level! Add coins, enemies, and make sure it's possible to win!",
+        detailedExplanation: "A great level has a good balance - not too easy, not too hard! Add coins for the player to collect, place your custom enemies, and make sure there's a clear path from start to finish.",
+        starterCode: '',
+        hint: "Test your level by clicking 'Play Test'! Can YOU beat it?",
+        successCriteria: [
+          'Add at least 3 coins to collect',
+          'Place at least 1 enemy',
+          'Test that the level is completable',
+          'Save your level'
+        ],
+        validation: {
+          type: 'runtime',
+          checks: [
+            { type: 'level_has_platforms', count: 3 },
+            { type: 'level_saved' }
+          ]
+        },
+        reward: { stars: 3, badge: 'Level Architect' }
+      },
+      {
+        stepId: 'm2_s5_code_your_level',
+        concepts: ['python basics', 'loading content', 'simple code'],
+        instruction: "Now let's write some Python code to bring your level to life!",
+        detailedExplanation: "You've designed everything visually - now we'll write simple Python code to load your level and make it playable. Don't worry, we'll start with just a few lines!",
+        starterCode: `# 🎮 Let's load YOUR level!
+# This will load all the platforms, coins, and enemies you designed
+
+# Load your custom level
+load_my_level("My Level")
+
+# Set up the basic controls
+setup_simple_game()
+
+# That's it! Press Run to play YOUR game!
+print("🎮 Your game is ready!")
+`,
+        hint: "Change 'My Level' to the name you gave your level in the designer!",
+        successCriteria: [
+          'Load your custom level',
+          'Set up controls',
+          'Play and enjoy your game!'
+        ],
+        validation: {
+          type: 'runtime',
+          checks: [
+            { type: 'ui_message_shown' }
+          ]
+        },
+        reward: { stars: 3, badge: 'Scene Builder' },
         customization: {
-          type: 'cosmetic',
-          description: 'Choose your theme and player character',
-          options: ['space', 'jungle', 'city', 'robot', 'cat', 'knight', 'astronaut']
+          type: 'level_design',
+          description: 'Load and play your custom level',
+          options: []
         }
       }
     ]

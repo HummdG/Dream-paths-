@@ -23,6 +23,8 @@ import { PlatformerEngine, resetEngine } from "@/lib/game-engine";
 import { wrapUserCode } from "@/lib/game-engine/python-api";
 import { validateStep, ValidationResult, friendlyError } from "@/lib/validation";
 import { CharacterCreator } from "@/components/character-creator";
+import { LevelDesigner, LevelData } from "@/components/level-designer";
+import { SpriteDesigner } from "@/components/sprite-designer";
 
 // Simple syntax highlighting for Python
 function highlightPython(code: string): string {
@@ -316,28 +318,101 @@ __captured_output__
       onHeroSaved?.(data.pixels);
 
       // Mark step as complete
-      if (currentStep && !completedSteps.has(currentStep.stepId)) {
-        const newCompleted = new Set(completedSteps);
-        newCompleted.add(currentStep.stepId);
-        setCompletedSteps(newCompleted);
-
-        onStepComplete?.(
-          currentStep.stepId,
-          currentStep.reward.stars,
-          currentStep.reward.badge
-        );
-
-        // Show celebration for mission complete
-        setShowCelebration(true);
-        onMissionComplete?.(mission.missionId);
-      }
+      markCurrentStepComplete();
     } catch (error) {
       console.error("Failed to save hero:", error);
     }
   };
 
-  // Check if this is a creative mission
+  // Handle level save for level design missions
+  const handleLevelSave = async (levelData: LevelData) => {
+    try {
+      const response = await fetch("/api/levels", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          childId,
+          name: levelData.name,
+          theme: levelData.theme,
+          gridData: {},
+          objects: levelData.objects,
+          settings: levelData.settings,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save level");
+      }
+
+      // Mark step as complete
+      markCurrentStepComplete();
+    } catch (error) {
+      console.error("Failed to save level:", error);
+    }
+  };
+
+  // Handle level test
+  const handleLevelTest = (levelData: LevelData) => {
+    // Could launch a test preview mode
+    console.log("Testing level:", levelData);
+  };
+
+  // Handle sprite save for sprite design missions
+  const handleSpriteSave = async (data: { 
+    name: string; 
+    category: string; 
+    pixels: string[][]; 
+    behavior?: { type: string; speed: number; range: number; } 
+  }) => {
+    try {
+      const response = await fetch("/api/sprites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          childId,
+          name: data.name,
+          type: data.category.toUpperCase(),
+          pixelData: data.pixels,
+          behavior: data.behavior,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save sprite");
+      }
+
+      // Mark step as complete
+      markCurrentStepComplete();
+    } catch (error) {
+      console.error("Failed to save sprite:", error);
+    }
+  };
+
+  // Helper to mark current step complete
+  const markCurrentStepComplete = () => {
+    if (currentStep && !completedSteps.has(currentStep.stepId)) {
+      const newCompleted = new Set(completedSteps);
+      newCompleted.add(currentStep.stepId);
+      setCompletedSteps(newCompleted);
+
+      onStepComplete?.(
+        currentStep.stepId,
+        currentStep.reward.stars,
+        currentStep.reward.badge
+      );
+
+      // Check if this was the last step
+      if (currentStepIndex === mission.steps.length - 1) {
+        setShowCelebration(true);
+        onMissionComplete?.(mission.missionId);
+      }
+    }
+  };
+
+  // Check mission type
   const isCreativeMission = mission.missionType === 'creative';
+  const isLevelDesignMission = mission.missionType === 'level_design';
+  const isSpriteDesignMission = mission.missionType === 'sprite_design';
 
   const goToPrevStep = () => {
     if (currentStepIndex > 0) {
@@ -480,6 +555,20 @@ __captured_output__
             initialPixels={heroPixels}
             initialName="My Hero"
             onSave={handleHeroSave}
+            childName={childName}
+          />
+        ) : isLevelDesignMission ? (
+          /* Level Design Mission - Level Designer */
+          <LevelDesigner
+            heroPixels={heroPixels}
+            onSave={handleLevelSave}
+            onTest={handleLevelTest}
+            childName={childName}
+          />
+        ) : isSpriteDesignMission ? (
+          /* Sprite Design Mission - Sprite Designer */
+          <SpriteDesigner
+            onSave={handleSpriteSave}
             childName={childName}
           />
         ) : (
