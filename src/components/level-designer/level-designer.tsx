@@ -462,7 +462,7 @@ export function LevelDesigner({
           </div>
 
           {/* Center - Canvas */}
-          <div className="space-y-4">
+          <div className="space-y-4 min-w-0">
             {/* Toolbar */}
             <div className="flex items-center justify-between bg-slate-800 rounded-xl p-2">
               <div className="flex items-center gap-1">

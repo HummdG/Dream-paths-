@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { Rocket, Gamepad2, Star, CheckCircle, ArrowRight, Sparkles } from "lucide-react";
 
 const features = [
@@ -38,10 +39,16 @@ export default function Home() {
     <div className="min-h-screen bg-[var(--color-cream)]">
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-2xl">🚀</span>
-            <span className="font-bold text-xl text-[var(--color-navy)]">DreamPath Kids</span>
+        <div className="max-w-6xl mx-auto px-6 py-2 flex justify-between items-center">
+          <Link href="/" className="flex items-center">
+            <Image 
+              src="/logo.svg" 
+              alt="DreamPaths" 
+              width={550} 
+              height={180} 
+              priority
+              className="h-12 sm:h-16 md:h-20 lg:h-24 w-auto"
+            />
           </Link>
           <div className="flex items-center gap-4">
             <Link 
@@ -335,12 +342,18 @@ export default function Home() {
       {/* Footer */}
       <footer className="py-12 px-6 border-t border-gray-200">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">🚀</span>
-            <span className="font-bold text-[var(--color-navy)]">DreamPath Kids</span>
+          <div className="flex items-center">
+            <Image 
+              src="/logo.svg" 
+              alt="DreamPaths" 
+              width={320} 
+              height={105} 
+              priority
+              className="h-16 sm:h-20 md:h-24 w-auto"
+            />
           </div>
           <p className="text-gray-500 text-sm">
-            © 2026 DreamPath Kids. Made with ❤️ for young creators.
+            © 2026 DreamPaths. Made with ❤️ for young creators.
           </p>
           <div className="flex gap-6 text-sm text-gray-500">
             <Link href="#" className="hover:text-[var(--color-violet)]">Privacy</Link>

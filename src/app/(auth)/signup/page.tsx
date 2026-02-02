@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 
@@ -79,9 +80,15 @@ export default function SignUpPage() {
         className="card max-w-md w-full"
       >
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <span className="text-3xl">🚀</span>
-            <span className="font-bold text-xl text-[var(--color-navy)]">DreamPath Kids</span>
+          <Link href="/" className="inline-flex items-center mb-6">
+            <Image 
+              src="/logo.svg" 
+              alt="DreamPaths" 
+              width={450} 
+              height={150} 
+              priority
+              className="h-20 sm:h-24 md:h-32 w-auto"
+            />
           </Link>
           <h1 className="text-2xl font-bold text-[var(--color-navy)] mb-2">
             Create your account

@@ -487,19 +487,16 @@ export function LevelCanvas({
         </div>
       )}
 
-      {/* Canvas - fixed size container with scrollbars for larger levels */}
+      {/* Canvas - fills available space with scrollbars for larger levels */}
       <div 
-        className="overflow-auto rounded-xl border-2 border-slate-700 bg-slate-900"
+        className="overflow-auto rounded-xl border-2 border-slate-700 bg-slate-900 w-full min-w-0"
         style={{ 
           height: "500px",
-          width: "800px",
         }}
       >
         <div style={{ 
           width: canvasWidth * zoom, 
           height: canvasHeight * zoom,
-          minWidth: "100%",
-          minHeight: "100%",
         }}>
           <canvas
             ref={canvasRef}
