@@ -235,3 +235,4 @@ export function getTemplatesByCategory(category: SpriteTemplate["category"]): Sp
   return SPRITE_TEMPLATES.filter(t => t.category === category);
 }
 
+
