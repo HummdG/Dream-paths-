@@ -23,8 +23,11 @@ import builtins
 def _get_engine():
     return window.gameEngine
 
-# Store the original print function
-_original_print = builtins.print
+# Store the original print function ONLY ONCE (prevent recursion on reload)
+if not hasattr(builtins, '_dreampaths_original_print'):
+    builtins._dreampaths_original_print = builtins.print
+
+_original_print = builtins._dreampaths_original_print
 
 # Override print to also show speech bubble
 def print(*args, **kwargs):

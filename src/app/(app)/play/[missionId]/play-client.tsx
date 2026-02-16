@@ -6,6 +6,25 @@ import { Loader2 } from "lucide-react";
 import { MissionWorkspace } from "@/components/mission";
 import { Mission } from "@/lib/missions/schema";
 
+interface LevelData {
+  name: string;
+  theme: "space" | "jungle" | "city";
+  objects: Array<{
+    id: string;
+    type: "platform" | "coin" | "enemy" | "spawn" | "goal" | "decoration";
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    subtype?: string;
+  }>;
+  settings: {
+    winCondition: "reach_goal" | "collect_all_coins" | "defeat_all_enemies";
+    requiredCoins?: number;
+    timeLimit?: number;
+  };
+}
+
 interface PlayClientProps {
   mission: Mission;
   childId: string;
@@ -14,6 +33,7 @@ interface PlayClientProps {
   completedStepIds: string[];
   initialStepIndex: number;
   heroPixels?: string[][];
+  levelData?: LevelData;
 }
 
 export function PlayClient({
@@ -24,10 +44,12 @@ export function PlayClient({
   completedStepIds,
   initialStepIndex,
   heroPixels: initialHeroPixels,
+  levelData: initialLevelData,
 }: PlayClientProps) {
   const [pyodideReady, setPyodideReady] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState("Loading Python...");
   const [heroPixels, setHeroPixels] = useState<string[][] | undefined>(initialHeroPixels);
+  const [levelData, setLevelData] = useState<LevelData | undefined>(initialLevelData);
 
   // For creative missions, we don't need Pyodide
   const isCreativeMission = mission.missionType === 'creative';
@@ -97,6 +119,8 @@ export function PlayClient({
         onMissionComplete={handleMissionComplete}
         heroPixels={heroPixels}
         onHeroSaved={(pixels) => setHeroPixels(pixels)}
+        levelData={levelData}
+        onLevelSaved={(data) => setLevelData(data)}
       />
     );
   }
@@ -143,6 +167,8 @@ export function PlayClient({
           onMissionComplete={handleMissionComplete}
           heroPixels={heroPixels}
           onHeroSaved={(pixels) => setHeroPixels(pixels)}
+          levelData={levelData}
+          onLevelSaved={(data) => setLevelData(data)}
         />
       )}
     </>

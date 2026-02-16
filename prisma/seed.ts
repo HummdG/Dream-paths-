@@ -47,26 +47,22 @@ async function main() {
     {
       sequenceNumber: 2,
       title: 'Build Your First Playable Scene',
-      storyIntro: "Amazing hero you created! 🌟 Now your hero needs a world to explore. Today, you'll build your first game scene - a place where your hero can walk around. We'll use a tool called Scratch that makes coding feel like building with LEGO blocks!",
-      goal: 'Create a simple scene in Scratch where your hero can move left and right using the arrow keys.',
+      storyIntro: "Amazing hero you created! 🌟 Now your hero needs a world to explore. Today, you'll build your first game level using the Level Designer - just click and drag to create platforms, add coins, and place enemies!",
+      goal: 'Create a playable level with platforms, coins, and a goal flag.',
       steps: [
-        'Go to scratch.mit.edu and click "Create" (ask a parent to help you make a free account if needed)',
-        'Delete the cat sprite by right-clicking it and choosing "delete"',
-        'Click the "Choose a Sprite" button and pick a character (or upload your hero drawing!)',
-        'Click "Choose a Backdrop" and select a cool background for your scene',
-        'Click on your sprite, then go to the "Code" tab',
-        'Find the "Events" category (yellow) and drag "when green flag clicked" to your code area',
-        'Find "forever" in Control (orange) and attach it below the flag block',
-        'From Sensing (light blue), put "if key right arrow pressed then" inside the forever loop',
-        'From Motion (blue), add "change x by 10" inside the if block',
-        'Do the same for left arrow, but use "change x by -10"',
-        'Click the green flag and test your game! Your character should move!'
+        'Open the Level Designer from your dashboard',
+        'Pick a theme for your level (Jungle, Space, or City)',
+        'Add some platforms by clicking the Platform tool and drawing on the canvas',
+        'Place at least 3 coins for your hero to collect',
+        'Add the Goal flag at the end of your level',
+        'Click "Test" to play your level and make sure it\'s beatable!',
+        'Save your level with a cool name'
       ],
-      estimatedDuration: 45,
+      estimatedDuration: 30,
       resources: [
-        'Scratch website: https://scratch.mit.edu',
-        'Tip: Save your project by clicking File > Save Now',
-        'Stuck? Ask a parent to help or watch a Scratch beginner video on YouTube'
+        'Tip: Make sure there\'s a path from the start to the goal!',
+        'Tip: Start simple - you can always add more later',
+        'Challenge: Try adding a moving platform!'
       ],
       unlockCondition: 'completion_of_mission_1',
     },

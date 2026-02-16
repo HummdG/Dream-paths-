@@ -1,109 +1,25 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowLeft, 
-  Play, 
-  RotateCcw, 
-  Lightbulb, 
-  Check, 
-  AlertCircle,
-  Loader2,
   Star,
   Trophy,
   PartyPopper
 } from "lucide-react";
 import Link from "next/link";
 import { Confetti } from "@/components/confetti";
-import { GameCanvas } from "@/components/game-preview/game-canvas";
+import { GamePreview } from "@/components/coding-journey/game-preview";
 import { StepPanel } from "@/components/mission/step-panel";
-import { Mission, MissionStep } from "@/lib/missions/schema";
-import { PlatformerEngine, resetEngine } from "@/lib/game-engine";
+import { Mission } from "@/lib/missions/schema";
+import { PlatformerEngine } from "@/lib/game-engine";
 import { wrapUserCode } from "@/lib/game-engine/python-api";
 import { validateStep, ValidationResult, friendlyError } from "@/lib/validation";
 import { CharacterCreator } from "@/components/character-creator";
 import { LevelDesigner, LevelData } from "@/components/level-designer";
 import { SpriteDesigner } from "@/components/sprite-designer";
-
-// Simple syntax highlighting for Python
-function highlightPython(code: string): string {
-  const keywords = [
-    "def", "class", "if", "else", "elif", "for", "while", "return",
-    "import", "from", "as", "try", "except", "finally", "with",
-    "True", "False", "None", "and", "or", "not", "in", "is",
-    "break", "continue", "pass", "lambda", "global", "nonlocal",
-  ];
-  
-  const builtins = [
-    "print", "range", "len", "str", "int", "float", "list", "dict",
-    "set", "tuple", "input", "abs", "max", "min", "sum", "round",
-  ];
-
-  // Game API functions
-  const gameAPI = [
-    "show_message", "show_score", "show_lives", "set_theme", "set_player_sprite",
-    "set_player_position", "get_player_x", "get_player_y", "set_player_x",
-    "move", "move_player_y", "set_player_vy", "is_on_ground", "will_collide_below",
-    "snap_to_platform", "collides_with", "remove_colliding", "add_platform",
-    "load_platform_preset", "add_coin", "add_enemy", "set_enemy_x", "set_enemy_position",
-    "add_goal", "play_sound", "you_win", "stop_game", "restart_level",
-    "reset_player_position", "freeze_enemies", "unlock_next_level",
-    "on_update", "on_key_down", "on_key_up", "is_key_pressed"
-  ];
-
-  let result = code
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-  
-  // Highlight strings
-  result = result.replace(
-    /(["'])((?:\\.|(?!\1)[^\\])*)\1/g,
-    '<span class="text-green-400">$&</span>'
-  );
-  
-  // Highlight comments
-  result = result.replace(
-    /(#.*$)/gm,
-    '<span class="text-gray-500 italic">$1</span>'
-  );
-  
-  // Highlight numbers
-  result = result.replace(
-    /\b(\d+\.?\d*)\b/g,
-    '<span class="text-amber-400">$1</span>'
-  );
-  
-  // Highlight keywords
-  keywords.forEach(kw => {
-    const regex = new RegExp(`\\b(${kw})\\b`, "g");
-    result = result.replace(
-      regex,
-      '<span class="text-violet-400 font-semibold">$1</span>'
-    );
-  });
-  
-  // Highlight builtins
-  builtins.forEach(fn => {
-    const regex = new RegExp(`\\b(${fn})\\b`, "g");
-    result = result.replace(
-      regex,
-      '<span class="text-sky-400">$1</span>'
-    );
-  });
-
-  // Highlight game API
-  gameAPI.forEach(fn => {
-    const regex = new RegExp(`\\b(${fn})\\b`, "g");
-    result = result.replace(
-      regex,
-      '<span class="text-pink-400 font-semibold">$1</span>'
-    );
-  });
-
-  return result;
-}
+import { SimpleEditor } from "@/components/code-editor/simple-editor";
 
 interface MissionWorkspaceProps {
   mission: Mission;
@@ -114,6 +30,8 @@ interface MissionWorkspaceProps {
   onMissionComplete?: (missionId: string) => void;
   heroPixels?: string[][];
   onHeroSaved?: (pixels: string[][]) => void;
+  levelData?: LevelData;
+  onLevelSaved?: (levelData: LevelData) => void;
 }
 
 export function MissionWorkspace({
@@ -124,99 +42,73 @@ export function MissionWorkspace({
   onStepComplete,
   onMissionComplete,
   heroPixels,
-  onHeroSaved
+  onHeroSaved,
+  levelData: initialLevelData,
+  onLevelSaved
 }: MissionWorkspaceProps) {
   const [currentStepIndex, setCurrentStepIndex] = useState(initialStepIndex);
-  const [code, setCode] = useState("");
-  const [output, setOutput] = useState("");
-  const [error, setError] = useState("");
-  const [isRunning, setIsRunning] = useState(false);
-  const [showHint, setShowHint] = useState(false);
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
   const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
   const [showCelebration, setShowCelebration] = useState(false);
   const [engine, setEngine] = useState<PlatformerEngine | null>(null);
-  
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const highlightRef = useRef<HTMLDivElement>(null);
+  const [currentCode, setCurrentCode] = useState("");
+  const [levelData, setLevelData] = useState<LevelData | undefined>(initialLevelData);
+  const [hasRunCode, setHasRunCode] = useState(false);
+
+  // Default level data if none provided
+  const defaultLevelData: LevelData = {
+    name: "My Level",
+    theme: "jungle",
+    objects: [
+      { id: "spawn", type: "spawn", x: 2, y: 18, width: 1, height: 1 },
+      { id: "platform1", type: "platform", x: 0, y: 19, width: 40, height: 1 },
+      { id: "goal", type: "goal", x: 35, y: 17, width: 2, height: 2 },
+    ],
+    settings: { winCondition: "reach_goal" }
+  };
+
+  const activeLevelData = levelData || defaultLevelData;
 
   const currentStep = mission.steps[currentStepIndex];
 
-  // Initialize code when step changes
+  // Reset state when step changes
   useEffect(() => {
     if (currentStep) {
-      setCode(currentStep.starterCode);
-      setOutput("");
-      setError("");
       setValidationResult(null);
-      setShowHint(false);
-      
-      // Reset engine for new step
-      const newEngine = resetEngine();
-      // Set hero pixels if available
-      if (heroPixels) {
-        newEngine.setCustomPlayerSprite(heroPixels);
-      }
-      setEngine(newEngine);
+      setCurrentCode(currentStep.starterCode);
+      setHasRunCode(false);
     }
-  }, [currentStep, heroPixels]);
+  }, [currentStep]);
 
-  const syncScroll = useCallback(() => {
-    if (textareaRef.current && highlightRef.current) {
-      highlightRef.current.scrollTop = textareaRef.current.scrollTop;
-      highlightRef.current.scrollLeft = textareaRef.current.scrollLeft;
-    }
-  }, []);
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Tab") {
-      e.preventDefault();
-      const start = e.currentTarget.selectionStart;
-      const end = e.currentTarget.selectionEnd;
-      const newCode = code.substring(0, start) + "    " + code.substring(end);
-      setCode(newCode);
-      
-      setTimeout(() => {
-        if (textareaRef.current) {
-          textareaRef.current.selectionStart = start + 4;
-          textareaRef.current.selectionEnd = start + 4;
-        }
-      }, 0);
-    }
-  };
-
-  const runCode = async () => {
-    setIsRunning(true);
-    setOutput("");
-    setError("");
-    setValidationResult(null);
-
+  // Run code handler for SimpleEditor
+  const handleRunCode = async (code: string): Promise<{ output: string; error?: string; success?: boolean }> => {
+    setCurrentCode(code);
+    setHasRunCode(true);
+    
     try {
-      // Reset and reinitialize engine
-      const newEngine = resetEngine();
-      // Set hero pixels if available
-      if (heroPixels) {
-        newEngine.setCustomPlayerSprite(heroPixels);
+      // Start the game engine first so code can control it
+      // Use window.gameEngine directly to ensure we start the actual engine instance
+      // that Python will access, not just the React state reference
+      const windowEngine = (window as unknown as { gameEngine?: { start: () => void } }).gameEngine;
+      if (windowEngine) {
+        windowEngine.start();
+      } else if (engine) {
+        engine.start();
       }
-      setEngine(newEngine);
       
-      // Wait a bit for engine to initialize
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Longer delay to ensure engine is fully running and ready for Python commands
+      await new Promise(resolve => setTimeout(resolve, 200));
 
       // @ts-expect-error - Pyodide is loaded globally
       if (typeof window.pyodide === "undefined") {
-        setError("Python is still loading... Please wait a moment and try again!");
-        setIsRunning(false);
-        return;
+        return { output: "", error: "Python is still loading... Please wait a moment and try again!" };
       }
 
       // @ts-expect-error - Pyodide is loaded globally
       const pyodide = window.pyodide;
       
-      // Wrap user code with game API
       const wrappedCode = wrapUserCode(code);
       
-      // Capture print output
       const runnerCode = `
 import sys
 from io import StringIO
@@ -237,63 +129,43 @@ __captured_output__
       const result = await pyodide.runPythonAsync(runnerCode);
       const printOutput = result || "";
       
-      setOutput(printOutput.trim());
+      // Get events from the game engine for validation
+      await new Promise(resolve => setTimeout(resolve, 500));
+      const events = engine?.getEvents() || [];
       
-      // Start the game engine
-      if (newEngine) {
-        newEngine.start();
+      if (currentStep) {
+        const validation = validateStep(
+          code,
+          printOutput,
+          events,
+          currentStep.validation
+        );
+        setValidationResult(validation);
         
-        // Wait a bit for events to accumulate
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Get events for validation
-        const events = newEngine.getEvents();
-        
-        // Validate the step
-        if (currentStep) {
-          const validation = validateStep(
-            code,
-            printOutput,
-            events,
-            currentStep.validation
-          );
-          setValidationResult(validation);
+        if (validation.passed && !completedSteps.has(currentStep.stepId)) {
+          const newCompleted = new Set(completedSteps);
+          newCompleted.add(currentStep.stepId);
+          setCompletedSteps(newCompleted);
           
-          // If passed, mark step as complete
-          if (validation.passed && !completedSteps.has(currentStep.stepId)) {
-            const newCompleted = new Set(completedSteps);
-            newCompleted.add(currentStep.stepId);
-            setCompletedSteps(newCompleted);
-            
-            // Notify parent
-            onStepComplete?.(
-              currentStep.stepId,
-              currentStep.reward.stars,
-              currentStep.reward.badge
-            );
-            
-            // Check if this was the last step
-            if (currentStepIndex === mission.steps.length - 1) {
-              setShowCelebration(true);
-              onMissionComplete?.(mission.missionId);
-            }
+          onStepComplete?.(
+            currentStep.stepId,
+            currentStep.reward.stars,
+            currentStep.reward.badge
+          );
+          
+          if (currentStepIndex === mission.steps.length - 1) {
+            setShowCelebration(true);
+            onMissionComplete?.(mission.missionId);
           }
+          
+          return { output: printOutput.trim(), success: true };
         }
       }
+      
+      return { output: printOutput.trim() };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Something went wrong!";
-      setError(friendlyError(errorMessage));
-    } finally {
-      setIsRunning(false);
-    }
-  };
-
-  const resetCode = () => {
-    if (currentStep) {
-      setCode(currentStep.starterCode);
-      setOutput("");
-      setError("");
-      setValidationResult(null);
+      return { output: "", error: friendlyError(errorMessage) };
     }
   };
 
@@ -325,24 +197,30 @@ __captured_output__
   };
 
   // Handle level save for level design missions
-  const handleLevelSave = async (levelData: LevelData) => {
+  const handleLevelSave = async (savedLevelData: LevelData) => {
     try {
       const response = await fetch("/api/levels", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           childId,
-          name: levelData.name,
-          theme: levelData.theme,
+          name: savedLevelData.name,
+          theme: savedLevelData.theme,
           gridData: {},
-          objects: levelData.objects,
-          settings: levelData.settings,
+          objects: savedLevelData.objects,
+          settings: savedLevelData.settings,
         }),
       });
 
       if (!response.ok) {
         throw new Error("Failed to save level");
       }
+
+      // Update local state so subsequent missions can use this level
+      setLevelData(savedLevelData);
+      
+      // Notify parent component
+      onLevelSaved?.(savedLevelData);
 
       // Mark step as complete
       markCurrentStepComplete();
@@ -426,9 +304,6 @@ __captured_output__
       setCurrentStepIndex(currentStepIndex + 1);
     }
   };
-
-  const lineCount = code.split("\n").length;
-  const lineNumbers = Array.from({ length: lineCount }, (_, i) => i + 1);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-slate-900">
@@ -575,144 +450,24 @@ __captured_output__
         <div className="grid lg:grid-cols-[1fr_400px] gap-4 h-[calc(100vh-80px)]">
           {/* Left side: Code editor + Game preview */}
           <div className="flex flex-col gap-4 min-h-0">
-            {/* Code Editor */}
-            <div className="flex-1 min-h-0 rounded-2xl overflow-hidden border-2 border-white/10 bg-slate-950 shadow-xl flex flex-col">
-              {/* Editor Header */}
-              <div className="bg-slate-800 px-4 py-3 flex items-center justify-between shrink-0">
-                <div className="flex items-center gap-2">
-                  <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-red-400" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                    <div className="w-3 h-3 rounded-full bg-green-400" />
-                  </div>
-                  <span className="text-white/70 text-sm font-medium ml-2">🐍 Python Code</span>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  {currentStep?.hint && (
-                    <button
-                      onClick={() => setShowHint(!showHint)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                        showHint 
-                          ? "bg-amber-500 text-white" 
-                          : "bg-amber-500/20 text-amber-300 hover:bg-amber-500/30"
-                      }`}
-                    >
-                      <Lightbulb className="w-4 h-4" />
-                      Hint
-                    </button>
-                  )}
-                  
-                  <button
-                    onClick={resetCode}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-white/10 text-white/70 hover:bg-white/20 transition-all"
-                  >
-                    <RotateCcw className="w-4 h-4" />
-                    Reset
-                  </button>
-                  
-                  <button
-                    onClick={runCode}
-                    disabled={isRunning}
-                    className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
-                      isRunning
-                        ? "bg-gray-500 text-white cursor-wait"
-                        : "bg-emerald-500 text-white hover:bg-emerald-600 hover:scale-105"
-                    }`}
-                  >
-                    {isRunning ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Running...
-                      </>
-                    ) : (
-                      <>
-                        <Play className="w-4 h-4" />
-                        Run Code
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Hint Box */}
-              {showHint && currentStep?.hint && (
-                <div className="bg-amber-950/50 border-b border-amber-500/30 px-4 py-3 shrink-0">
-                  <div className="flex items-start gap-2">
-                    <Lightbulb className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
-                    <p className="text-amber-200 text-sm">{currentStep.hint}</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Code Input Area */}
-              <div className="relative flex-1 flex bg-slate-950 overflow-hidden">
-                {/* Line Numbers */}
-                <div className="flex flex-col bg-slate-900 text-slate-500 text-sm font-mono py-3 px-3 select-none shrink-0">
-                  {lineNumbers.map(num => (
-                    <div key={num} className="leading-6 text-right pr-2">
-                      {num}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Code area */}
-                <div className="relative flex-1 overflow-hidden">
-                  {/* Syntax highlighted code (background) */}
-                  <div
-                    ref={highlightRef}
-                    className="absolute inset-0 p-3 font-mono text-sm leading-6 whitespace-pre overflow-auto pointer-events-none"
-                    dangerouslySetInnerHTML={{ __html: highlightPython(code) }}
-                  />
-                  
-                  {/* Actual textarea (transparent, on top) */}
-                  <textarea
-                    ref={textareaRef}
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    onScroll={syncScroll}
-                    className="absolute inset-0 w-full h-full p-3 font-mono text-sm leading-6 bg-transparent text-transparent caret-white resize-none outline-none"
-                    spellCheck={false}
-                    autoCapitalize="off"
-                    autoCorrect="off"
-                  />
-                </div>
-              </div>
-
-              {/* Output Area */}
-              <div className="border-t border-slate-700 shrink-0">
-                <div className="bg-slate-800 px-4 py-2 flex items-center gap-2">
-                  <span className="text-white/60 text-sm font-medium">📤 Output</span>
-                  {validationResult?.passed && (
-                    <span className="flex items-center gap-1 text-emerald-400 text-sm font-medium">
-                      <Check className="w-4 h-4" />
-                      Step Complete!
-                    </span>
-                  )}
-                </div>
-                
-                <div className="bg-slate-950 p-4 max-h-32 overflow-y-auto font-mono text-sm">
-                  {error ? (
-                    <div className="flex items-start gap-2 text-red-400">
-                      <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-                      <pre className="whitespace-pre-wrap">{error}</pre>
-                    </div>
-                  ) : output ? (
-                    <pre className={`whitespace-pre-wrap ${validationResult?.passed ? "text-emerald-400" : "text-white"}`}>
-                      {output}
-                    </pre>
-                  ) : (
-                    <span className="text-slate-500">Click "Run Code" to see what happens! ✨</span>
-                  )}
-                </div>
-              </div>
+            {/* Simple Code Editor */}
+            <div className="flex-1 min-h-0">
+              <SimpleEditor
+                initialCode={currentStep?.starterCode || ""}
+                hint={currentStep?.hint}
+                onRun={handleRunCode}
+                onCodeChange={setCurrentCode}
+                height="380px"
+                showGameHint
+              />
             </div>
 
             {/* Game Preview */}
             <div className="h-[440px] shrink-0">
-              <GameCanvas 
-                engine={engine}
+              <GamePreview 
+                levelData={activeLevelData}
+                heroPixels={heroPixels}
+                isPlaying={hasRunCode}
                 onEngineReady={(e) => setEngine(e)}
               />
             </div>

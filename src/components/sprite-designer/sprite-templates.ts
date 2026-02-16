@@ -236,3 +236,5 @@ export function getTemplatesByCategory(category: SpriteTemplate["category"]): Sp
 }
 
 
+
+

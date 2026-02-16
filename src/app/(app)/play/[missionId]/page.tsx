@@ -109,6 +109,32 @@ export default async function PlayPage({ params }: PlayPageProps) {
   // Get hero pixels if available
   const heroPixels = child.heroCharacter?.pixelData as string[][] | undefined;
 
+  // Get the user's most recent level for game preview
+  const userLevel = await db.userLevel.findFirst({
+    where: { childId: child.id },
+    orderBy: { updatedAt: "desc" },
+  });
+
+  // Parse level data if available
+  const levelData = userLevel ? {
+    name: userLevel.name,
+    theme: userLevel.theme as "space" | "jungle" | "city",
+    objects: userLevel.objects as Array<{
+      id: string;
+      type: "platform" | "coin" | "enemy" | "spawn" | "goal" | "decoration";
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      subtype?: string;
+    }>,
+    settings: userLevel.settings as {
+      winCondition: "reach_goal" | "collect_all_coins" | "defeat_all_enemies";
+      requiredCoins?: number;
+      timeLimit?: number;
+    },
+  } : undefined;
+
   return (
     <PlayClient
       mission={mission}
@@ -118,6 +144,7 @@ export default async function PlayPage({ params }: PlayPageProps) {
       completedStepIds={completedStepIds}
       initialStepIndex={currentStepIndex}
       heroPixels={heroPixels}
+      levelData={levelData}
     />
   );
 }

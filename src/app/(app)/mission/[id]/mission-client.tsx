@@ -326,8 +326,30 @@ export function MissionClient({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="sticky bottom-6"
+            className="sticky bottom-6 space-y-3"
           >
+            {/* Quick complete button for testing */}
+            {!allChecked && (
+              <button
+                onClick={handleComplete}
+                disabled={isCompleting}
+                className="w-full py-3 px-8 rounded-2xl font-bold text-base flex items-center justify-center gap-3 transition-all bg-violet-500 text-white hover:bg-violet-600 shadow-md"
+              >
+                {isCompleting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Completing...
+                  </>
+                ) : (
+                  <>
+                    <Trophy className="w-5 h-5" />
+                    Complete Mission (Skip Steps)
+                  </>
+                )}
+              </button>
+            )}
+            
+            {/* Normal complete button */}
             <button
               onClick={handleComplete}
               disabled={!allChecked || isCompleting}
