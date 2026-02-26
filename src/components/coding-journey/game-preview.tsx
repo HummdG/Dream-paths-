@@ -63,6 +63,9 @@ export function GamePreview({
     // Reset and load fresh
     engine.restart();
 
+    // Remove the default ground from createInitialState() before loading user platforms.
+    engine.clearPlatforms();
+
     // Set theme
     engine.setTheme(levelData.theme);
 
@@ -102,10 +105,18 @@ export function GamePreview({
         );
       });
 
-    // Set player spawn
+    // Set player spawn — position the player so their FEET are at the bottom of
+    // the spawn grid cell (spawn.y + spawn.height), not their head at spawn.y.
+    // Player height in the engine is 48px; this keeps them standing on the floor.
+    // Also store as the spawn point so respawns (on death) return here, not
+    // the hardcoded default (100, 300) which has no platform in custom levels.
+    const PLAYER_HEIGHT = 48;
     const spawn = levelData.objects.find(obj => obj.type === 'spawn');
     if (spawn) {
-      engine.setPlayerPosition(spawn.x * gridSize, spawn.y * gridSize);
+      const spawnPx = spawn.x * gridSize;
+      const spawnPy = (spawn.y + spawn.height) * gridSize - PLAYER_HEIGHT;
+      engine.setSpawnPoint(spawnPx, spawnPy);
+      engine.setPlayerPosition(spawnPx, spawnPy);
     }
 
     // Add goal
@@ -128,6 +139,10 @@ export function GamePreview({
     if (isPlaying && !isRunning) {
       engine.start();
       setIsRunning(true);
+    } else if (!isPlaying && isRunning) {
+      // e.g. user navigated to a new step — stop and reset the overlay
+      engine.stop();
+      setIsRunning(false);
     }
   }, [isPlaying, isRunning, isEngineReady]);
 

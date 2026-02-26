@@ -78,7 +78,11 @@ export class PlatformerEngine {
   
   // Custom player sprite (pixel art)
   private customPlayerPixels: string[][] | null = null;
-  
+
+  // Spawn point — updated by setSpawnPoint() so respawns use the level spawn, not the hardcoded default.
+  private spawnX: number = 100;
+  private spawnY: number = 300;
+
   // Canvas dimensions
   private width: number = 800;
   private height: number = 400;
@@ -157,6 +161,7 @@ export class PlatformerEngine {
   // ==========================================================================
 
   public start(): void {
+    if (this.state.isRunning) return; // Prevent double animation loops
     this.state.isRunning = true;
     this.lastTime = performance.now();
     this.gameLoop();
@@ -287,10 +292,11 @@ export class PlatformerEngine {
   }
 
   private resetPlayerPosition(): void {
-    this.state.player.x = 100;
-    this.state.player.y = 300;  // On ground level
+    this.state.player.x = this.spawnX;
+    this.state.player.y = this.spawnY;
     this.state.player.vx = 0;
     this.state.player.vy = 0;
+    this.state.player.isOnGround = false;
     this.emitEvent('level_restart', {});
   }
 
@@ -711,6 +717,11 @@ export class PlatformerEngine {
     this.emitEvent('custom_sprite_set', {});
   }
 
+  public setSpawnPoint(x: number, y: number): void {
+    this.spawnX = x;
+    this.spawnY = y;
+  }
+
   public setPlayerPosition(x: number, y: number): void {
     this.state.player.x = x;
     this.state.player.y = y;
@@ -966,7 +977,11 @@ export class PlatformerEngine {
   public restart(): void {
     // Preserve custom player pixels
     const savedPixels = this.customPlayerPixels;
-    
+
+    // Reset spawn point to defaults (loadLevelIntoEngine will re-set them)
+    this.spawnX = 100;
+    this.spawnY = 300;
+
     // Reset state
     this.state = this.createInitialState();
     this.events = [];
@@ -1000,6 +1015,10 @@ export class PlatformerEngine {
     this.callbacks.onUpdate = [];
     this.callbacks.onKeyDown.clear();
     this.callbacks.onKeyUp.clear();
+  }
+
+  public clearPlatforms(): void {
+    this.state.platforms = [];
   }
 
   public onUpdate(callback: UpdateCallback): void {

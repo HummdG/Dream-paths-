@@ -23,6 +23,7 @@ interface StepPanelProps {
   missionTitle: string;
   validationResult?: ValidationResult;
   isCompleted: boolean;
+  onCompleteStep?: () => void;
   onPrevStep?: () => void;
   onNextStep?: () => void;
   hasPrevStep: boolean;
@@ -36,6 +37,7 @@ export function StepPanel({
   missionTitle,
   validationResult,
   isCompleted,
+  onCompleteStep,
   onPrevStep,
   onNextStep,
   hasPrevStep,
@@ -120,13 +122,34 @@ export function StepPanel({
         <div className="bg-gray-50 rounded-xl p-4">
           <h4 className="font-medium text-gray-700 mb-3">✅ What you need to do:</h4>
           <ul className="space-y-2">
-            {step.successCriteria.map((criterion, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm">
-                <Circle className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
-                <span className="text-gray-600">{criterion}</span>
-              </li>
-            ))}
+            {step.successCriteria.map((criterion, i) => {
+              const allPassed = isCompleted || validationResult?.passed === true;
+              return (
+                <li key={i} className="flex items-start gap-2 text-sm">
+                  {allPassed ? (
+                    <CheckCircle className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+                  ) : (
+                    <Circle className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                  )}
+                  <span className={allPassed ? "text-emerald-700 font-medium" : "text-gray-600"}>
+                    {criterion}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
+
+          {/* Step complete banner — appears automatically when all checks pass */}
+          {isCompleted && (
+            <motion.div
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-4 w-full flex items-center justify-center gap-2 bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-xl"
+            >
+              <CheckCircle className="w-4 h-4" />
+              Step Complete! 🎉
+            </motion.div>
+          )}
         </div>
 
         {/* Validation results */}

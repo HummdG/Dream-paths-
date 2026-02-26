@@ -353,34 +353,30 @@ show_message('Welcome to my game!')`,
         concepts: ['functions', 'parameters'],
         instruction: 'Write a function called `move()` that moves the player left or right.',
         detailedExplanation: "A function is a reusable piece of code. We use `def` to define it, give it a name, and put our code inside. The `dx` parameter tells us how far to move.",
-        starterCode: `# Let's create a movement function!
-# 'dx' means 'change in x' - positive goes right, negative goes left
+        starterCode: `# Create a move() function!
+# 'dx' is how many pixels to move — positive = right, negative = left
 
 def move(dx):
-    # Get the player's current position
-    current_x = get_player_x()
-    
-    # Calculate new position
-    new_x = current_x + dx
-    
-    # Move the player!
-    set_player_x(new_x)
+    current_x = get_player_x()   # get the player's current x position
+    new_x = current_x + dx       # add dx to find the new position
+    # YOUR CODE: call set_player_x() with new_x to move the player there
 
-# Test your function!
-# move(50) moves right, move(-50) moves left
+
+# Test it — call move() to see it work!
 move(50)
-print('Player moved right!')
+print('Testing my move() function!')
 `,
-        hint: "Try adding move(-50) after move(50) to see the player go right then left!",
+        hint: "Inside the move() function, call: set_player_x(new_x)  — this actually moves the player to the new position!",
         successCriteria: [
-          "Function 'move' exists in your code",
-          'Calling move(50) moves the player right',
-          'Calling move(-50) moves the player left'
+          "Define a function called 'move' using def",
+          "Inside move(), call set_player_x() with the new position",
+          "Call move() at least once to test it"
         ],
         validation: {
           type: 'ast',
           checks: [
             { type: 'ast_has_function', name: 'move' },
+            { type: 'ast_calls_function', name: 'set_player_x' },
             { type: 'ast_calls_function', name: 'move' }
           ]
         },
@@ -405,32 +401,30 @@ print('Player moved right!')
         concepts: ['events', 'if/elif'],
         instruction: 'Use if/elif to move the player when LEFT or RIGHT arrow keys are pressed.',
         detailedExplanation: "`if` lets us check something and do different things. `elif` means 'else if' - another check if the first wasn't true.",
-        starterCode: `# Player speed - try different numbers!
+        starterCode: `# How many pixels to move each time a key is pressed
 speed = 5
 
-# This function runs when a key is pressed
+# This function runs whenever a key is pressed
 def on_key(key):
-    # Check which key was pressed
     if key == 'LEFT':
-        # Move left (negative direction)
-        move(-speed)
+        # YOUR CODE: call move(-speed) here to move left
         print('Moving left!')
     elif key == 'RIGHT':
-        # Move right (positive direction)
-        move(speed)
+        # YOUR CODE: call move(speed) here to move right
+        # Hint: look at LEFT above — do the same but with +speed!
         print('Moving right!')
 
-# Connect arrow keys to our function
+# Both keys are connected below — you just need to add the move() calls above!
 on_key_down('LEFT', lambda: on_key('LEFT'))
 on_key_down('RIGHT', lambda: on_key('RIGHT'))
 
-print('Use arrow keys to move! ⬅️ ➡️')
+print('Add move() inside each if/elif block above! ⬅️ ➡️')
 `,
-        hint: "Try changing speed = 10 to move faster, or speed = 2 to move slower!",
+        hint: "Inside 'if key == LEFT': write move(-speed)  — and inside 'elif key == RIGHT': write move(speed)",
         successCriteria: [
-          'LEFT arrow moves player left',
-          'RIGHT arrow moves player right',
-          'Uses if/elif (not separate duplicate code)'
+          "Add move(-speed) inside the LEFT key block",
+          "Add move(speed) inside the RIGHT key block",
+          "Both keys are already connected with on_key_down()"
         ],
         validation: {
           type: 'ast',

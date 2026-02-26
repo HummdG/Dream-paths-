@@ -21,6 +21,48 @@ import { LevelDesigner, LevelData } from "@/components/level-designer";
 import { SpriteDesigner } from "@/components/sprite-designer";
 import { SimpleEditor } from "@/components/code-editor/simple-editor";
 
+// Grid size must match game-preview.tsx's gridSize constant.
+const GRID_SIZE = 20;
+// Must match the player height defined in engine.ts createInitialState().
+const PLAYER_HEIGHT = 48;
+
+/**
+ * Re-apply the user's level data into a live engine instance.
+ * Call this after engine.restart() so the user's custom platforms/coins/etc.
+ * are not lost. Also sets the player at the correct spawn position.
+ */
+function loadLevelIntoEngine(eng: PlatformerEngine, levelData: LevelData): void {
+  // Remove the default ground created by createInitialState() so it doesn't
+  // conflict with the user's custom level platforms.
+  eng.clearPlatforms();
+  eng.setTheme(levelData.theme);
+
+  levelData.objects
+    .filter(o => o.type === 'platform')
+    .forEach(p => eng.addPlatform(p.x * GRID_SIZE, p.y * GRID_SIZE, p.width * GRID_SIZE, p.height * GRID_SIZE));
+
+  levelData.objects
+    .filter(o => o.type === 'coin')
+    .forEach(c => eng.addCoin(c.x * GRID_SIZE + 10, c.y * GRID_SIZE + 10));
+
+  levelData.objects
+    .filter(o => o.type === 'enemy')
+    .forEach(e => eng.addEnemy(e.subtype || 'slime', e.x * GRID_SIZE, e.y * GRID_SIZE));
+
+  const spawn = levelData.objects.find(o => o.type === 'spawn');
+  if (spawn) {
+    const spawnPx = spawn.x * GRID_SIZE;
+    const spawnPy = (spawn.y + spawn.height) * GRID_SIZE - PLAYER_HEIGHT;
+    eng.setSpawnPoint(spawnPx, spawnPy);
+    eng.setPlayerPosition(spawnPx, spawnPy);
+  }
+
+  const goal = levelData.objects.find(o => o.type === 'goal');
+  if (goal) {
+    eng.addGoal(goal.x * GRID_SIZE, goal.y * GRID_SIZE);
+  }
+}
+
 interface MissionWorkspaceProps {
   mission: Mission;
   initialStepIndex?: number;
@@ -76,12 +118,11 @@ export function MissionWorkspace({
     if (currentStep) {
       setValidationResult(null);
       setCurrentCode(currentStep.starterCode);
-      setHasRunCode(false);
+      setHasRunCode(false); // triggers GamePreview to stop the engine via isPlaying=false
       const windowEngine = (window as unknown as { gameEngine?: PlatformerEngine }).gameEngine;
       if (windowEngine) {
-        windowEngine.clearCallbacks();
-        windowEngine.clearEvents();
-        windowEngine.restart();
+        windowEngine.restart(); // clearCallbacks + clearEvents + reset state
+        loadLevelIntoEngine(windowEngine, activeLevelData); // re-apply user's level
       }
     }
   }, [currentStep?.stepId]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -92,16 +133,14 @@ export function MissionWorkspace({
     setHasRunCode(true);
 
     try {
-      // Reset engine state before running new code
+      // Restart engine and reload the user's level before running new code.
+      // engine.restart() clears callbacks, events, and state (including default ground).
+      // loadLevelIntoEngine() re-adds the user's platforms, coins, goal, and spawn.
       const windowEngine = (window as unknown as { gameEngine?: PlatformerEngine }).gameEngine;
-      if (windowEngine) {
-        windowEngine.clearCallbacks();
-        windowEngine.clearEvents();
-        windowEngine.restart();
-      } else if (engine) {
-        engine.clearCallbacks();
-        engine.clearEvents();
-        engine.restart();
+      const activeEngine = windowEngine || engine;
+      if (activeEngine) {
+        activeEngine.restart();
+        loadLevelIntoEngine(activeEngine, activeLevelData);
       }
 
       await new Promise(resolve => setTimeout(resolve, 200));
@@ -113,11 +152,9 @@ export function MissionWorkspace({
 
       const pyodide = win.pyodide;
 
-      // Start engine so Python callbacks can fire
-      if (windowEngine) {
-        windowEngine.start();
-      } else if (engine) {
-        engine.start();
+      // Start engine so Python callbacks can fire (start() guards against double-start)
+      if (activeEngine) {
+        activeEngine.start();
       }
 
       const wrappedCode = wrapUserCode(code);
@@ -144,7 +181,6 @@ __captured_output__
 
       // Wait for physics frames to run before collecting events
       await new Promise(resolve => setTimeout(resolve, 800));
-      const activeEngine = windowEngine || engine;
       const events = activeEngine?.getEvents() || [];
       
       if (currentStep) {
@@ -155,27 +191,21 @@ __captured_output__
           currentStep.validation
         );
         setValidationResult(validation);
-        
-        if (validation.passed && !completedSteps.has(currentStep.stepId)) {
+
+        // Auto-mark step complete when all checks pass
+        if (validation.passed && currentStep && !completedSteps.has(currentStep.stepId)) {
           const newCompleted = new Set(completedSteps);
           newCompleted.add(currentStep.stepId);
           setCompletedSteps(newCompleted);
-          
-          onStepComplete?.(
-            currentStep.stepId,
-            currentStep.reward.stars,
-            currentStep.reward.badge
-          );
-          
+          onStepComplete?.(currentStep.stepId, currentStep.reward.stars, currentStep.reward.badge);
+
           if (currentStepIndex === mission.steps.length - 1) {
             setShowCelebration(true);
             onMissionComplete?.(mission.missionId);
           }
-          
-          return { output: printOutput.trim(), success: true };
         }
       }
-      
+
       return { output: printOutput.trim() };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Something went wrong!";
@@ -312,6 +342,11 @@ __captured_output__
     setCompletedSteps(newCompleted);
     setShowCelebration(true);
     onMissionComplete?.(mission.missionId);
+  };
+
+  // Called when user explicitly clicks "Mark Complete" in StepPanel
+  const handleCompleteStep = () => {
+    markCurrentStepComplete();
   };
 
   // Check mission type
@@ -507,6 +542,7 @@ __captured_output__
               missionTitle={mission.title}
               validationResult={validationResult || undefined}
               isCompleted={completedSteps.has(currentStep.stepId)}
+              onCompleteStep={handleCompleteStep}
               onPrevStep={goToPrevStep}
               onNextStep={goToNextStep}
               hasPrevStep={currentStepIndex > 0}
