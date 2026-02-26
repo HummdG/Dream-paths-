@@ -37,10 +37,11 @@ export async function POST(request: NextRequest, { params }: Props) {
           missionId,
         },
       },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       data: {
         currentStep: currentStep ?? undefined,
         codeProgress: codeProgress ?? undefined,
-      },
+      } as any,
     });
 
     return NextResponse.json({ success: true });
@@ -52,6 +53,8 @@ export async function POST(request: NextRequest, { params }: Props) {
     );
   }
 }
+
+
 
 
 

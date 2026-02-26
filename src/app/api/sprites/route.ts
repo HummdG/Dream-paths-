@@ -92,8 +92,8 @@ export async function POST(request: Request) {
         childId: child.id,
         name: validatedData.name,
         type: validatedData.type,
-        pixelData: validatedData.pixelData,
-        behavior: validatedData.behavior || null,
+        pixelData: validatedData.pixelData as object,
+        behavior: (validatedData.behavior || undefined) as object | undefined,
       },
     });
 
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid data", details: error.errors },
+        { error: "Invalid data", details: error.issues },
         { status: 400 }
       );
     }
@@ -157,6 +157,8 @@ export async function DELETE(request: Request) {
     );
   }
 }
+
+
 
 
 

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, RotateCcw, HelpCircle, Sparkles, AlertTriangle, Check } from "lucide-react";
-import { PYTHON_GAME_API } from "@/lib/game-engine/python-api";
+import { HighlightedEditor } from "./highlighted-editor";
+import type { CheckResult } from "@/lib/validation/validator";
 
 interface SimpleEditorProps {
   initialCode: string;
@@ -15,6 +16,7 @@ interface SimpleEditorProps {
   readOnly?: boolean;
   height?: string;
   showGameHint?: boolean;
+  validationChecks?: CheckResult[];
 }
 
 export function SimpleEditor({
@@ -27,6 +29,7 @@ export function SimpleEditor({
   readOnly = false,
   height = "200px",
   showGameHint = false,
+  validationChecks,
 }: SimpleEditorProps) {
   const [code, setCode] = useState(initialCode);
   const [output, setOutput] = useState<string>("");
@@ -35,13 +38,14 @@ export function SimpleEditor({
   const [showHint, setShowHint] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [hasRun, setHasRun] = useState(false);
-  const [gameApiLoaded, setGameApiLoaded] = useState(false);
-  
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Reset code when initialCode changes (e.g., step changes)
   useEffect(() => {
     setCode(initialCode);
+    setOutput("");
+    setError("");
+    setIsSuccess(false);
+    setHasRun(false);
   }, [initialCode]);
 
   const handleCodeChange = (newCode: string) => {
@@ -50,21 +54,10 @@ export function SimpleEditor({
     onCodeChange?.(newCode);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Tab") {
       e.preventDefault();
-      const textarea = e.currentTarget;
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      const newCode = code.substring(0, start) + "    " + code.substring(end);
-      setCode(newCode);
-      onCodeChange?.(newCode);
-      
-      // Restore cursor position after the tab
-      requestAnimationFrame(() => {
-        textarea.selectionStart = start + 4;
-        textarea.selectionEnd = start + 4;
-      });
+      // Tab handling is done inside HighlightedEditor via insertSpaces + tabSize
     }
   };
 
@@ -77,7 +70,6 @@ export function SimpleEditor({
 
     try {
       if (onRun) {
-        // Use custom run handler (MissionWorkspace provides this)
         const result = await onRun(code);
         if (result.error) {
           setError(result.error);
@@ -89,29 +81,15 @@ export function SimpleEditor({
           }
         }
       } else {
-        // Default Pyodide execution with Game API
-        // @ts-expect-error - Pyodide is loaded globally
-        if (typeof window.pyodide === "undefined") {
+        const win = window as unknown as { pyodide?: { runPythonAsync: (code: string) => Promise<string> } };
+        if (typeof win.pyodide === "undefined") {
           setError("Python is still loading... Please wait a moment and try again!");
           setIsRunning(false);
           return;
         }
 
-        // @ts-expect-error - Pyodide is loaded globally
-        const pyodide = window.pyodide;
-        
-        // Load the Game API if not already loaded
-        if (!gameApiLoaded) {
-          try {
-            await pyodide.runPythonAsync(PYTHON_GAME_API);
-            setGameApiLoaded(true);
-          } catch (apiError) {
-            console.warn("Could not load game API:", apiError);
-            // Continue anyway - basic Python will still work
-          }
-        }
-        
-        // Wrap user code to capture output
+        const pyodide = win.pyodide;
+
         const wrappedCode = `
 import sys
 from io import StringIO
@@ -128,13 +106,12 @@ __captured_output__ = sys.stdout.getvalue()
 sys.stdout = __old_stdout__
 __captured_output__
 `;
-        
+
         const result = await pyodide.runPythonAsync(wrappedCode);
         const printOutput = result || "";
-        
+
         setOutput(printOutput.trim());
-        
-        // Check if output matches expected
+
         if (expectedOutput && printOutput.trim() === expectedOutput.trim()) {
           setIsSuccess(true);
           onSuccess?.();
@@ -142,7 +119,6 @@ __captured_output__
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Something went wrong!";
-      // Make error messages kid-friendly
       const friendlyError = errorMessage
         .replace(/SyntaxError:/g, "Oops! Check your code:")
         .replace(/NameError:/g, "Hmm, I don't know:")
@@ -163,21 +139,23 @@ __captured_output__
     onCodeChange?.(initialCode);
   };
 
+  const visibleChecks = validationChecks?.filter(c => c.message !== "") ?? [];
+
   return (
     <div className="rounded-2xl overflow-hidden border-4 border-amber-300 bg-white shadow-xl flex flex-col">
-      {/* Header - Bright yellow like Scratch */}
+      {/* Header */}
       <div className="bg-gradient-to-r from-amber-400 to-yellow-400 px-4 py-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
           <span className="text-2xl">🐍</span>
           <span className="text-amber-900 font-bold text-lg">Your Code</span>
         </div>
-        
+
         {hint && (
           <button
             onClick={() => setShowHint(!showHint)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold transition-all ${
-              showHint 
-                ? "bg-blue-500 text-white shadow-md" 
+              showHint
+                ? "bg-blue-500 text-white shadow-md"
                 : "bg-white/80 text-amber-800 hover:bg-white"
             }`}
           >
@@ -187,7 +165,7 @@ __captured_output__
         )}
       </div>
 
-      {/* Hint Box - Light blue, friendly */}
+      {/* Hint Box */}
       <AnimatePresence>
         {showHint && hint && (
           <motion.div
@@ -211,28 +189,23 @@ __captured_output__
         )}
       </AnimatePresence>
 
-      {/* Code Editor Area - Simple, reliable textarea */}
-      <div className="bg-slate-900 flex-1 min-h-0" style={{ height }}>
-        <textarea
-          ref={textareaRef}
+      {/* Code Editor Area */}
+      <div
+        className={`bg-slate-900 flex-1 min-h-0 transition-all ${
+          isRunning ? "ring-2 ring-inset ring-amber-400 animate-pulse" : ""
+        }`}
+        style={{ height }}
+      >
+        <HighlightedEditor
           value={code}
-          onChange={(e) => handleCodeChange(e.target.value)}
+          onValueChange={handleCodeChange}
           onKeyDown={handleKeyDown}
           readOnly={readOnly}
-          className="w-full h-full p-4 font-mono text-sm leading-relaxed bg-slate-900 text-green-400 resize-none outline-none focus:ring-2 focus:ring-amber-400 focus:ring-inset"
-          style={{
-            caretColor: "#fbbf24", // amber-400 caret
-            tabSize: 4,
-          }}
-          spellCheck={false}
-          autoCapitalize="off"
-          autoCorrect="off"
-          autoComplete="off"
-          placeholder="# Type your code here!"
+          height={height}
         />
       </div>
 
-      {/* Action Buttons - Big, chunky, centered */}
+      {/* Action Buttons */}
       <div className="bg-gray-100 px-4 py-3 flex items-center justify-center gap-3 border-t-2 border-gray-200 shrink-0">
         <button
           onClick={resetCode}
@@ -241,7 +214,7 @@ __captured_output__
           <RotateCcw className="w-4 h-4" />
           Start Over
         </button>
-        
+
         <motion.button
           onClick={runCode}
           disabled={isRunning || readOnly}
@@ -258,10 +231,10 @@ __captured_output__
         </motion.button>
       </div>
 
-      {/* Output Area - Inline, colorful feedback with max height */}
+      {/* Output Area */}
       <div className={`border-t-4 transition-colors shrink-0 max-h-[120px] overflow-y-auto ${
-        error ? "border-orange-400 bg-orange-50" : 
-        isSuccess ? "border-green-400 bg-green-50" : 
+        error ? "border-orange-400 bg-orange-50" :
+        isSuccess ? "border-green-400 bg-green-50" :
         "border-violet-300 bg-violet-50"
       }`}>
         <div className="px-3 py-2">
@@ -269,7 +242,7 @@ __captured_output__
             {error ? (
               <>
                 <AlertTriangle className="w-4 h-4 text-orange-500" />
-                <span className="font-bold text-sm text-orange-700">Oops! Something's not quite right:</span>
+                <span className="font-bold text-sm text-orange-700">Oops! Something&apos;s not quite right:</span>
               </>
             ) : isSuccess ? (
               <>
@@ -283,10 +256,10 @@ __captured_output__
               </>
             )}
           </div>
-          
+
           <div className={`font-mono text-xs p-2 rounded-lg ${
-            error ? "bg-white text-orange-700" : 
-            isSuccess ? "bg-white text-green-700" : 
+            error ? "bg-white text-orange-700" :
+            isSuccess ? "bg-white text-green-700" :
             "bg-white text-gray-800"
           }`}>
             {error ? (
@@ -302,13 +275,30 @@ __captured_output__
         </div>
       </div>
 
-      {/* Optional game hint - compact */}
+      {/* Per-check validation results */}
+      {visibleChecks.length > 0 && (
+        <div className="border-t-2 border-gray-200 bg-gray-50 px-3 py-2 shrink-0">
+          <p className="text-xs font-bold text-gray-500 mb-1.5">Checklist:</p>
+          <div className="flex flex-col gap-1">
+            {visibleChecks.map((check, i) => (
+              <div key={i} className={`flex items-center gap-2 text-xs font-mono rounded px-2 py-1 ${
+                check.passed ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+              }`}>
+                <span>{check.passed ? "✅" : "❌"}</span>
+                <span>{check.message.replace(/^[✅❌]\s*/, "")}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Game hint */}
       {showGameHint && (
         <div className="bg-slate-800 px-3 py-1.5 border-t border-slate-700 shrink-0">
           <p className="text-slate-400 text-xs">
-            <span className="text-cyan-400 font-mono">move(50)</span> = right, 
-            <span className="text-cyan-400 font-mono ml-1">move(-50)</span> = left,
-            <span className="text-pink-400 font-mono ml-1">print()</span> = speech bubble
+            <span className="text-cyan-400 font-mono">move(50)</span> = right,{" "}
+            <span className="text-cyan-400 font-mono">move(-50)</span> = left,{" "}
+            <span className="text-pink-400 font-mono">print()</span> = speech bubble
           </p>
         </div>
       )}

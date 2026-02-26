@@ -132,12 +132,25 @@ function performASTCheck(code: string, check: ValidationCheck): CheckResult {
       return {
         check,
         passed,
-        message: passed 
-          ? `✅ Calls '${check.name}()'` 
+        message: passed
+          ? `✅ Calls '${check.name}()'`
           : `❌ Call the function '${check.name}()'`
       };
     }
-    
+
+    case 'ast_has_on_key_handler': {
+      // Look for on_key_down( or when_key_pressed(
+      const pattern = /on_key_down\s*\(|when_key_pressed\s*\(/m;
+      const passed = pattern.test(code);
+      return {
+        check,
+        passed,
+        message: passed
+          ? `✅ Found key handler`
+          : `❌ Use on_key_down() to handle key presses`
+      };
+    }
+
     default:
       // Non-AST checks are skipped here
       return {
@@ -540,6 +553,8 @@ export function friendlyError(error: string): string {
   
   return friendlyMessage;
 }
+
+
 
 
 

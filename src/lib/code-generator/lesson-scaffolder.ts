@@ -1,13 +1,13 @@
 /**
  * Lesson Scaffolder
- * 
+ *
  * Personalizes coding lessons with the user's actual level data.
- * Creates a "fill-in-the-blanks" experience where kids complete
- * code that controls THEIR game.
+ * The game is already running via GamePreview — lessons teach Python
+ * by directly manipulating it with move(), print(), add_platform(), etc.
  */
 
 import { LevelData } from '@/components/level-designer/level-designer';
-import { CodePhase, generateCode, getPhaseSummaries } from './index';
+import { CodePhase } from './index';
 
 export interface LessonStep {
   id: string;
@@ -54,679 +54,575 @@ export function generateLessonsForLevel(
   childName: string,
   heroName: string = "Hero"
 ): PersonalizedLesson[] {
-  const lessons: PersonalizedLesson[] = [];
-  
-  // Lesson 1: Hello World & Print
-  lessons.push(generateLesson1(levelData, childName, heroName));
-  
-  // Lesson 2: Variables
-  lessons.push(generateLesson2(levelData, childName, heroName));
-  
-  // Lesson 3: Lists & Loops
-  lessons.push(generateLesson3(levelData, childName, heroName));
-  
-  // Lesson 4: Functions
-  lessons.push(generateLesson4(levelData, childName, heroName));
-  
-  // Lesson 5: Complete Game
-  lessons.push(generateLesson5(levelData, childName, heroName));
-  
-  return lessons;
+  return [
+    generateLesson1(levelData, childName, heroName),
+    generateLesson2(levelData, childName, heroName),
+    generateLesson3(levelData, childName, heroName),
+    generateLesson4(levelData, childName, heroName),
+    generateLesson5(levelData, childName, heroName),
+  ];
 }
 
-/**
- * Lesson 1: Hello World - Print statements and basic function calls
- */
+// =============================================================================
+// LESSON 1: Make Your Hero Talk
+// print(), say(), show_message()
+// =============================================================================
+
 function generateLesson1(
   levelData: LevelData,
   childName: string,
   heroName: string
 ): PersonalizedLesson {
   return {
-    id: 'lesson_1_hello_world',
+    id: 'lesson_1_print',
     phase: 1,
-    title: '🌟 Hello World!',
-    description: 'Write your first Python code and see it come to life!',
-    concepts: ['print()', 'strings', 'function calls'],
+    title: '🗣️ Make Your Hero Talk',
+    description: 'Use print() and show_message() to make your hero speak!',
+    concepts: ['print()', 'strings', 'show_message()'],
     levelName: levelData.name,
     childName,
     heroName,
     totalXp: 150,
     steps: [
       {
-        id: 'l1_step1_first_print',
+        id: 'l1_step1_print',
         title: 'Say Hello!',
-        instruction: `Let's make ${heroName} say something! Type a message in the print() function.`,
-        explanation: `In Python, \`print()\` shows text on the screen. But in YOUR game, it also makes ${heroName} say it in a speech bubble! Try it!`,
-        starterCode: `# Type your message between the quotes!
-print("Hello, I am ${heroName}!")
+        instruction: `Make ${heroName} say something using print().`,
+        explanation: `In Python, print() shows text. In this game it also makes ${heroName} say it in a speech bubble above their head! Think of print() like giving your hero a voice — whatever you put in the quotes is what they say. Try changing the message to anything you want!`,
+        starterCode: `# Make your hero say something!
+print("Hello! I am ${heroName}!")
 `,
-        solutionCode: `print("Hello, I am ${heroName}!")`,
+        solutionCode: `print("Hello! I am ${heroName}!")`,
         hints: [
-          "Make sure your text is between the quote marks \"like this\"",
-          "You can change the message to say anything you want!",
-          "Press the Run button to see what happens"
+          'Make sure your text is between quote marks "like this"',
+          `Try changing the message — what does ${heroName} want to say?`,
+          'Press Run Code! to see the speech bubble appear on screen'
         ],
-        expectedOutput: `Hello, I am ${heroName}!`,
+        expectedOutput: `Hello! I am ${heroName}!`,
         validation: [
           { type: 'contains', value: 'print(' },
           { type: 'runs_without_error', value: '' }
         ],
-        rewards: { xp: 30 }
+        rewards: { xp: 40 }
       },
       {
         id: 'l1_step2_multiple_prints',
         title: 'Tell a Story',
-        instruction: `Great job! Now let's have ${heroName} tell us about the level you made!`,
-        explanation: `You can use multiple print() statements to show several messages. Each one becomes a new speech bubble!`,
-        starterCode: `# Make ${heroName} introduce the level!
-print("Welcome to ${levelData.name}!")
-print("I'm ${heroName}!")
-print("Let's have an adventure!")
+        instruction: `Use three print() statements to tell a mini story about ${heroName}.`,
+        explanation: `You can use multiple print() calls — each one creates a new message. This is like writing lines in a script for your hero. Real games use this to show dialogue, instructions, and story text. Try adding a third line about the level!`,
+        starterCode: `# Tell a 3-line story!
+print("Hi! I'm ${heroName}!")
+print("I'm ready to explore ${levelData.name}!")
+print("Let's go!")
 `,
-        solutionCode: `print("Welcome to ${levelData.name}!")
-print("I'm ${heroName}!")
-print("Let's have an adventure!")`,
+        solutionCode: `print("Hi! I'm ${heroName}!")
+print("I'm ready to explore ${levelData.name}!")
+print("Let's go!")`,
         hints: [
-          "Each print() shows one message",
-          "Try adding your own print() with a custom message!",
-          "Don't forget the quotes around your text"
+          'Each print() shows one message in the speech bubble',
+          `The level is called "${levelData.name}" — try using that name!`,
+          'Add an exclamation mark to make it more exciting!'
         ],
         validation: [
           { type: 'contains', value: 'print(' },
-          { type: 'output_contains', value: levelData.name }
+          { type: 'output_contains', value: heroName }
         ],
         rewards: { xp: 40 }
       },
       {
-        id: 'l1_step3_load_level',
-        title: 'Load Your Level',
-        instruction: `Now let's actually load the level "${levelData.name}" that you designed!`,
-        explanation: `Functions do specific jobs. \`load_my_level()\` loads the level you designed, and \`setup_simple_game()\` adds the controls. Watch your game appear!`,
-        starterCode: `# Say hello
-print("Loading ${levelData.name}...")
+        id: 'l1_step3_show_message',
+        title: 'Big Screen Message',
+        instruction: `Use show_message() to display a bold message in the centre of the game screen.`,
+        explanation: `show_message() puts text in the middle of the game canvas — like a loading screen or announcement. print() is a speech bubble near your hero; show_message() is a broadcast to the whole screen. Game designers use these for level intros, tutorials, and countdowns. Try using both together!`,
+        starterCode: `# Speech bubble from the hero
+print("Get ready...")
 
-# Load YOUR level!
-load_my_level("${levelData.name}")
-
-# Add controls
-setup_simple_game()
-
-# Ready to play!
-print("Game loaded! Use arrow keys to move!")
+# Big message on screen
+show_message("Welcome to ${levelData.name}!")
 `,
-        solutionCode: `print("Loading ${levelData.name}...")
-load_my_level("${levelData.name}")
-setup_simple_game()
-print("Game loaded! Use arrow keys to move!")`,
+        solutionCode: `print("Get ready...")
+show_message("Welcome to ${levelData.name}!")`,
         hints: [
-          "load_my_level() needs your level name in quotes",
-          "setup_simple_game() adds arrow key controls",
-          "After running this, try playing your game!"
+          'show_message() takes a string in quotes just like print()',
+          'You can use both print() and show_message() at the same time',
+          `Try: show_message("Level: ${levelData.name} — GO!")`
         ],
         validation: [
-          { type: 'calls_function', value: 'load_my_level' },
-          { type: 'calls_function', value: 'setup_simple_game' },
+          { type: 'calls_function', value: 'show_message' },
           { type: 'runs_without_error', value: '' }
         ],
-        rewards: { xp: 80, badge: 'First Game Loaded' }
+        rewards: { xp: 70, badge: 'Storyteller' }
       }
     ]
   };
 }
 
-/**
- * Lesson 2: Variables - Store and use data
- */
+// =============================================================================
+// LESSON 2: Move Your Hero
+// move(), set_player_position(), variables
+// =============================================================================
+
 function generateLesson2(
   levelData: LevelData,
-  childName: string,
+  _childName: string,
   heroName: string
 ): PersonalizedLesson {
-  const coinCount = levelData.objects.filter(o => o.type === 'coin').length;
-  const platformCount = levelData.objects.filter(o => o.type === 'platform').length;
-  
   return {
-    id: 'lesson_2_variables',
+    id: 'lesson_2_move',
     phase: 2,
-    title: '📦 Variables',
-    description: 'Learn to store information in labeled boxes!',
-    concepts: ['variables', 'numbers', 'strings', 'f-strings'],
+    title: '🏃 Move Your Hero',
+    description: 'Make your hero slide left and right using move()!',
+    concepts: ['move()', 'variables', 'numbers'],
     levelName: levelData.name,
-    childName,
+    childName: _childName,
     heroName,
     totalXp: 200,
     steps: [
       {
-        id: 'l2_step1_create_variable',
-        title: 'Create a Variable',
-        instruction: `Variables are like labeled boxes. Let's create one to store ${heroName}'s speed!`,
-        explanation: `A variable has a name and a value. \`speed = 5\` creates a box called "speed" with the number 5 inside. You can change this number to make ${heroName} faster or slower!`,
-        starterCode: `# Create a speed variable - try different numbers!
-speed = 5
-
-# Use the variable
-print(f"${heroName}'s speed is {speed}")
-
-# Try changing speed to 10 and run again!
+        id: 'l2_step1_move',
+        title: 'Slide Right!',
+        instruction: `Call move(100) to slide ${heroName} to the right.`,
+        explanation: `move() is like telling your hero "take X steps". The number inside is how many pixels to move. Positive numbers go right, negative numbers go left. Think of it like a number line — right is positive, left is negative. Watch the hero slide!`,
+        starterCode: `# Move the hero right by 100 pixels
+move(100)
+print("${heroName} moved right!")
 `,
-        solutionCode: `speed = 5
-print(f"${heroName}'s speed is {speed}")`,
+        solutionCode: `move(100)
+print("${heroName} moved right!")`,
         hints: [
-          "Try changing speed = 5 to speed = 10",
-          "The {speed} in the print shows the variable's value",
-          "Variable names can't have spaces - use underscores like player_speed"
+          'The number inside move() is how many pixels to slide',
+          'Try move(200) for a bigger slide!',
+          'After clicking Run, watch the game screen — the hero will move'
         ],
         validation: [
-          { type: 'contains', value: 'speed' },
-          { type: 'contains', value: '=' },
-          { type: 'runs_without_error', value: '' }
-        ],
-        rewards: { xp: 40 }
-      },
-      {
-        id: 'l2_step2_multiple_variables',
-        title: 'Game Settings',
-        instruction: `Let's create variables for all your game settings!`,
-        explanation: `You can have many variables! Each one stores a different piece of information about your game. This makes it easy to customize everything.`,
-        starterCode: `# Game settings
-game_name = "${levelData.name}"
-theme = "${levelData.theme}"
-player_speed = 5
-jump_power = 15
-
-# Count what's in your level
-num_coins = ${coinCount}
-num_platforms = ${platformCount}
-
-# Show the settings
-print(f"🎮 Game: {game_name}")
-print(f"🎨 Theme: {theme}")
-print(f"⚡ Speed: {player_speed}")
-print(f"🦘 Jump: {jump_power}")
-print(f"🪙 Coins: {num_coins}")
-`,
-        solutionCode: `game_name = "${levelData.name}"
-theme = "${levelData.theme}"
-player_speed = 5
-jump_power = 15
-num_coins = ${coinCount}
-num_platforms = ${platformCount}`,
-        hints: [
-          "f-strings let you put variables inside text using {variable_name}",
-          "Try changing player_speed to 10 - it will update in the message!",
-          `Your level "${levelData.name}" has ${coinCount} coins`
-        ],
-        validation: [
-          { type: 'contains', value: 'game_name' },
-          { type: 'contains', value: 'player_speed' },
-          { type: 'runs_without_error', value: '' }
-        ],
-        rewards: { xp: 60 }
-      },
-      {
-        id: 'l2_step3_use_variables',
-        title: 'Use Your Variables',
-        instruction: `Now let's use these variables to actually load and configure your game!`,
-        explanation: `Instead of typing "${levelData.name}" every time, we can use the variable game_name. This is called "using a variable" - Python replaces it with the stored value.`,
-        starterCode: `# Your game settings
-game_name = "${levelData.name}"
-theme = "${levelData.theme}"
-
-print(f"Loading {game_name}...")
-
-# Use variables instead of typing names!
-set_theme(theme)
-load_my_level(game_name)
-setup_simple_game()
-
-print(f"{game_name} is ready to play!")
-`,
-        solutionCode: `game_name = "${levelData.name}"
-theme = "${levelData.theme}"
-set_theme(theme)
-load_my_level(game_name)
-setup_simple_game()`,
-        hints: [
-          "set_theme() changes the visual style of your game",
-          "Using variables means you only change the value in one place",
-          "Try changing theme to 'space' or 'city' at the top!"
-        ],
-        validation: [
-          { type: 'calls_function', value: 'set_theme' },
-          { type: 'calls_function', value: 'load_my_level' },
-          { type: 'runs_without_error', value: '' }
-        ],
-        rewards: { xp: 100, badge: 'Variable Master' }
-      }
-    ]
-  };
-}
-
-/**
- * Lesson 3: Lists & Loops
- */
-function generateLesson3(
-  levelData: LevelData,
-  childName: string,
-  heroName: string
-): PersonalizedLesson {
-  const platforms = levelData.objects.filter(o => o.type === 'platform').slice(0, 3);
-  const coins = levelData.objects.filter(o => o.type === 'coin').slice(0, 3);
-  
-  const platformData = platforms.map(p => `(${p.x * 20}, ${p.y * 20}, ${p.width * 20}, ${p.height * 20})`).join(', ');
-  const coinData = coins.map(c => `(${c.x * 20}, ${c.y * 20})`).join(', ');
-  
-  return {
-    id: 'lesson_3_lists_loops',
-    phase: 3,
-    title: '🔄 Lists & Loops',
-    description: 'Work with collections and repeat actions!',
-    concepts: ['lists', 'tuples', 'for loops', 'len()'],
-    levelName: levelData.name,
-    childName,
-    heroName,
-    totalXp: 250,
-    steps: [
-      {
-        id: 'l3_step1_lists',
-        title: 'Create a List',
-        instruction: `A list holds multiple items. Let's make a list of messages for ${heroName} to say!`,
-        explanation: `Lists use square brackets [] and items are separated by commas. They're perfect for storing collections of things!`,
-        starterCode: `# A list of messages
-messages = [
-    "Hello!",
-    "Welcome to ${levelData.name}!",
-    "Let's collect some coins!",
-    "Watch out for enemies!"
-]
-
-# Show all messages
-print(messages)
-print(f"We have {len(messages)} messages!")
-`,
-        solutionCode: `messages = ["Hello!", "Welcome!", "Let's play!"]`,
-        hints: [
-          "Lists use square brackets []",
-          "len() tells you how many items are in a list",
-          "Try adding your own message to the list!"
-        ],
-        validation: [
-          { type: 'contains', value: '[' },
-          { type: 'contains', value: ']' },
+          { type: 'calls_function', value: 'move' },
           { type: 'runs_without_error', value: '' }
         ],
         rewards: { xp: 50 }
       },
       {
-        id: 'l3_step2_for_loops',
-        title: 'Loop Through Items',
-        instruction: `Instead of printing each message one by one, let's use a loop!`,
-        explanation: `A for loop goes through each item in a list and does something with it. It saves you from writing the same code over and over!`,
-        starterCode: `# Messages for ${heroName}
-messages = [
-    "Hello!",
-    "Welcome to ${levelData.name}!",
-    "Ready to play?"
-]
+        id: 'l2_step2_variable_speed',
+        title: 'Speed Variable',
+        instruction: `Create a variable called speed, then use it inside move().`,
+        explanation: `Variables are like labelled boxes that store values. Instead of typing 80 directly into move(80), you create a box called "speed" and put 80 inside. Then move(speed) uses whatever is in that box. This is powerful because you only need to change the number in ONE place to affect everything — real game devs do this!`,
+        starterCode: `# Create a speed variable
+speed = 80
 
-# Loop through and print each message
-for message in messages:
-    print(message)
-
-print("All messages said!")
+# Use the variable
+move(speed)
+print(f"${heroName} moved at speed {speed}")
 `,
-        solutionCode: `for message in messages:
-    print(message)`,
+        solutionCode: `speed = 80
+move(speed)
+print(f"${heroName} moved at speed {speed}")`,
         hints: [
-          "The 'for' keyword starts the loop",
-          "'message' is a variable that holds each item as we go",
-          "Everything indented under the for runs for each item"
+          'speed = 80 creates a variable with value 80',
+          'Change speed = 80 to speed = 150 and run again — see the difference?',
+          'The f"..." string lets you put {speed} inside to show the value'
         ],
         validation: [
-          { type: 'contains', value: 'for ' },
-          { type: 'contains', value: ' in ' },
+          { type: 'contains', value: 'speed' },
+          { type: 'calls_function', value: 'move' },
+          { type: 'runs_without_error', value: '' }
+        ],
+        rewards: { xp: 60 }
+      },
+      {
+        id: 'l2_step3_multi_move',
+        title: 'Dance Moves',
+        instruction: `Make ${heroName} do a three-step dance: right, left, then right again.`,
+        explanation: `You can call move() multiple times in a row. Each call is applied instantly to the hero's position. This is how cutscenes and scripted animations work in real games — a sequence of position commands. Try making a little dance pattern! Negative numbers move left.`,
+        starterCode: `# Three-step dance!
+move(100)   # Step right
+move(-50)   # Step back left
+move(75)    # Step right again
+
+print("${heroName} danced!")
+`,
+        solutionCode: `move(100)
+move(-50)
+move(75)
+print("${heroName} danced!")`,
+        hints: [
+          'Positive move() = right, negative move() = left',
+          'Each move() adds to the previous position',
+          'Try your own pattern: move(200) move(-200) move(50)'
+        ],
+        validation: [
+          { type: 'calls_function', value: 'move' },
+          { type: 'output_contains', value: heroName }
+        ],
+        rewards: { xp: 90, badge: 'Mover' }
+      }
+    ]
+  };
+}
+
+// =============================================================================
+// LESSON 3: Build Your Level
+// add_platform(), add_coin(), for loops
+// =============================================================================
+
+function generateLesson3(
+  levelData: LevelData,
+  _childName: string,
+  heroName: string
+): PersonalizedLesson {
+  const theme = levelData.theme || 'space';
+
+  return {
+    id: 'lesson_3_build',
+    phase: 3,
+    title: '🏗️ Build Your Level',
+    description: 'Place platforms and coins using add_platform() and add_coin()!',
+    concepts: ['add_platform()', 'add_coin()', 'lists', 'for loops'],
+    levelName: levelData.name,
+    childName: _childName,
+    heroName,
+    totalXp: 250,
+    steps: [
+      {
+        id: 'l3_step1_platform',
+        title: 'Place a Platform',
+        instruction: `Use add_platform(x, y, width, height) to add a floating platform.`,
+        explanation: `add_platform() places a solid platform your hero can stand on. The four numbers are: x (left position), y (top position), width (how wide), height (how tall). Coordinates start at the top-left of the screen (0, 0). Lower y values are higher up — like a map where north is up. Run this and you'll see a platform appear!`,
+        starterCode: `# Set the theme
+set_theme("${theme}")
+
+# Add a floating platform
+# add_platform(x, y, width, height)
+add_platform(200, 280, 200, 20)
+
+print("Platform placed!")
+`,
+        solutionCode: `set_theme("${theme}")
+add_platform(200, 280, 200, 20)
+print("Platform placed!")`,
+        hints: [
+          'Try add_platform(100, 300, 300, 20) for a wide ground platform',
+          'A lower y value puts the platform higher up on screen',
+          'Width controls how long the platform is — try 400!'
+        ],
+        validation: [
+          { type: 'calls_function', value: 'add_platform' },
           { type: 'runs_without_error', value: '' }
         ],
         rewards: { xp: 70 }
       },
       {
-        id: 'l3_step3_build_platforms',
-        title: 'Build Platforms with Loops',
-        instruction: `Now the real magic - let's build YOUR level's platforms using a loop!`,
-        explanation: `Your level has platforms stored as positions. We can loop through them and add each one to the game. This is how real games are built!`,
-        starterCode: `print("Building ${levelData.name}...")
+        id: 'l3_step2_coin',
+        title: 'Add a Coin',
+        instruction: `Use add_coin(x, y) to place a collectible coin in the level.`,
+        explanation: `add_coin() places a shiny coin that players can collect. Coins give players a reason to explore your level — they reward curiosity. Place it somewhere interesting: floating above a platform, at the end of a jump, or hidden in a corner. In real platformer games, level designers spend hours perfecting coin placement!`,
+        starterCode: `# Add a platform to stand on
+add_platform(200, 300, 300, 20)
 
-set_theme("${levelData.theme}")
+# Add a coin floating above the platform
+add_coin(320, 260)
 
-# Your platform positions from the level designer!
-# Format: (x, y, width, height)
+print("Coin added! Can you collect it?")
+`,
+        solutionCode: `add_platform(200, 300, 300, 20)
+add_coin(320, 260)
+print("Coin added!")`,
+        hints: [
+          'Place the coin above a platform so the player can reach it',
+          'Try add_coin(400, 200) for a coin higher up',
+          'Move the hero with move() to try collecting the coin!'
+        ],
+        validation: [
+          { type: 'calls_function', value: 'add_coin' },
+          { type: 'runs_without_error', value: '' }
+        ],
+        rewards: { xp: 70 }
+      },
+      {
+        id: 'l3_step3_for_loop',
+        title: 'Build with a Loop',
+        instruction: `Use a for loop to add multiple platforms from a list.`,
+        explanation: `A list holds multiple items in square brackets, separated by commas. A for loop goes through each item and does something with it. Instead of writing add_platform() ten times, you write it once inside the loop. This is how real games load level data — a single loop processes hundreds of platforms. The 'for p in platforms:' means "for each item in platforms, call it p and run the code below".`,
+        starterCode: `# A list of platforms: (x, y, width, height)
 platforms = [
-    ${platformData || '(0, 360, 800, 40)'}
+    (0, 360, 800, 20),    # Ground
+    (150, 280, 180, 20),  # Low platform
+    (400, 210, 180, 20),  # Mid platform
 ]
 
-# Build each platform
-for x, y, width, height in platforms:
-    add_platform(x, y, width, height)
-    print(f"Platform at ({x}, {y})")
+# Loop through and add each one
+for p in platforms:
+    add_platform(p[0], p[1], p[2], p[3])
 
 print(f"Built {len(platforms)} platforms!")
-
-# Set up the game
-setup_simple_game()
 `,
-        solutionCode: `platforms = [${platformData}]
-for x, y, width, height in platforms:
-    add_platform(x, y, width, height)`,
+        solutionCode: `platforms = [
+    (0, 360, 800, 20),
+    (150, 280, 180, 20),
+    (400, 210, 180, 20),
+]
+for p in platforms:
+    add_platform(p[0], p[1], p[2], p[3])`,
         hints: [
-          "Each platform is a tuple: (x, y, width, height)",
-          "The for loop 'unpacks' the tuple into 4 variables",
-          "add_platform() creates the platform in the game"
+          'Try adding a fourth platform to the list — just add another (x, y, width, height) line',
+          'len(platforms) tells you how many items are in the list',
+          'p[0] is the first value, p[1] is second, p[2] is third, p[3] is fourth'
         ],
         validation: [
           { type: 'contains', value: 'for ' },
           { type: 'calls_function', value: 'add_platform' },
           { type: 'runs_without_error', value: '' }
         ],
-        rewards: { xp: 130, badge: 'Loop Legend' }
+        rewards: { xp: 110, badge: 'Level Builder' }
       }
     ]
   };
 }
 
-/**
- * Lesson 4: Functions
- */
+// =============================================================================
+// LESSON 4: Score and Win
+// score variable, show_score(), collides_with(), you_win()
+// =============================================================================
+
 function generateLesson4(
   levelData: LevelData,
-  childName: string,
+  _childName: string,
   heroName: string
 ): PersonalizedLesson {
   return {
-    id: 'lesson_4_functions',
+    id: 'lesson_4_score',
     phase: 4,
-    title: '🔧 Functions',
-    description: 'Create reusable blocks of code!',
-    concepts: ['def', 'parameters', 'return', 'calling functions'],
+    title: '🏆 Score and Win',
+    description: 'Track score, collect coins, and set up a win condition!',
+    concepts: ['score variable', 'show_score()', 'collides_with()', 'you_win()'],
     levelName: levelData.name,
-    childName,
+    childName: _childName,
     heroName,
     totalXp: 300,
     steps: [
       {
-        id: 'l4_step1_first_function',
-        title: 'Create a Function',
-        instruction: `Functions are reusable blocks of code with a name. Let's make one for ${heroName}!`,
-        explanation: `Use 'def' to define a function, give it a name, and put your code inside (indented). Then you can call it anytime!`,
-        starterCode: `# Create a function
-def say_hello():
-    print("Hello!")
-    print("I'm ${heroName}!")
-    print("Ready to play ${levelData.name}!")
+        id: 'l4_step1_score_display',
+        title: 'Show the Score',
+        instruction: `Create a score variable and display it on screen with show_score().`,
+        explanation: `Every game needs a way to track progress. score = 0 creates a variable starting at zero. show_score() puts it in the top-left corner of the game canvas where players can see it. Think of variables like memory slots in the computer — score = 0 reserves a slot called "score" and puts 0 in it. Later we'll change that number when the player collects coins!`,
+        starterCode: `# Start with zero points
+score = 0
 
-# Call the function
-say_hello()
+# Show it on the game screen
+show_score(score)
 
-# You can call it again!
-say_hello()
+print(f"Score: {score}")
 `,
-        solutionCode: `def say_hello():
-    print("Hello!")
-say_hello()`,
+        solutionCode: `score = 0
+show_score(score)
+print(f"Score: {score}")`,
         hints: [
-          "'def' means 'define a function'",
-          "Don't forget the colon : at the end of the def line",
-          "The code inside must be indented (4 spaces)"
+          'score = 0 creates the variable; show_score(score) displays it',
+          'Try changing score = 0 to score = 10 to see a different starting number',
+          'show_score() always shows the current value of whatever you pass it'
         ],
         validation: [
-          { type: 'contains', value: 'def ' },
-          { type: 'runs_without_error', value: '' }
-        ],
-        rewards: { xp: 60 }
-      },
-      {
-        id: 'l4_step2_parameters',
-        title: 'Add Parameters',
-        instruction: `Parameters let you pass information INTO a function!`,
-        explanation: `Parameters are like slots where you put values when calling the function. This makes functions flexible and reusable.`,
-        starterCode: `# Function with a parameter
-def greet(name):
-    print(f"Hello, {name}!")
-    print(f"Welcome to ${levelData.name}!")
-
-# Call with different names
-greet("${childName}")
-greet("${heroName}")
-greet("Player")
-`,
-        solutionCode: `def greet(name):
-    print(f"Hello, {name}!")
-greet("${childName}")`,
-        hints: [
-          "The parameter 'name' becomes a variable inside the function",
-          "You can pass different values each time you call it",
-          "Try calling greet() with your own name!"
-        ],
-        validation: [
-          { type: 'contains', value: 'def ' },
-          { type: 'contains', value: '(' },
+          { type: 'contains', value: 'score' },
+          { type: 'calls_function', value: 'show_score' },
           { type: 'runs_without_error', value: '' }
         ],
         rewards: { xp: 80 }
       },
       {
-        id: 'l4_step3_build_game',
-        title: 'Organize Your Game',
-        instruction: `Let's organize your entire game into clean functions!`,
-        explanation: `Real game developers organize code into functions. Each function does one job. This makes code easier to understand and change!`,
-        starterCode: `# Function to set up the level
-def setup_level():
-    print("Setting up ${levelData.name}...")
-    set_theme("${levelData.theme}")
-    load_my_level("${levelData.name}")
-    print("Level loaded!")
+        id: 'l4_step2_collect_coin',
+        title: 'Collect a Coin',
+        instruction: `Add a coin and collect it: move ${heroName} into it, then check with collides_with().`,
+        explanation: `collides_with('COIN') checks if your hero is touching a coin right now — it returns True or False. This is called collision detection and it's one of the most important concepts in game programming. Move the hero into the coin with move(), then check if they're touching. If yes, score goes up! += 1 is a shortcut for score = score + 1.`,
+        starterCode: `score = 0
+show_score(score)
 
-# Function to set up controls
-def setup_controls():
-    print("Adding controls...")
-    setup_simple_game()
-    print("Controls ready!")
+# Add a coin right in front of the hero
+add_coin(180, 295)
 
-# Function to start the game
-def start_game():
-    print("🎮 Starting game!")
-    setup_level()
-    setup_controls()
-    print("Have fun playing!")
+# Move hero into the coin
+move(80)
 
-# Run everything!
-start_game()
+# Check if touching a coin
+if collides_with('COIN'):
+    remove_colliding('COIN')
+    score += 1
+    show_score(score)
+    print(f"Coin collected! Score: {score}")
+else:
+    print("Not touching a coin yet")
 `,
-        solutionCode: `def setup_level():
-    set_theme("${levelData.theme}")
-    load_my_level("${levelData.name}")
-
-def start_game():
-    setup_level()
-    setup_simple_game()
-
-start_game()`,
+        solutionCode: `score = 0
+add_coin(180, 295)
+move(80)
+if collides_with('COIN'):
+    remove_colliding('COIN')
+    score += 1
+    show_score(score)`,
         hints: [
-          "Each function has one job",
-          "start_game() calls the other functions in order",
-          "You only need to call start_game() to run everything!"
+          "collides_with('COIN') is True when the hero overlaps a coin",
+          'remove_colliding() makes the coin disappear when collected',
+          'Try moving more with move(120) if the hero misses the coin'
         ],
         validation: [
-          { type: 'contains', value: 'def setup_level' },
-          { type: 'contains', value: 'def start_game' },
+          { type: 'calls_function', value: 'collides_with' },
+          { type: 'contains', value: 'score' },
           { type: 'runs_without_error', value: '' }
         ],
-        rewards: { xp: 160, badge: 'Function Wizard' }
+        rewards: { xp: 100 }
+      },
+      {
+        id: 'l4_step3_win_condition',
+        title: 'Add a Win Condition',
+        instruction: `Place a goal flag and call you_win() when ${heroName} reaches it.`,
+        explanation: `Every game needs an ending — a moment where the player wins! add_goal() places a flag the player aims for. When you detect a collision with it, call you_win() and the game shows a victory screen. This is the loop that makes games satisfying: challenge → effort → reward. The if/not game_won check prevents winning multiple times!`,
+        starterCode: `game_won = False
+
+# Place a goal flag
+add_goal(700, 300)
+
+# Move hero toward the goal
+move(600)
+
+# Check if reached the goal
+if not game_won and collides_with('GOAL'):
+    game_won = True
+    show_message("🎉 YOU WIN!")
+    you_win()
+    print("Victory!")
+`,
+        solutionCode: `game_won = False
+add_goal(700, 300)
+move(600)
+if not game_won and collides_with('GOAL'):
+    game_won = True
+    show_message("🎉 YOU WIN!")
+    you_win()`,
+        hints: [
+          "add_goal(x, y) places the flag; collides_with('GOAL') checks if touching it",
+          'game_won = True prevents winning multiple times',
+          'Try move(700) if the hero is not reaching the flag'
+        ],
+        validation: [
+          { type: 'calls_function', value: 'add_goal' },
+          { type: 'calls_function', value: 'you_win' },
+          { type: 'runs_without_error', value: '' }
+        ],
+        rewards: { xp: 120, badge: 'Win Condition Set' }
       }
     ]
   };
 }
 
-/**
- * Lesson 5: Complete Game
- */
+// =============================================================================
+// LESSON 5: Keyboard Controls
+// on_key_down(), on_update(), lambdas, set_player_vy()
+// =============================================================================
+
 function generateLesson5(
   levelData: LevelData,
-  childName: string,
+  _childName: string,
   heroName: string
 ): PersonalizedLesson {
-  const coinCount = levelData.objects.filter(o => o.type === 'coin').length;
-  
   return {
-    id: 'lesson_5_complete_game',
+    id: 'lesson_5_controls',
     phase: 5,
-    title: '🚀 Complete Game',
-    description: 'Put it all together - physics, scoring, and win conditions!',
-    concepts: ['state', 'game loop', 'conditionals', 'events'],
+    title: '⌨️ Keyboard Controls',
+    description: 'Hook up arrow keys and make your hero jump!',
+    concepts: ['on_key_down()', 'on_update()', 'lambda', 'set_player_vy()'],
     levelName: levelData.name,
-    childName,
+    childName: _childName,
     heroName,
     totalXp: 400,
     steps: [
       {
-        id: 'l5_step1_game_state',
-        title: 'Track Game State',
-        instruction: `Games need to remember things - like your score and lives. These are called "state"!`,
-        explanation: `State variables track information that changes during the game. Score goes up when you collect coins. Lives go down when you get hit!`,
-        starterCode: `# Game state - things that change while playing
-score = 0
-lives = 3
+        id: 'l5_step1_right_key',
+        title: 'Arrow Key — Right',
+        instruction: `Use on_key_down('RIGHT', ...) so pressing the right arrow moves ${heroName}.`,
+        explanation: `on_key_down() registers a listener — it says "whenever the RIGHT key is pressed, run this code". The lambda: move(50) is a mini function written in one line. It's like setting a trap: whenever the key is pressed the trap fires and the hero moves. This is the pattern used in every game ever made! After clicking Run Code!, try pressing → on your keyboard.`,
+        starterCode: `# Pressing RIGHT arrow moves the hero
+on_key_down('RIGHT', lambda: move(50))
 
-# Show initial state
-show_score(score)
-show_lives(lives)
-
-print(f"Score: {score}, Lives: {lives}")
-print("Your game state is set up!")
-
-# Load the level
-set_theme("${levelData.theme}")
-load_my_level("${levelData.name}")
-setup_simple_game()
+print("Press → to move right!")
 `,
-        solutionCode: `score = 0
-lives = 3
-show_score(score)
-show_lives(lives)`,
+        solutionCode: `on_key_down('RIGHT', lambda: move(50))
+print("Press → to move right!")`,
         hints: [
-          "Variables at the top of your code are 'global' state",
-          "show_score() and show_lives() update the display",
-          "These values will change as you play!"
+          "on_key_down('RIGHT', ...) fires when you press the right arrow key",
+          "lambda: move(50) is a shorthand function — it means 'when called, run move(50)'",
+          'Click Run Code!, then click the game canvas, then press →'
         ],
         validation: [
-          { type: 'contains', value: 'score' },
-          { type: 'contains', value: 'lives' },
+          { type: 'calls_function', value: 'on_key_down' },
           { type: 'runs_without_error', value: '' }
         ],
-        rewards: { xp: 80 }
+        rewards: { xp: 100 }
       },
       {
-        id: 'l5_step2_collecting',
-        title: 'Collect Coins',
-        instruction: `Let's make ${heroName} collect coins and increase the score!`,
-        explanation: `We check if ${heroName} touches a coin. If they do, we remove the coin, add to the score, and play a sound. Instant gratification!`,
-        starterCode: `score = 0
-show_score(score)
+        id: 'l5_step2_both_directions',
+        title: 'Left and Right',
+        instruction: `Add both LEFT and RIGHT arrow key controls for ${heroName}.`,
+        explanation: `Now we register two listeners — one for LEFT, one for RIGHT. The LEFT key moves the hero in the negative direction (move(-50)). Try changing the number to control speed. You can also print a message when a key is pressed so you know it fired. After running, click the game and use both arrow keys!`,
+        starterCode: `# RIGHT arrow → move right
+on_key_down('RIGHT', lambda: move(50))
 
-# Set up the level
-set_theme("${levelData.theme}")
-load_my_level("${levelData.name}")
+# LEFT arrow → move left
+on_key_down('LEFT', lambda: move(-50))
 
-# This function runs when touching a coin
-def collect_coin():
-    global score
-    if collides_with('COIN'):
-        remove_colliding('COIN')
-        score = score + 1
-        show_score(score)
-        play_sound('coin')
-        print(f"🪙 Got a coin! Score: {score}")
-
-# Check for coins every frame
-on_update(collect_coin)
-
-# Add controls
-setup_simple_game()
-
-print("Collect all ${coinCount} coins!")
+print("Use ← → arrow keys to move!")
 `,
-        solutionCode: `def collect_coin():
-    global score
-    if collides_with('COIN'):
-        remove_colliding('COIN')
-        score += 1
-        show_score(score)`,
+        solutionCode: `on_key_down('RIGHT', lambda: move(50))
+on_key_down('LEFT', lambda: move(-50))
+print("Use ← → arrow keys to move!")`,
         hints: [
-          "'global score' lets us change the score variable inside the function",
-          "collides_with('COIN') checks if touching a coin",
-          "on_update() makes this function run every frame"
+          'Negative move() values move the hero left',
+          'Try changing 50 to 100 for faster movement',
+          'Click on the game canvas first, then press the arrow keys'
         ],
         validation: [
-          { type: 'contains', value: 'collides_with' },
-          { type: 'contains', value: 'global score' },
+          { type: 'calls_function', value: 'on_key_down' },
+          { type: 'contains', value: 'LEFT' },
+          { type: 'contains', value: 'RIGHT' },
           { type: 'runs_without_error', value: '' }
         ],
         rewards: { xp: 120 }
       },
       {
-        id: 'l5_step3_win_condition',
-        title: 'Win the Game!',
-        instruction: `The final step - let ${heroName} WIN when reaching the goal!`,
-        explanation: `We check if ${heroName} touches the goal. When they do - VICTORY! Confetti, sounds, celebration!`,
-        starterCode: `score = 0
-game_won = False
+        id: 'l5_step3_jump',
+        title: 'Add Jumping',
+        instruction: `Press SPACE to jump! Use set_player_vy() with a guard so ${heroName} can only jump on the ground.`,
+        explanation: `set_player_vy() sets the hero's vertical velocity — how fast they move up or down. Negative numbers go up (because y=0 is the top of the screen). The is_on_ground() check is a guard: it prevents double-jumping in mid-air. Without it, the player could jump infinitely! This is the same logic used in Super Mario Bros. Once you run this, try pressing SPACE while standing on a platform.`,
+        starterCode: `# Arrow key controls
+on_key_down('RIGHT', lambda: move(50))
+on_key_down('LEFT', lambda: move(-50))
 
-show_score(score)
-set_theme("${levelData.theme}")
-load_my_level("${levelData.name}")
+# Jump with SPACE — only when on the ground!
+def try_jump():
+    if is_on_ground():
+        set_player_vy(-15)  # Negative = upward
+        print("Jump!")
+    else:
+        print("Can't jump mid-air!")
 
-def collect_coin():
-    global score
-    if collides_with('COIN'):
-        remove_colliding('COIN')
-        score += 1
-        show_score(score)
-        print(f"🪙 Score: {score}")
+on_key_down('SPACE', try_jump)
 
-def check_win():
-    global game_won
-    if not game_won and collides_with('GOAL'):
-        game_won = True
-        show_message("🎉 YOU WIN! 🎉")
-        play_sound('victory')
-        freeze_enemies()
-        print("🏆 VICTORY!")
-
-def game_loop():
-    collect_coin()
-    check_win()
-
-on_update(game_loop)
-setup_simple_game()
-
-print("Reach the goal to win!")
+print("Use ← → to move, SPACE to jump!")
 `,
-        solutionCode: `def check_win():
-    global game_won
-    if not game_won and collides_with('GOAL'):
-        game_won = True
-        show_message("🎉 YOU WIN! 🎉")`,
+        solutionCode: `on_key_down('RIGHT', lambda: move(50))
+on_key_down('LEFT', lambda: move(-50))
+def try_jump():
+    if is_on_ground():
+        set_player_vy(-15)
+on_key_down('SPACE', try_jump)`,
         hints: [
-          "game_won prevents winning multiple times",
-          "collides_with('GOAL') checks if touching the flag",
-          "freeze_enemies() stops enemies when you win"
+          'set_player_vy(-15) makes the hero launch upward — bigger negatives jump higher',
+          'is_on_ground() returns True only when touching a platform',
+          'The def try_jump(): block defines a named function — on_key_down calls it on SPACE'
         ],
         validation: [
-          { type: 'contains', value: 'collides_with' },
-          { type: 'contains', value: 'GOAL' },
+          { type: 'calls_function', value: 'on_key_down' },
+          { type: 'calls_function', value: 'set_player_vy' },
+          { type: 'contains', value: 'is_on_ground' },
           { type: 'runs_without_error', value: '' }
         ],
-        rewards: { xp: 200, badge: 'Game Developer' }
+        rewards: { xp: 180, badge: 'Game Controller' }
       }
     ]
   };
@@ -768,7 +664,7 @@ export function calculateLessonProgress(
     for (const step of lesson.steps) {
       totalSteps++;
       totalXp += step.rewards.xp;
-      
+
       if (completedStepIds.includes(step.id)) {
         completedSteps++;
         earnedXp += step.rewards.xp;
@@ -789,6 +685,3 @@ export function calculateLessonProgress(
     percentComplete: totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0
   };
 }
-
-
-

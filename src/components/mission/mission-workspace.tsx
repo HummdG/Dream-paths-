@@ -77,38 +77,51 @@ export function MissionWorkspace({
       setValidationResult(null);
       setCurrentCode(currentStep.starterCode);
       setHasRunCode(false);
+      const windowEngine = (window as unknown as { gameEngine?: PlatformerEngine }).gameEngine;
+      if (windowEngine) {
+        windowEngine.clearCallbacks();
+        windowEngine.clearEvents();
+        windowEngine.restart();
+      }
     }
-  }, [currentStep]);
+  }, [currentStep?.stepId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Run code handler for SimpleEditor
   const handleRunCode = async (code: string): Promise<{ output: string; error?: string; success?: boolean }> => {
     setCurrentCode(code);
     setHasRunCode(true);
-    
+
     try {
-      // Start the game engine first so code can control it
-      // Use window.gameEngine directly to ensure we start the actual engine instance
-      // that Python will access, not just the React state reference
-      const windowEngine = (window as unknown as { gameEngine?: { start: () => void } }).gameEngine;
+      // Reset engine state before running new code
+      const windowEngine = (window as unknown as { gameEngine?: PlatformerEngine }).gameEngine;
+      if (windowEngine) {
+        windowEngine.clearCallbacks();
+        windowEngine.clearEvents();
+        windowEngine.restart();
+      } else if (engine) {
+        engine.clearCallbacks();
+        engine.clearEvents();
+        engine.restart();
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      const win = window as unknown as { pyodide?: { runPythonAsync: (code: string) => Promise<string> } };
+      if (typeof win.pyodide === "undefined") {
+        return { output: "", error: "Python is still loading... Please wait a moment and try again!" };
+      }
+
+      const pyodide = win.pyodide;
+
+      // Start engine so Python callbacks can fire
       if (windowEngine) {
         windowEngine.start();
       } else if (engine) {
         engine.start();
       }
-      
-      // Longer delay to ensure engine is fully running and ready for Python commands
-      await new Promise(resolve => setTimeout(resolve, 200));
 
-      // @ts-expect-error - Pyodide is loaded globally
-      if (typeof window.pyodide === "undefined") {
-        return { output: "", error: "Python is still loading... Please wait a moment and try again!" };
-      }
-
-      // @ts-expect-error - Pyodide is loaded globally
-      const pyodide = window.pyodide;
-      
       const wrappedCode = wrapUserCode(code);
-      
+
       const runnerCode = `
 import sys
 from io import StringIO
@@ -125,13 +138,14 @@ __captured_output__ = sys.stdout.getvalue()
 sys.stdout = __old_stdout__
 __captured_output__
 `;
-      
+
       const result = await pyodide.runPythonAsync(runnerCode);
       const printOutput = result || "";
-      
-      // Get events from the game engine for validation
-      await new Promise(resolve => setTimeout(resolve, 500));
-      const events = engine?.getEvents() || [];
+
+      // Wait for physics frames to run before collecting events
+      await new Promise(resolve => setTimeout(resolve, 800));
+      const activeEngine = windowEngine || engine;
+      const events = activeEngine?.getEvents() || [];
       
       if (currentStep) {
         const validation = validateStep(
@@ -198,35 +212,32 @@ __captured_output__
 
   // Handle level save for level design missions
   const handleLevelSave = async (savedLevelData: LevelData) => {
-    try {
-      const response = await fetch("/api/levels", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          childId,
-          name: savedLevelData.name,
-          theme: savedLevelData.theme,
-          gridData: {},
-          objects: savedLevelData.objects,
-          settings: savedLevelData.settings,
-        }),
-      });
+    // Save the level to the DB (simple POST - duplicates are fine, latest is always used)
+    const response = await fetch("/api/levels", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        childId,
+        name: savedLevelData.name,
+        theme: savedLevelData.theme,
+        gridData: {},
+        objects: savedLevelData.objects,
+        settings: savedLevelData.settings,
+      }),
+    });
 
-      if (!response.ok) {
-        throw new Error("Failed to save level");
-      }
-
-      // Update local state so subsequent missions can use this level
-      setLevelData(savedLevelData);
-      
-      // Notify parent component
-      onLevelSaved?.(savedLevelData);
-
-      // Mark step as complete
-      markCurrentStepComplete();
-    } catch (error) {
-      console.error("Failed to save level:", error);
+    if (!response.ok) {
+      throw new Error("Failed to save level");
     }
+
+    // Update local state so subsequent missions can use this level
+    setLevelData(savedLevelData);
+
+    // Notify parent component
+    onLevelSaved?.(savedLevelData);
+
+    // Complete ALL steps and the mission in one go
+    markAllStepsComplete();
   };
 
   // Handle level test
@@ -287,6 +298,22 @@ __captured_output__
     }
   };
 
+  // Helper to mark ALL steps complete at once (used for level_design missions)
+  const markAllStepsComplete = () => {
+    const newCompleted = new Set(completedSteps);
+
+    for (const step of mission.steps) {
+      if (!newCompleted.has(step.stepId)) {
+        newCompleted.add(step.stepId);
+        onStepComplete?.(step.stepId, step.reward.stars, step.reward.badge);
+      }
+    }
+
+    setCompletedSteps(newCompleted);
+    setShowCelebration(true);
+    onMissionComplete?.(mission.missionId);
+  };
+
   // Check mission type
   const isCreativeMission = mission.missionType === 'creative';
   const isLevelDesignMission = mission.missionType === 'level_design';
@@ -319,7 +346,7 @@ __captured_output__
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-6"
+            className="fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-6"
             onClick={() => setShowCelebration(false)}
           >
             <motion.div
@@ -447,24 +474,22 @@ __captured_output__
             childName={childName}
           />
         ) : (
-        <div className="grid lg:grid-cols-[1fr_400px] gap-4 h-[calc(100vh-80px)]">
-          {/* Left side: Code editor + Game preview */}
-          <div className="flex flex-col gap-4 min-h-0">
-            {/* Simple Code Editor */}
-            <div className="flex-1 min-h-0">
-              <SimpleEditor
-                initialCode={currentStep?.starterCode || ""}
-                hint={currentStep?.hint}
-                onRun={handleRunCode}
-                onCodeChange={setCurrentCode}
-                height="380px"
-                showGameHint
-              />
-            </div>
+        <div className="grid lg:grid-cols-[1fr_400px] gap-4">
+          {/* Left side: Code editor + Game preview — natural height, scrollable on small screens */}
+          <div className="flex flex-col gap-4">
+            <SimpleEditor
+              initialCode={currentStep?.starterCode || ""}
+              hint={currentStep?.hint}
+              onRun={handleRunCode}
+              onCodeChange={setCurrentCode}
+              height="340px"
+              showGameHint
+              validationChecks={validationResult?.checks}
+            />
 
             {/* Game Preview */}
-            <div className="h-[440px] shrink-0">
-              <GamePreview 
+            <div className="h-[420px]">
+              <GamePreview
                 levelData={activeLevelData}
                 heroPixels={heroPixels}
                 isPlaying={hasRunCode}
@@ -473,8 +498,8 @@ __captured_output__
             </div>
           </div>
 
-          {/* Right side: Step instructions */}
-          <div className="min-h-0">
+          {/* Right side: sticky so step instructions stay in view as user scrolls */}
+          <div className="lg:sticky lg:top-[72px] lg:self-start lg:max-h-[calc(100vh-88px)] lg:overflow-y-auto">
             <StepPanel
               step={currentStep}
               stepNumber={currentStepIndex + 1}

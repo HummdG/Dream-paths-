@@ -29,7 +29,7 @@ type Tool = "select" | "place" | "erase" | "pan";
 type SaveStatus = "idle" | "saving" | "success" | "error";
 type LevelSize = "short" | "medium" | "long" | "infinite";
 
-const LEVEL_SIZES = {
+const LEVEL_SIZES: Record<LevelSize, { width: number; label: string; icon: string; description: string; loops?: boolean }> = {
   short: { width: 40, label: "Short", icon: "📏", description: "Quick level" },
   medium: { width: 80, label: "Medium", icon: "📐", description: "Standard level" },
   long: { width: 120, label: "Long", icon: "📏📏", description: "Epic journey" },

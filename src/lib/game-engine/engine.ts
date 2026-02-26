@@ -780,6 +780,7 @@ export class PlatformerEngine {
       active: true
     };
     this.state.coins.push(coin);
+    this.emitEvent('coin_added', { id, x, y });
     return id;
   }
 
@@ -995,6 +996,12 @@ export class PlatformerEngine {
   }
 
   // Callback registration
+  public clearCallbacks(): void {
+    this.callbacks.onUpdate = [];
+    this.callbacks.onKeyDown.clear();
+    this.callbacks.onKeyUp.clear();
+  }
+
   public onUpdate(callback: UpdateCallback): void {
     this.callbacks.onUpdate.push(callback);
   }

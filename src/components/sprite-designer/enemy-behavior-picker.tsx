@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, type TargetAndTransition } from "framer-motion";
 import { Info } from "lucide-react";
 
 export interface EnemyBehavior {
@@ -343,7 +343,7 @@ function BehaviorPreview({ behavior }: { behavior: EnemyBehavior }) {
     <motion.div
       className="absolute w-8 h-8 bg-violet-500 rounded-lg flex items-center justify-center"
       style={{ left: 0, top: "50%", marginTop: -16 }}
-      animate={getAnimation()}
+      animate={getAnimation() as TargetAndTransition}
     >
       <span className="text-lg">👾</span>
     </motion.div>

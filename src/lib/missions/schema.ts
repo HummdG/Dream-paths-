@@ -18,7 +18,8 @@ export type ValidationCheck =
   | { type: 'ast_has_while_loop' }
   | { type: 'ast_uses_global'; variable: string }
   | { type: 'ast_calls_function'; name: string }
-  
+  | { type: 'ast_has_on_key_handler' }
+
   // Runtime behavior checks
   | { type: 'stdout_contains'; text: string }
   | { type: 'ui_message_shown' }

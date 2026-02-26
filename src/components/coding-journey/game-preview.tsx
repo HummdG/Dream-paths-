@@ -20,10 +20,17 @@ export function GamePreview({
 }: GamePreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<PlatformerEngine | null>(null);
+  const onEngineReadyRef = useRef(onEngineReady);
   const [isRunning, setIsRunning] = useState(false);
   const [isEngineReady, setIsEngineReady] = useState(false);
 
-  // Initialize engine
+  // Keep the ref up-to-date without adding onEngineReady as an effect dependency
+  useEffect(() => {
+    onEngineReadyRef.current = onEngineReady;
+  });
+
+  // Initialize engine — only re-runs when heroPixels changes, NOT when the
+  // parent re-renders and passes a new onEngineReady function reference.
   useEffect(() => {
     if (!canvasRef.current) return;
 
@@ -41,12 +48,12 @@ export function GamePreview({
     }
 
     setIsEngineReady(true);
-    onEngineReady?.(engine);
+    onEngineReadyRef.current?.(engine);
 
     return () => {
       engine.destroy();
     };
-  }, [heroPixels, onEngineReady]);
+  }, [heroPixels]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Load level data when engine is ready
   const loadLevel = useCallback(() => {
@@ -231,6 +238,8 @@ export function GamePreview({
     </div>
   );
 }
+
+
 
 
 

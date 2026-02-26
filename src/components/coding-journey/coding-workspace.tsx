@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { PlatformerEngine } from "@/lib/game-engine/engine";
+import { PlatformerEngine } from "@/lib/game-engine";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Check,
@@ -180,19 +180,28 @@ export function CodingWorkspace({
       // Small delay to ensure engine is running
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      // @ts-expect-error - Pyodide is loaded globally
-      if (typeof window.pyodide === "undefined") {
+      const win = window as unknown as { pyodide?: { globals: { get: (key: string) => unknown; set: (key: string, val: unknown) => void }; runPythonAsync: (code: string) => Promise<string> } };
+      if (typeof win.pyodide === "undefined") {
         return { output: "", error: "Python is loading... Try again in a moment!" };
       }
 
-      // @ts-expect-error - Pyodide is loaded globally
-      const pyodide = window.pyodide;
+      const pyodide = win.pyodide;
       
-      // First, load the game API if not already loaded
+      // Load the game API once, then reset state on subsequent runs
       const apiLoaded = pyodide.globals.get('__game_api_loaded__');
       if (!apiLoaded) {
         await pyodide.runPythonAsync(PYTHON_GAME_API);
         pyodide.globals.set('__game_api_loaded__', true);
+      } else {
+        // Reset Python globals and clear engine callbacks/events for a clean run
+        await pyodide.runPythonAsync('_reset_game_state()');
+      }
+
+      // Reset JS engine state as well (in case Python-side reset missed anything)
+      const windowEngine = (window as unknown as { gameEngine?: PlatformerEngine }).gameEngine;
+      if (windowEngine) {
+        windowEngine.clearCallbacks();
+        windowEngine.clearEvents();
       }
       
       const wrappedCode = `

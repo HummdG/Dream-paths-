@@ -18,9 +18,10 @@ const createLevelSchema = z.object({
     width: z.number(),
     height: z.number(),
     subtype: z.string().optional(),
-    data: z.record(z.unknown()).optional(),
+    data: z.record(z.string(), z.unknown()).optional(),
   })),
   settings: z.object({
+    
     winCondition: z.enum(["reach_goal", "collect_all_coins", "defeat_all_enemies"]),
     requiredCoins: z.number().optional(),
     timeLimit: z.number().optional(),
@@ -108,8 +109,8 @@ export async function POST(request: Request) {
         name: validatedData.name,
         theme: validatedData.theme,
         gridData: validatedData.gridData || {},
-        objects: validatedData.objects,
-        settings: validatedData.settings,
+        objects: validatedData.objects as object,
+        settings: validatedData.settings as object,
         thumbnail: validatedData.thumbnail,
       },
     });
@@ -118,7 +119,7 @@ export async function POST(request: Request) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid data", details: error.errors },
+        { error: "Invalid data", details: error.issues },
         { status: 400 }
       );
     }
@@ -174,7 +175,7 @@ export async function PUT(request: Request) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid data", details: error.errors },
+        { error: "Invalid data", details: error.issues },
         { status: 400 }
       );
     }
@@ -230,6 +231,8 @@ export async function DELETE(request: Request) {
     );
   }
 }
+
+
 
 
 

@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { PlayClient } from "./play-client";
 import { platformerMissionPack, getMissionById } from "@/lib/missions";
+import type { LevelData } from "@/components/level-designer/level-designer";
 
 interface PlayPageProps {
   params: Promise<{
@@ -61,20 +62,22 @@ export default async function PlayPage({ params }: PlayPageProps) {
 
   if (!project) {
     // Create new project with default config
-    project = await db.project.create({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    project = await (db.project.create({
       data: {
         childId: child.id,
         packId: platformerMissionPack.packId,
         name: "My Platformer Game",
         currentMissionId: missionId,
         currentStepId: mission.steps[0].stepId,
-        gameConfigJson: platformerMissionPack.gameTemplate.defaultConfig,
+        gameConfigJson: platformerMissionPack.gameTemplate.defaultConfig as object,
         badgesJson: [],
       },
       include: {
         stepProgress: true,
       },
-    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }) as any);
   } else {
     // Update current mission if needed
     if (project.currentMissionId !== missionId) {
@@ -87,6 +90,8 @@ export default async function PlayPage({ params }: PlayPageProps) {
       });
     }
   }
+
+  if (!project) redirect("/");
 
   // Get completed steps for this mission
   const completedStepIds = project.stepProgress
@@ -115,25 +120,11 @@ export default async function PlayPage({ params }: PlayPageProps) {
     orderBy: { updatedAt: "desc" },
   });
 
-  // Parse level data if available
-  const levelData = userLevel ? {
-    name: userLevel.name,
-    theme: userLevel.theme as "space" | "jungle" | "city",
-    objects: userLevel.objects as Array<{
-      id: string;
-      type: "platform" | "coin" | "enemy" | "spawn" | "goal" | "decoration";
-      x: number;
-      y: number;
-      width: number;
-      height: number;
-      subtype?: string;
-    }>,
-    settings: userLevel.settings as {
-      winCondition: "reach_goal" | "collect_all_coins" | "defeat_all_enemies";
-      requiredCoins?: number;
-      timeLimit?: number;
-    },
-  } : undefined;
+  // Parse level data if available.
+  // The data was saved by LevelDesigner so we trust its shape. Cast through unknown
+  // to avoid fighting unexported internal types (LevelSize etc.).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const levelData = userLevel ? (userLevel as unknown as any) as LevelData : undefined;
 
   return (
     <PlayClient

@@ -637,10 +637,29 @@ def setup_simple_game():
 # Initialize global variables
 score = 0
 lives = 3
+game_won = False
 _win_goal = 'reach_flag'
 
+# =============================================================================
+# STATE RESET (called before every code run)
+# =============================================================================
+
+def _reset_game_state():
+    """Reset all Python globals and clear engine callbacks/events before each run."""
+    global score, lives, game_won, _win_goal
+    global _update_callbacks, _key_callbacks
+    score = 0
+    lives = 3
+    game_won = False
+    _win_goal = 'reach_flag'
+    _update_callbacks = []
+    _key_callbacks = {}
+    engine = _get_engine()
+    if engine:
+        engine.clearCallbacks()
+        engine.clearEvents()
+
 print("🎮 Game API loaded! Let's make a game!")
-print("💡 Tip: Call setup_simple_game() for quick start!")
 `;
 
 /**
@@ -648,6 +667,9 @@ print("💡 Tip: Call setup_simple_game() for quick start!")
  */
 export function wrapUserCode(userCode: string): string {
   return `${PYTHON_GAME_API}
+
+# Reset state before user code runs
+_reset_game_state()
 
 # =============================================================================
 # YOUR CODE BELOW ⬇️

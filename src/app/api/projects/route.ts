@@ -11,7 +11,7 @@ const createProjectSchema = z.object({
   heroId: z.string().optional(),
   levelIds: z.array(z.string()).optional(),
   spriteIds: z.array(z.string()).optional(),
-  settings: z.record(z.unknown()).optional(),
+  settings: z.record(z.string(), z.unknown()).optional(),
 });
 
 // Update schema
@@ -93,7 +93,7 @@ export async function POST(request: Request) {
         heroId: validatedData.heroId,
         levelIds: validatedData.levelIds || [],
         spriteIds: validatedData.spriteIds || [],
-        settings: validatedData.settings || {},
+        settings: (validatedData.settings || {}) as object,
       },
     });
 
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid data", details: error.errors },
+        { error: "Invalid data", details: error.issues },
         { status: 400 }
       );
     }
@@ -143,20 +143,21 @@ export async function PUT(request: Request) {
     // Update the project
     const project = await prisma.gameProject.update({
       where: { id: validatedData.id },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       data: {
         ...(validatedData.name && { name: validatedData.name }),
         ...(validatedData.heroId !== undefined && { heroId: validatedData.heroId }),
         ...(validatedData.levelIds && { levelIds: validatedData.levelIds }),
         ...(validatedData.spriteIds && { spriteIds: validatedData.spriteIds }),
-        ...(validatedData.settings && { settings: validatedData.settings }),
-      },
+        ...(validatedData.settings && { settings: validatedData.settings as object }),
+      } as any,
     });
 
     return NextResponse.json({ project });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid data", details: error.errors },
+        { error: "Invalid data", details: error.issues },
         { status: 400 }
       );
     }
@@ -212,6 +213,8 @@ export async function DELETE(request: Request) {
     );
   }
 }
+
+
 
 
 

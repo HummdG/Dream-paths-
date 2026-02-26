@@ -6,24 +6,9 @@ import { Loader2 } from "lucide-react";
 import { MissionWorkspace } from "@/components/mission";
 import { Mission } from "@/lib/missions/schema";
 
-interface LevelData {
-  name: string;
-  theme: "space" | "jungle" | "city";
-  objects: Array<{
-    id: string;
-    type: "platform" | "coin" | "enemy" | "spawn" | "goal" | "decoration";
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    subtype?: string;
-  }>;
-  settings: {
-    winCondition: "reach_goal" | "collect_all_coins" | "defeat_all_enemies";
-    requiredCoins?: number;
-    timeLimit?: number;
-  };
-}
+// Use the canonical LevelData type from the level designer so all themes
+// (space, jungle, city, ocean, castle, sky, volcano, candy) are accepted.
+import type { LevelData } from "@/components/level-designer/level-designer";
 
 interface PlayClientProps {
   mission: Mission;
@@ -56,16 +41,14 @@ export function PlayClient({
 
   useEffect(() => {
     // Check if Pyodide is already loaded
-    // @ts-expect-error - Pyodide is loaded globally
-    if (typeof window.pyodide !== "undefined") {
+    if (typeof (window as unknown as { pyodide?: unknown }).pyodide !== "undefined") {
       setPyodideReady(true);
       return;
     }
 
     // Wait for Pyodide to load
     const checkPyodide = setInterval(() => {
-      // @ts-expect-error - Pyodide is loaded globally
-      if (typeof window.pyodide !== "undefined") {
+      if (typeof (window as unknown as { pyodide?: unknown }).pyodide !== "undefined") {
         setPyodideReady(true);
         clearInterval(checkPyodide);
       }
@@ -120,7 +103,8 @@ export function PlayClient({
         heroPixels={heroPixels}
         onHeroSaved={(pixels) => setHeroPixels(pixels)}
         levelData={levelData}
-        onLevelSaved={(data) => setLevelData(data)}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onLevelSaved={(data) => setLevelData(data as any)}
       />
     );
   }
@@ -137,8 +121,7 @@ export function PlayClient({
             const pyodide = await loadPyodide({
               indexURL: "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/",
             });
-            // @ts-expect-error - Setting global pyodide
-            window.pyodide = pyodide;
+            (window as unknown as { pyodide: unknown }).pyodide = pyodide;
             setPyodideReady(true);
           } catch (error) {
             console.error("Failed to load Pyodide:", error);
@@ -168,7 +151,8 @@ export function PlayClient({
           heroPixels={heroPixels}
           onHeroSaved={(pixels) => setHeroPixels(pixels)}
           levelData={levelData}
-          onLevelSaved={(data) => setLevelData(data)}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          onLevelSaved={(data) => setLevelData(data as any)}
         />
       )}
     </>

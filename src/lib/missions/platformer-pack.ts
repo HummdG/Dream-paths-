@@ -310,16 +310,17 @@ show_message('Welcome to my game!')`,
     learningOutcomes: ['level design', 'game objects', 'spatial thinking', 'creativity'],
     steps: [
       {
-        stepId: 'm2_s1_explore_level_designer',
-        concepts: ['level design', 'UI tools'],
-        instruction: "Let's explore the Level Designer! Pick a theme and place some platforms.",
-        detailedExplanation: "The Level Designer is like a sandbox - you can place platforms, coins, and more by clicking and dragging. Start by choosing a theme that matches the adventure you want to create!",
-        starterCode: '', // Not used for level_design missions
-        hint: "Try picking a template on the left for inspiration, then change it to make it yours!",
+        stepId: 'm2_s1_design_level',
+        concepts: ['level design', 'game objects', 'spatial thinking', 'creativity'],
+        instruction: "Design your level! Pick a theme, place platforms, add coins and enemies, then save it.",
+        detailedExplanation: "The Level Designer is your sandbox - place platforms to jump on, coins to collect, and enemies to dodge. Pick a theme, make sure there's a path from spawn to goal, then hit Save when you're happy with it!",
+        starterCode: '',
+        hint: "Try picking a template on the left for inspiration, then customize it to make it yours! Don't forget to test your level before saving.",
         successCriteria: [
           'Choose a theme for your level',
-          'Place at least 3 platforms',
-          'Your level has a spawn point and goal'
+          'Place platforms, coins, and enemies',
+          'Make sure there is a spawn point and goal',
+          'Save your level'
         ],
         validation: {
           type: 'runtime',
@@ -327,111 +328,11 @@ show_message('Welcome to my game!')`,
             { type: 'theme_applied' },
             { type: 'level_has_spawn' },
             { type: 'level_has_goal' },
-            { type: 'level_has_platforms', count: 3 }
-          ]
-        },
-        reward: { stars: 2, badge: 'Scene Starter' }
-      },
-      {
-        stepId: 'm2_s2_design_obstacle',
-        concepts: ['pixel art', 'obstacles', 'creativity'],
-        instruction: "Design your first obstacle! Create something dangerous for your hero to avoid.",
-        detailedExplanation: "In the Sprite Designer, you can create obstacles using pixel art. Think about what makes something look dangerous - spikes, fire, or something totally new you invent!",
-        starterCode: '',
-        hint: "Start with a template like spikes, then change the colors to make it unique!",
-        successCriteria: [
-          'Create an obstacle sprite',
-          'Give it a name',
-          'Save your obstacle'
-        ],
-        validation: {
-          type: 'runtime',
-          checks: [
-            { type: 'sprite_has_pixels' },
-            { type: 'sprite_saved' }
-          ]
-        },
-        reward: { stars: 2, badge: 'Obstacle Creator' }
-      },
-      {
-        stepId: 'm2_s3_design_enemy',
-        concepts: ['pixel art', 'enemy design', 'behaviors'],
-        instruction: "Now create an ENEMY! Design how it looks AND how it moves.",
-        detailedExplanation: "Enemies are like obstacles that MOVE! You'll design what your enemy looks like with pixel art, then choose its behavior - does it patrol back and forth? Chase the player? Fly around?",
-        starterCode: '',
-        hint: "Try the 'patrol' behavior first - it's fun to watch enemies walk back and forth!",
-        successCriteria: [
-          'Create an enemy sprite',
-          'Choose a movement behavior',
-          'Save your enemy'
-        ],
-        validation: {
-          type: 'runtime',
-          checks: [
-            { type: 'sprite_has_pixels' },
-            { type: 'enemy_has_behavior' },
-            { type: 'sprite_saved' }
-          ]
-        },
-        reward: { stars: 3, badge: 'Enemy Designer' }
-      },
-      {
-        stepId: 'm2_s4_complete_level',
-        concepts: ['level design', 'game balance', 'playtesting'],
-        instruction: "Finish your level! Add coins, enemies, and make sure it's possible to win!",
-        detailedExplanation: "A great level has a good balance - not too easy, not too hard! Add coins for the player to collect, place your custom enemies, and make sure there's a clear path from start to finish.",
-        starterCode: '',
-        hint: "Test your level by clicking 'Play Test'! Can YOU beat it?",
-        successCriteria: [
-          'Add at least 3 coins to collect',
-          'Place at least 1 enemy',
-          'Test that the level is completable',
-          'Save your level'
-        ],
-        validation: {
-          type: 'runtime',
-          checks: [
             { type: 'level_has_platforms', count: 3 },
             { type: 'level_saved' }
           ]
         },
-        reward: { stars: 3, badge: 'Level Architect' }
-      },
-      {
-        stepId: 'm2_s5_code_your_level',
-        concepts: ['python basics', 'loading content', 'simple code'],
-        instruction: "Now let's write some Python code to bring your level to life!",
-        detailedExplanation: "You've designed everything visually - now we'll write simple Python code to load your level and make it playable. Don't worry, we'll start with just a few lines!",
-        starterCode: `# 🎮 Let's load YOUR level!
-# This will load all the platforms, coins, and enemies you designed
-
-# Load your custom level
-load_my_level("My Level")
-
-# Set up the basic controls
-setup_simple_game()
-
-# That's it! Press Run to play YOUR game!
-print("🎮 Your game is ready!")
-`,
-        hint: "Change 'My Level' to the name you gave your level in the designer!",
-        successCriteria: [
-          'Load your custom level',
-          'Set up controls',
-          'Play and enjoy your game!'
-        ],
-        validation: {
-          type: 'runtime',
-          checks: [
-            { type: 'ui_message_shown' }
-          ]
-        },
-        reward: { stars: 3, badge: 'Scene Builder' },
-        customization: {
-          type: 'level_design',
-          description: 'Load and play your custom level',
-          options: []
-        }
+        reward: { stars: 5, badge: 'Scene Builder' }
       }
     ]
   },
@@ -477,10 +378,10 @@ print('Player moved right!')
           'Calling move(-50) moves the player left'
         ],
         validation: {
-          type: 'ast_and_runtime',
+          type: 'ast',
           checks: [
             { type: 'ast_has_function', name: 'move' },
-            { type: 'player_moves_on_key', key: 'RIGHT' }
+            { type: 'ast_calls_function', name: 'move' }
           ]
         },
         reward: { stars: 2, badge: 'Function Builder' }
@@ -532,11 +433,11 @@ print('Use arrow keys to move! ⬅️ ➡️')
           'Uses if/elif (not separate duplicate code)'
         ],
         validation: {
-          type: 'ast_and_runtime',
+          type: 'ast',
           checks: [
             { type: 'ast_has_if' },
-            { type: 'player_moves_on_key', key: 'LEFT' },
-            { type: 'player_moves_on_key', key: 'RIGHT' }
+            { type: 'ast_has_on_key_handler' },
+            { type: 'ast_calls_function', name: 'move' }
           ]
         },
         reward: { stars: 2, badge: 'Controls Unlocked' }
@@ -679,9 +580,10 @@ print('Gravity is ON! Watch the player fall! 🍎')
           'vy increases over time due to gravity'
         ],
         validation: {
-          type: 'runtime',
+          type: 'ast',
           checks: [
-            { type: 'player_falls_when_airborne' }
+            { type: 'ast_has_assignment', variable: 'vy' },
+            { type: 'ast_calls_function', name: 'on_update' }
           ]
         },
         reward: { stars: 3, badge: 'Physics Apprentice' }
@@ -715,11 +617,11 @@ print('Press SPACE to jump! 🚀')
           'Cannot double-jump in mid-air'
         ],
         validation: {
-          type: 'ast_and_runtime',
+          type: 'ast',
           checks: [
             { type: 'ast_has_if' },
-            { type: 'player_jumps_on_key', key: 'SPACE' },
-            { type: 'no_double_jump' }
+            { type: 'ast_has_on_key_handler' },
+            { type: 'ast_calls_function', name: 'set_player_vy' }
           ]
         },
         reward: { stars: 3, badge: 'Jump Master' }

@@ -328,14 +328,13 @@ export function GameCanvas({ code, autoRun = false, height = "300px" }: GameCanv
     engine.reset();
 
     try {
-      // @ts-expect-error - Pyodide loaded globally
-      if (typeof window.pyodide === "undefined") {
+      const win = window as unknown as { pyodide?: { globals: { set: (key: string, val: unknown) => void; get: (key: string) => { toJs: () => unknown[][] } }; runPythonAsync: (code: string) => Promise<unknown> } };
+      if (typeof win.pyodide === "undefined") {
         setError("Python is still loading...");
         return;
       }
 
-      // @ts-expect-error - Pyodide loaded globally
-      const pyodide = window.pyodide;
+      const pyodide = win.pyodide;
 
       // Create Python bindings for our game API
       pyodide.globals.set("__game_commands__", []);
@@ -370,22 +369,22 @@ def set_background(color):
       const commands = pyodide.globals.get("__game_commands__").toJs();
       
       for (const cmd of commands) {
-        const [action, ...args] = cmd;
+        const [action, ...args] = cmd as [string, ...unknown[]];
         switch (action) {
           case "create_player":
-            engine.createPlayer(args[0], args[1], args[2], args[3], args[4]);
+            engine.createPlayer(args[0] as number, args[1] as number, args[2] as number, args[3] as number, args[4] as string);
             break;
           case "create_platform":
-            engine.createPlatform(args[0], args[1], args[2], args[3], args[4]);
+            engine.createPlatform(args[0] as number, args[1] as number, args[2] as number, args[3] as number, args[4] as string);
             break;
           case "create_coin":
-            engine.createCoin(args[0], args[1]);
+            engine.createCoin(args[0] as number, args[1] as number);
             break;
           case "set_gravity":
-            engine.setGravity(args[0]);
+            engine.setGravity(args[0] as number);
             break;
           case "set_background":
-            engine.setBackgroundColor(args[0]);
+            engine.setBackgroundColor(args[0] as string);
             break;
         }
       }
@@ -495,6 +494,8 @@ def set_background(color):
     </div>
   );
 }
+
+
 
 
 
