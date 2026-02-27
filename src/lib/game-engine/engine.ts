@@ -83,9 +83,10 @@ export class PlatformerEngine {
   private spawnX: number = 100;
   private spawnY: number = 300;
 
-  // Canvas dimensions
+  // Canvas dimensions — must match the level designer's 25-row grid (25 * 20px = 500px).
+  // The level designer uses tileSize=20, height=25 rows → 500px canvas height.
   private width: number = 800;
-  private height: number = 400;
+  private height: number = 500;
 
   constructor() {
     this.state = this.createInitialState();

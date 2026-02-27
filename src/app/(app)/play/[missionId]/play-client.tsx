@@ -5,6 +5,7 @@ import Script from "next/script";
 import { Loader2 } from "lucide-react";
 import { MissionWorkspace } from "@/components/mission";
 import { Mission } from "@/lib/missions/schema";
+import { platformerMissionPack } from "@/lib/missions";
 
 // Use the canonical LevelData type from the level designer so all themes
 // (space, jungle, city, ocean, castle, sky, volcano, candy) are accepted.
@@ -35,6 +36,12 @@ export function PlayClient({
   const [loadingStatus, setLoadingStatus] = useState("Loading Python...");
   const [heroPixels, setHeroPixels] = useState<string[][] | undefined>(initialHeroPixels);
   const [levelData, setLevelData] = useState<LevelData | undefined>(initialLevelData);
+
+  // Determine the next mission in the pack (if any)
+  const missionIndex = platformerMissionPack.missions.findIndex(m => m.missionId === mission.missionId);
+  const nextMissionId = missionIndex >= 0 && missionIndex < platformerMissionPack.missions.length - 1
+    ? platformerMissionPack.missions[missionIndex + 1].missionId
+    : undefined;
 
   // For creative missions, we don't need Pyodide
   const isCreativeMission = mission.missionType === 'creative';
@@ -105,6 +112,7 @@ export function PlayClient({
         levelData={levelData}
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onLevelSaved={(data) => setLevelData(data as any)}
+        nextMissionId={nextMissionId}
       />
     );
   }
@@ -153,6 +161,7 @@ export function PlayClient({
           levelData={levelData}
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           onLevelSaved={(data) => setLevelData(data as any)}
+          nextMissionId={nextMissionId}
         />
       )}
     </>

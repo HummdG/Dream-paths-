@@ -119,7 +119,7 @@ export function GameCanvas({ engine, onEngineReady }: GameCanvasProps) {
         <canvas
           ref={canvasRef}
           width={800}
-          height={400}
+          height={500}
           className={`block ${isFullscreen ? 'w-full h-full' : 'w-full'}`}
           style={{ imageRendering: 'pixelated' }}
         />

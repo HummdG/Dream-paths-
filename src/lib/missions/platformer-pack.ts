@@ -353,18 +353,20 @@ show_message('Welcome to my game!')`,
         concepts: ['functions', 'parameters'],
         instruction: 'Write a function called `move()` that moves the player left or right.',
         detailedExplanation: "A function is a reusable piece of code. We use `def` to define it, give it a name, and put our code inside. The `dx` parameter tells us how far to move.",
-        starterCode: `# Create a move() function!
-# 'dx' is how many pixels to move — positive = right, negative = left
+        starterCode: `# Step 1: See the built-in move() in action — run this now!
+move(100)
+print('The player moved 100 pixels right!')
 
+# Step 2: Now write YOUR OWN move() function using set_player_x()
+# 'dx' is how far to move — positive = right, negative = left
 def move(dx):
-    current_x = get_player_x()   # get the player's current x position
-    new_x = current_x + dx       # add dx to find the new position
-    # YOUR CODE: call set_player_x() with new_x to move the player there
+    current_x = get_player_x()   # find where the player is now
+    new_x = current_x + dx       # calculate the new position
+    # YOUR CODE: call set_player_x(new_x) to move the player there!
 
-
-# Test it — call move() to see it work!
-move(50)
-print('Testing my move() function!')
+# Step 3: Test YOUR version!
+move(100)
+print('Testing MY move() function!')
 `,
         hint: "Inside the move() function, call: set_player_x(new_x)  — this actually moves the player to the new position!",
         successCriteria: [
@@ -536,142 +538,122 @@ print(f'Loaded {LEVEL_PRESET} preset with YOUR changes!')
   // --------------------------------------------------------------------------
   {
     missionId: 'm6_gravity_and_jump',
-    title: 'Mission 6: Jump and Gravity',
-    purpose: 'Introduce velocity, update loop, and simple physics.',
-    storyIntro: "Platforms are ready! 🏗️ But your player is floating... Let's add GRAVITY so they fall down, and JUMPING so they can leap to higher platforms!",
-    estimatedMinutes: 25,
-    learningOutcomes: ['state', 'update loop', 'velocity', 'global keyword'],
+    title: 'Mission 6: Make Your Player Jump!',
+    purpose: 'Teach set_player_vy, is_on_ground, and keyboard events.',
+    storyIntro: "Your player can walk left and right — now let's make them jump! 🦘 Jumping is how your hero reaches higher platforms and avoids enemies. Let's code it!",
+    estimatedMinutes: 20,
+    learningOutcomes: ['set_player_vy', 'is_on_ground', 'on_key_down', 'if statements'],
     steps: [
       {
-        stepId: 'm6_s1_velocity',
-        concepts: ['state', 'update loop'],
-        instruction: 'Add vertical velocity (vy) and gravity to make the player fall.',
-        detailedExplanation: "Velocity is how fast something is moving. Gravity pulls things down by adding to velocity every frame. `global` lets us change a variable from inside a function.",
-        starterCode: `# Vertical velocity - starts at 0 (not moving up or down)
-vy = 0
+        stepId: 'm6_s1_simple_jump',
+        concepts: ['set_player_vy', 'on_key_down'],
+        instruction: 'Complete the jump() function so pressing SPACE launches the player upward.',
+        detailedExplanation: "set_player_vy() sets the player's vertical speed. Negative = moving UP, positive = moving DOWN. -15 is a good jump strength — try it and see! The game's gravity will pull the player back down automatically.",
+        starterCode: `# ✅ Arrow keys from Mission 4 — already working!
+on_key_down('LEFT', lambda: move(-5))
+on_key_down('RIGHT', lambda: move(5))
 
-# Gravity - pulls the player down each frame
-gravity = 1
+# set_player_vy() sets the player's upward speed
+# Negative = up, positive = down. -15 is a good jump height!
 
-# This function runs every frame (60 times per second!)
-def update():
-    global vy  # We need 'global' to change vy inside the function
-    
-    # Gravity pulls down (increases vy)
-    vy = vy + gravity
-    
-    # Move the player by vy
-    move_player_y(vy)
+def jump():
+    # YOUR CODE: call set_player_vy(-15) to launch the player upward!
+    pass
 
-# Start the update loop
-on_update(update)
+# Connect SPACE key to your jump() function
+on_key_down('SPACE', jump)
 
-print('Gravity is ON! Watch the player fall! 🍎')
+print('Add set_player_vy(-15) inside jump(), then Run Code and press SPACE!')
 `,
-        hint: "Try changing gravity = 0.5 to fall slower, or gravity = 2 to fall faster!",
+        hint: "Inside jump(), delete 'pass' and write: set_player_vy(-15)",
         successCriteria: [
-          'Player falls down when not on a platform',
-          'vy increases over time due to gravity'
+          "Define a jump() function",
+          "Call set_player_vy() with a negative number inside jump()",
+          "Connect SPACE key to jump() using on_key_down()"
         ],
         validation: {
           type: 'ast',
           checks: [
-            { type: 'ast_has_assignment', variable: 'vy' },
-            { type: 'ast_calls_function', name: 'on_update' }
+            { type: 'ast_has_function', name: 'jump' },
+            { type: 'ast_calls_function', name: 'set_player_vy' },
+            { type: 'ast_has_on_key_handler' }
           ]
         },
-        reward: { stars: 3, badge: 'Physics Apprentice' }
+        reward: { stars: 2, badge: 'Jump Starter' }
       },
       {
-        stepId: 'm6_s2_jump',
-        concepts: ['conditionals', 'functions'],
-        instruction: 'Let the player jump, but only when touching the ground!',
-        detailedExplanation: "We need to check if the player is on the ground before letting them jump. This prevents infinite jumping in mid-air!",
-        starterCode: `# Jump strength - negative because up is negative y
-jump_strength = -15
+        stepId: 'm6_s2_ground_check',
+        concepts: ['is_on_ground', 'if statements'],
+        instruction: 'Add a ground check — only allow jumping when the player is on the ground!',
+        detailedExplanation: "Right now the player can jump again while in mid-air (double jump). Real platformers check if the player is on the ground before jumping. is_on_ground() returns True when touching a platform. Use an if statement to check before jumping!",
+        starterCode: `# ✅ Arrow keys from Mission 4 — already working!
+on_key_down('LEFT', lambda: move(-5))
+on_key_down('RIGHT', lambda: move(5))
 
-def try_jump():
-    global vy
-    
-    # Only jump if we're on the ground!
-    if is_on_ground():
-        vy = jump_strength
-        print('Jump! 🦘')
-    else:
-        print("Can't jump in mid-air!")
+# Jump height — try changing this number!
+JUMP_STRENGTH = -15
 
-# Press SPACE to jump
-on_key_down('SPACE', try_jump)
+def jump():
+    # YOUR CODE: use an if statement to only jump when on the ground!
+    # Hint: if is_on_ground():
+    #           set_player_vy(JUMP_STRENGTH)
+    set_player_vy(JUMP_STRENGTH)   # replace this line with the if check!
 
-print('Press SPACE to jump! 🚀')
+on_key_down('SPACE', jump)
+
+print('Add the if is_on_ground() check to stop double-jumping!')
 `,
-        hint: "Try changing jump_strength = -20 for a higher jump, or -10 for a smaller hop!",
+        hint: "Replace set_player_vy(JUMP_STRENGTH) with: if is_on_ground():  (new line)      set_player_vy(JUMP_STRENGTH)",
         successCriteria: [
-          'SPACE key triggers a jump',
-          'Cannot double-jump in mid-air'
+          "Use if is_on_ground(): before jumping",
+          "set_player_vy() is only called when on the ground",
+          "Cannot double-jump in mid-air"
         ],
         validation: {
           type: 'ast',
           checks: [
             { type: 'ast_has_if' },
-            { type: 'ast_has_on_key_handler' },
+            { type: 'ast_calls_function', name: 'is_on_ground' },
             { type: 'ast_calls_function', name: 'set_player_vy' }
           ]
         },
         reward: { stars: 3, badge: 'Jump Master' }
       },
       {
-        stepId: 'm6_s3_choose_jump_style',
-        concepts: ['booleans', 'conditionals'],
-        instruction: 'Choose your jump style: Double Jump OR Super Jump!',
-        detailedExplanation: "Booleans are True or False values. We can use them to turn features on or off. Pick ONE style to make your game feel unique!",
-        starterCode: `# 🎮 CHOOSE YOUR JUMP STYLE!
-# Pick ONE (not both!)
-DOUBLE_JUMP = True   # Can jump again in mid-air
-SUPER_JUMP = False   # One powerful jump
+        stepId: 'm6_s3_tune_jump',
+        concepts: ['variables', 'experimentation'],
+        instruction: 'Tune your jump! Change JUMP_STRENGTH to find the perfect jump height for your level.',
+        detailedExplanation: "Game designers test and tweak numbers to make a game feel right. A bigger number (like -25) makes a huge jump. A smaller number (like -10) makes a tiny hop. Try a few values and pick one that works with YOUR level's platform heights!",
+        starterCode: `# ✅ Arrow keys from Mission 4 — already working!
+on_key_down('LEFT', lambda: move(-5))
+on_key_down('RIGHT', lambda: move(5))
 
-# Jump tracking (for double jump)
-jumps_remaining = 2 if DOUBLE_JUMP else 1
-normal_jump = -15
-super_jump = -25
+# Try different values here and see how they feel!
+# -10 = small hop, -15 = normal jump, -20 = high jump, -25 = huge leap
+JUMP_STRENGTH = -15
 
-def try_jump():
-    global vy, jumps_remaining
-    
+def jump():
     if is_on_ground():
-        jumps_remaining = 2 if DOUBLE_JUMP else 1
-    
-    if jumps_remaining > 0:
-        if SUPER_JUMP and is_on_ground():
-            vy = super_jump
-            print('SUPER JUMP! 🚀')
-        else:
-            vy = normal_jump
-            print('Jump!')
-        jumps_remaining = jumps_remaining - 1
+        set_player_vy(JUMP_STRENGTH)
+        print(f'Jump! Strength: {JUMP_STRENGTH}')
 
-on_key_down('SPACE', try_jump)
-
-style = 'Double Jump' if DOUBLE_JUMP else 'Super Jump'
-print(f'Jump style: {style}')
+on_key_down('SPACE', jump)
+print(f'Jump strength is {JUMP_STRENGTH} — try changing it!')
 `,
-        hint: "Try DOUBLE_JUMP = False and SUPER_JUMP = True for powerful single jumps!",
+        hint: "Change -15 to any number between -8 and -30. Run Code and press SPACE to test it!",
         successCriteria: [
-          'One jump style is enabled',
-          'The jump behavior matches your choice'
+          "JUMP_STRENGTH is set to a value you chose",
+          "The jump feels good for your level"
         ],
         validation: {
-          type: 'runtime',
+          type: 'ast',
           checks: [
-            { type: 'jump_style_enabled' }
+            { type: 'ast_has_assignment', variable: 'JUMP_STRENGTH' },
+            { type: 'ast_calls_function', name: 'set_player_vy' },
+            { type: 'ast_has_if' }
           ]
         },
-        reward: { stars: 3, badge: 'Signature Move' },
-        customization: {
-          type: 'mechanics',
-          description: 'Choose between double jump or super jump',
-          options: ['double_jump', 'super_jump']
-        }
+        reward: { stars: 3, badge: 'Game Designer' }
       }
     ]
   },

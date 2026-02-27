@@ -2,17 +2,18 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  ChevronRight, 
-  ChevronLeft, 
-  Lightbulb, 
-  CheckCircle, 
+import {
+  ChevronRight,
+  ChevronLeft,
+  Lightbulb,
+  CheckCircle,
   Circle,
   Star,
   Eye,
   EyeOff,
   Trophy
 } from "lucide-react";
+import Link from "next/link";
 import { MissionStep } from "@/lib/missions/schema";
 import { ValidationResult, CheckResult } from "@/lib/validation";
 
@@ -28,6 +29,8 @@ interface StepPanelProps {
   onNextStep?: () => void;
   hasPrevStep: boolean;
   hasNextStep: boolean;
+  nextMissionId?: string;
+  allStepsComplete?: boolean;
 }
 
 export function StepPanel({
@@ -41,7 +44,9 @@ export function StepPanel({
   onPrevStep,
   onNextStep,
   hasPrevStep,
-  hasNextStep
+  hasNextStep,
+  nextMissionId,
+  allStepsComplete,
 }: StepPanelProps) {
   const [showHint, setShowHint] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
@@ -327,18 +332,39 @@ export function StepPanel({
           Previous
         </button>
 
-        <button
-          onClick={onNextStep}
-          disabled={!hasNextStep || !isCompleted}
-          className={`flex items-center gap-1 px-4 py-2 rounded-lg font-bold transition-all ${
-            hasNextStep && isCompleted
-              ? "bg-violet-600 text-white hover:bg-violet-700"
-              : "bg-gray-200 text-gray-400 cursor-not-allowed"
-          }`}
-        >
-          Next Step
-          <ChevronRight className="w-4 h-4" />
-        </button>
+        {allStepsComplete ? (
+          // All steps done — show Next Mission or Back to Map
+          nextMissionId ? (
+            <Link
+              href={`/play/${nextMissionId}`}
+              className="flex items-center gap-1 px-4 py-2 rounded-lg font-bold bg-emerald-500 text-white hover:bg-emerald-600 transition-all"
+            >
+              Next Mission
+              <ChevronRight className="w-4 h-4" />
+            </Link>
+          ) : (
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-1 px-4 py-2 rounded-lg font-bold bg-violet-600 text-white hover:bg-violet-700 transition-all"
+            >
+              Back to Map
+              <ChevronRight className="w-4 h-4" />
+            </Link>
+          )
+        ) : (
+          <button
+            onClick={onNextStep}
+            disabled={!hasNextStep || !isCompleted}
+            className={`flex items-center gap-1 px-4 py-2 rounded-lg font-bold transition-all ${
+              hasNextStep && isCompleted
+                ? "bg-violet-600 text-white hover:bg-violet-700"
+                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+            }`}
+          >
+            Next Step
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        )}
       </div>
     </div>
   );

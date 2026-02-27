@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowLeft, 
@@ -74,6 +74,7 @@ interface MissionWorkspaceProps {
   onHeroSaved?: (pixels: string[][]) => void;
   levelData?: LevelData;
   onLevelSaved?: (levelData: LevelData) => void;
+  nextMissionId?: string;
 }
 
 export function MissionWorkspace({
@@ -86,7 +87,8 @@ export function MissionWorkspace({
   heroPixels,
   onHeroSaved,
   levelData: initialLevelData,
-  onLevelSaved
+  onLevelSaved,
+  nextMissionId,
 }: MissionWorkspaceProps) {
   const [currentStepIndex, setCurrentStepIndex] = useState(initialStepIndex);
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
@@ -96,6 +98,7 @@ export function MissionWorkspace({
   const [currentCode, setCurrentCode] = useState("");
   const [levelData, setLevelData] = useState<LevelData | undefined>(initialLevelData);
   const [hasRunCode, setHasRunCode] = useState(false);
+  const gamePreviewRef = useRef<HTMLDivElement>(null);
 
   // Default level data if none provided
   const defaultLevelData: LevelData = {
@@ -126,6 +129,13 @@ export function MissionWorkspace({
       }
     }
   }, [currentStep?.stepId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Scroll the game canvas into view the first time the user runs code on each step
+  useEffect(() => {
+    if (hasRunCode && gamePreviewRef.current) {
+      gamePreviewRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [hasRunCode]);
 
   // Run code handler for SimpleEditor
   const handleRunCode = async (code: string): Promise<{ output: string; error?: string; success?: boolean }> => {
@@ -440,10 +450,17 @@ __captured_output__
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.6 }}
+                className="flex flex-col gap-3"
               >
+                <button
+                  onClick={() => setShowCelebration(false)}
+                  className="w-full flex items-center justify-center gap-2 bg-emerald-100 text-emerald-700 font-bold px-8 py-3 rounded-2xl hover:bg-emerald-200 transition-all"
+                >
+                  🎮 Keep Experimenting!
+                </button>
                 <Link
                   href="/dashboard"
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold px-8 py-4 rounded-2xl hover:from-violet-700 hover:to-indigo-700 transition-all"
+                  className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold px-8 py-4 rounded-2xl hover:from-violet-700 hover:to-indigo-700 transition-all"
                 >
                   <PartyPopper className="w-5 h-5" />
                   Continue Adventure
@@ -523,7 +540,7 @@ __captured_output__
             />
 
             {/* Game Preview */}
-            <div className="h-[420px]">
+            <div className="h-[520px]" ref={gamePreviewRef}>
               <GamePreview
                 levelData={activeLevelData}
                 heroPixels={heroPixels}
@@ -547,6 +564,8 @@ __captured_output__
               onNextStep={goToNextStep}
               hasPrevStep={currentStepIndex > 0}
               hasNextStep={currentStepIndex < mission.steps.length - 1}
+              nextMissionId={nextMissionId}
+              allStepsComplete={completedSteps.size === mission.steps.length}
             />
           </div>
         </div>

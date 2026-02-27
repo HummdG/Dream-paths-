@@ -46,11 +46,15 @@ export function validateAST(code: string, checks: ValidationCheck[]): CheckResul
 }
 
 function performASTCheck(code: string, check: ValidationCheck): CheckResult {
+  // Strip pure comment lines so patterns don't fire on commented-out code.
+  // e.g. "# YOUR CODE: call set_player_x(new_x)" must not count as a real call.
+  const codeStripped = code.replace(/^\s*#.*$/gm, '');
+
   switch (check.type) {
     case 'ast_has_assignment': {
       // Look for variable assignment: variable = value
       const pattern = new RegExp(`^\\s*${check.variable}\\s*=`, 'm');
-      const passed = pattern.test(code);
+      const passed = pattern.test(codeStripped);
       return {
         check,
         passed,
@@ -63,7 +67,7 @@ function performASTCheck(code: string, check: ValidationCheck): CheckResult {
     case 'ast_has_function': {
       // Look for function definition: def function_name(
       const pattern = new RegExp(`^\\s*def\\s+${check.name}\\s*\\(`, 'm');
-      const passed = pattern.test(code);
+      const passed = pattern.test(codeStripped);
       return {
         check,
         passed,
@@ -76,7 +80,7 @@ function performASTCheck(code: string, check: ValidationCheck): CheckResult {
     case 'ast_has_if': {
       // Look for if statement
       const pattern = /^\s*if\s+.+:/m;
-      const passed = pattern.test(code);
+      const passed = pattern.test(codeStripped);
       return {
         check,
         passed,
@@ -89,7 +93,7 @@ function performASTCheck(code: string, check: ValidationCheck): CheckResult {
     case 'ast_has_for_loop': {
       // Look for for loop
       const pattern = /^\s*for\s+\w+\s+in\s+.+:/m;
-      const passed = pattern.test(code);
+      const passed = pattern.test(codeStripped);
       return {
         check,
         passed,
@@ -102,7 +106,7 @@ function performASTCheck(code: string, check: ValidationCheck): CheckResult {
     case 'ast_has_while_loop': {
       // Look for while loop
       const pattern = /^\s*while\s+.+:/m;
-      const passed = pattern.test(code);
+      const passed = pattern.test(codeStripped);
       return {
         check,
         passed,
@@ -115,7 +119,7 @@ function performASTCheck(code: string, check: ValidationCheck): CheckResult {
     case 'ast_uses_global': {
       // Look for global statement
       const pattern = new RegExp(`^\\s*global\\s+.*\\b${check.variable}\\b`, 'm');
-      const passed = pattern.test(code);
+      const passed = pattern.test(codeStripped);
       return {
         check,
         passed,
@@ -128,7 +132,7 @@ function performASTCheck(code: string, check: ValidationCheck): CheckResult {
     case 'ast_calls_function': {
       // Look for function call
       const pattern = new RegExp(`\\b${check.name}\\s*\\(`, 'm');
-      const passed = pattern.test(code);
+      const passed = pattern.test(codeStripped);
       return {
         check,
         passed,
@@ -141,7 +145,7 @@ function performASTCheck(code: string, check: ValidationCheck): CheckResult {
     case 'ast_has_on_key_handler': {
       // Look for on_key_down( or when_key_pressed(
       const pattern = /on_key_down\s*\(|when_key_pressed\s*\(/m;
-      const passed = pattern.test(code);
+      const passed = pattern.test(codeStripped);
       return {
         check,
         passed,

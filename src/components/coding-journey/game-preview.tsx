@@ -214,7 +214,7 @@ export function GamePreview({
         <canvas
           ref={canvasRef}
           width={800}
-          height={400}
+          height={500}
           className="w-full h-full object-contain"
           style={{ imageRendering: 'pixelated' }}
         />
