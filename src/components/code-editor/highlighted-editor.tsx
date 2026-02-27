@@ -59,6 +59,15 @@ export function HighlightedEditor({
         .prism-editor pre {
           background: transparent !important;
         }
+        /* Selection colour — must be visible on the dark slate-900 background */
+        .prism-editor textarea::selection {
+          background: rgba(139, 92, 246, 0.55) !important;
+          color: #ffffff !important;
+        }
+        .prism-editor textarea::-moz-selection {
+          background: rgba(139, 92, 246, 0.55) !important;
+          color: #ffffff !important;
+        }
         /* Python token colours */
         .token.keyword { color: #c792ea; font-weight: bold; }
         .token.builtin { color: #82aaff; }

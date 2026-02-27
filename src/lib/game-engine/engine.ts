@@ -200,7 +200,12 @@ export class PlatformerEngine {
     this.animationFrame = requestAnimationFrame(() => this.gameLoop());
   }
 
-  private update(_deltaTime: number): void {
+  private update(deltaTime: number): void {
+    // Normalise to 60 fps so physics values (gravity, speed, etc.) feel the
+    // same regardless of actual frame rate. Cap at 1/30 s to avoid large
+    // tunnelling jumps if the tab was backgrounded.
+    const frameScale = Math.min(deltaTime, 1 / 30) * 60;
+
     // Run user-defined update callbacks
     for (const callback of this.callbacks.onUpdate) {
       try {
@@ -209,70 +214,73 @@ export class PlatformerEngine {
         console.error('Update callback error:', e);
       }
     }
-    
+
     // Apply gravity to player
     if (!this.state.player.isOnGround) {
-      this.state.player.vy += this.state.gravity;
+      this.state.player.vy += this.state.gravity * frameScale;
     }
-    
+
     // Apply player velocity
-    this.state.player.x += this.state.player.vx;
-    this.state.player.y += this.state.player.vy;
-    
-    // Check platform collisions
-    this.checkPlatformCollisions();
-    
+    this.state.player.x += this.state.player.vx * frameScale;
+    this.state.player.y += this.state.player.vy * frameScale;
+
+    // Check platform collisions (pass frameScale so tolerance scales correctly)
+    this.checkPlatformCollisions(frameScale);
+
     // Update enemies
-    this.updateEnemies();
-    
+    this.updateEnemies(frameScale);
+
     // Clean up expired messages
     const now = Date.now();
     this.state.messageQueue = this.state.messageQueue.filter(
       msg => now - msg.createdAt < msg.duration
     );
-    
+
     // Keep player in bounds
     this.state.player.x = Math.max(0, Math.min(this.width - this.state.player.width, this.state.player.x));
-    
+
     // Check if player fell off the bottom
     if (this.state.player.y > this.height + 100) {
       this.playerDied();
     }
   }
 
-  private checkPlatformCollisions(): void {
+  private checkPlatformCollisions(frameScale: number = 1): void {
     const player = this.state.player;
     let onGround = false;
-    
+    // Use the actual per-frame displacement as the landing tolerance so fast
+    // falls don't tunnel through thin platforms.
+    const tolerance = Math.abs(player.vy * frameScale) + 2;
+
     for (const platform of this.state.platforms) {
       // Check if player is falling onto platform
-      if (player.vy > 0 && // Moving down
+      if (player.vy >= 0 && // Moving down (or stationary)
           player.x + player.width > platform.x &&
           player.x < platform.x + platform.width &&
           player.y + player.height >= platform.y &&
-          player.y + player.height <= platform.y + platform.height + player.vy) {
+          player.y + player.height <= platform.y + platform.height + tolerance) {
         // Land on platform
         player.y = platform.y - player.height;
         player.vy = 0;
         onGround = true;
-        
+
         if (!player.isOnGround) {
           this.emitEvent('player_landed', { x: player.x, y: player.y });
         }
       }
     }
-    
+
     player.isOnGround = onGround;
   }
 
-  private updateEnemies(): void {
+  private updateEnemies(frameScale: number = 1): void {
     for (const enemy of this.state.enemies) {
       if (!enemy.active) continue;
-      
-      // Move enemy
-      enemy.x += enemy.speed * enemy.direction;
-      
-      // Simple boundary detection (will be improved)
+
+      // Move enemy — scale by frameScale for frame-rate-independent speed
+      enemy.x += enemy.speed * enemy.direction * frameScale;
+
+      // Simple boundary detection
       if (enemy.x <= 0 || enemy.x >= this.width - enemy.width) {
         enemy.direction *= -1;
         this.emitEvent('enemy_direction_changed', { enemyId: enemy.id, direction: enemy.direction });

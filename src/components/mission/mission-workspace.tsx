@@ -121,11 +121,13 @@ export function MissionWorkspace({
     if (currentStep) {
       setValidationResult(null);
       setCurrentCode(currentStep.starterCode);
-      setHasRunCode(false); // triggers GamePreview to stop the engine via isPlaying=false
+      setHasRunCode(false); // resets the scroll-to-game trigger for the new step
       const windowEngine = (window as unknown as { gameEngine?: PlatformerEngine }).gameEngine;
       if (windowEngine) {
-        windowEngine.restart(); // clearCallbacks + clearEvents + reset state
-        loadLevelIntoEngine(windowEngine, activeLevelData); // re-apply user's level
+        windowEngine.restart();
+        loadLevelIntoEngine(windowEngine, activeLevelData);
+        // Keep the game running at 60fps between steps — don't stop the engine
+        windowEngine.start();
       }
     }
   }, [currentStep?.stepId]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -143,17 +145,14 @@ export function MissionWorkspace({
     setHasRunCode(true);
 
     try {
-      // Restart engine and reload the user's level before running new code.
-      // engine.restart() clears callbacks, events, and state (including default ground).
-      // loadLevelIntoEngine() re-adds the user's platforms, coins, goal, and spawn.
+      // Keep the engine running — player position is preserved between runs so kids
+      // can experiment freely. Python's _reset_game_state() (called inside wrapUserCode)
+      // already clears stale callbacks and events before each run.
       const windowEngine = (window as unknown as { gameEngine?: PlatformerEngine }).gameEngine;
       const activeEngine = windowEngine || engine;
       if (activeEngine) {
-        activeEngine.restart();
-        loadLevelIntoEngine(activeEngine, activeLevelData);
+        activeEngine.start(); // no-op if already running (double-start guard in place)
       }
-
-      await new Promise(resolve => setTimeout(resolve, 200));
 
       const win = window as unknown as { pyodide?: { runPythonAsync: (code: string) => Promise<string> } };
       if (typeof win.pyodide === "undefined") {
@@ -161,11 +160,6 @@ export function MissionWorkspace({
       }
 
       const pyodide = win.pyodide;
-
-      // Start engine so Python callbacks can fire (start() guards against double-start)
-      if (activeEngine) {
-        activeEngine.start();
-      }
 
       const wrappedCode = wrapUserCode(code);
 
@@ -452,19 +446,29 @@ __captured_output__
                 transition={{ delay: 0.6 }}
                 className="flex flex-col gap-3"
               >
+                {nextMissionId ? (
+                  <Link
+                    href={`/play/${nextMissionId}`}
+                    className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold px-8 py-4 rounded-2xl hover:from-violet-700 hover:to-indigo-700 transition-all"
+                  >
+                    <PartyPopper className="w-5 h-5" />
+                    Next Mission
+                  </Link>
+                ) : (
+                  <Link
+                    href="/dashboard"
+                    className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold px-8 py-4 rounded-2xl hover:from-violet-700 hover:to-indigo-700 transition-all"
+                  >
+                    <PartyPopper className="w-5 h-5" />
+                    Back to Map
+                  </Link>
+                )}
                 <button
                   onClick={() => setShowCelebration(false)}
                   className="w-full flex items-center justify-center gap-2 bg-emerald-100 text-emerald-700 font-bold px-8 py-3 rounded-2xl hover:bg-emerald-200 transition-all"
                 >
-                  🎮 Keep Experimenting!
+                  🎮 Keep Experimenting
                 </button>
-                <Link
-                  href="/dashboard"
-                  className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold px-8 py-4 rounded-2xl hover:from-violet-700 hover:to-indigo-700 transition-all"
-                >
-                  <PartyPopper className="w-5 h-5" />
-                  Continue Adventure
-                </Link>
               </motion.div>
             </motion.div>
           </motion.div>
@@ -539,12 +543,12 @@ __captured_output__
               validationChecks={validationResult?.checks}
             />
 
-            {/* Game Preview */}
+            {/* Game Preview — always running at 60fps */}
             <div className="h-[520px]" ref={gamePreviewRef}>
               <GamePreview
                 levelData={activeLevelData}
                 heroPixels={heroPixels}
-                isPlaying={hasRunCode}
+                isPlaying={true}
                 onEngineReady={(e) => setEngine(e)}
               />
             </div>

@@ -343,43 +343,39 @@ show_message('Welcome to my game!')`,
   {
     missionId: 'm3_movement_with_functions',
     title: 'Mission 3: Move with Functions',
-    purpose: 'Teach functions and reuse.',
-    storyIntro: "Your player is in the game! 🏃 But they're just standing there... Let's teach them to move! We'll create a function - that's like a recipe the computer can follow.",
+    purpose: 'Teach functions, def, and calling move() with parameters.',
+    storyIntro: "Your player is in the game! 🏃 Let's write a function that makes them run. A function is like a named recipe — write it once, call it whenever you want!",
     estimatedMinutes: 15,
-    learningOutcomes: ['functions', 'parameters', 'def keyword'],
+    learningOutcomes: ['functions', 'def keyword', 'parameters'],
     steps: [
       {
-        stepId: 'm3_s1_define_move',
-        concepts: ['functions', 'parameters'],
-        instruction: 'Write a function called `move()` that moves the player left or right.',
-        detailedExplanation: "A function is a reusable piece of code. We use `def` to define it, give it a name, and put our code inside. The `dx` parameter tells us how far to move.",
-        starterCode: `# Step 1: See the built-in move() in action — run this now!
-move(100)
-print('The player moved 100 pixels right!')
+        stepId: 'm3_s1_go_right',
+        concepts: ['functions', 'def', 'parameters'],
+        instruction: 'Complete the go_right() function by adding a move() call inside it, then run it to see your player dash across the screen!',
+        detailedExplanation: "def creates a function — a named block of code you can call whenever you like. move(pixels) moves the player right by that many pixels instantly. Put move() inside go_right() and call go_right() to run it!",
+        starterCode: `# A function is a named block of code you can call whenever you like!
 
-# Step 2: Now write YOUR OWN move() function using set_player_x()
-# 'dx' is how far to move — positive = right, negative = left
-def move(dx):
-    current_x = get_player_x()   # find where the player is now
-    new_x = current_x + dx       # calculate the new position
-    # YOUR CODE: call set_player_x(new_x) to move the player there!
+def go_right():
+    # YOUR CODE: call move() with how many pixels to move
+    # Example: move(200) moves 200 pixels to the right
+    pass
 
-# Step 3: Test YOUR version!
-move(100)
-print('Testing MY move() function!')
+# Call your function to move the player!
+go_right()
+print('Player moved!')
 `,
-        hint: "Inside the move() function, call: set_player_x(new_x)  — this actually moves the player to the new position!",
+        hint: "Delete 'pass' inside go_right() and write: move(200)  — then run it!",
         successCriteria: [
-          "Define a function called 'move' using def",
-          "Inside move(), call set_player_x() with the new position",
-          "Call move() at least once to test it"
+          "Define a function called go_right()",
+          "Call move() inside go_right()",
+          "Call go_right() to test it"
         ],
         validation: {
           type: 'ast',
           checks: [
-            { type: 'ast_has_function', name: 'move' },
-            { type: 'ast_calls_function', name: 'set_player_x' },
-            { type: 'ast_calls_function', name: 'move' }
+            { type: 'ast_has_function', name: 'go_right' },
+            { type: 'ast_calls_function', name: 'move' },
+            { type: 'ast_calls_function', name: 'go_right' }
           ]
         },
         reward: { stars: 2, badge: 'Function Builder' }
