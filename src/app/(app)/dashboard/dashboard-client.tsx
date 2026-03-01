@@ -4,23 +4,22 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { signOut } from "next-auth/react";
-import { format, formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import {
   Rocket,
   Trophy,
   Clock,
   CheckCircle,
-  Lock,
   Play,
   Settings,
   LogOut,
   Star,
   Crown,
-  Code2,
   Sparkles,
   Pencil,
 } from "lucide-react";
 import { CodingMissions } from "@/components/dashboard/coding-missions";
+import { platformerMissionPack } from "@/lib/missions";
 
 interface Mission {
   id: string;
@@ -63,8 +62,6 @@ interface DashboardClientProps {
   } | null;
 }
 
-const missionEmojis = ["🎨", "🏗️", "🏃", "⭐", "🔊", "🚧", "📋", "🚀"];
-
 export function DashboardClient({
   parentName,
   childName,
@@ -79,7 +76,9 @@ export function DashboardClient({
   codingMissions,
   heroCharacter,
 }: DashboardClientProps) {
-  const progressPercent = totalMissions > 0 ? (completedMissions / totalMissions) * 100 : 0;
+  const codingCompleted = codingMissions?.completedMissionIds.length ?? 0;
+  const codingTotal = platformerMissionPack.missions.length;
+  const progressPercent = codingTotal > 0 ? (codingCompleted / codingTotal) * 100 : 0;
   const isFree = subscriptionPlan === "free";
   const maxFreeMissions = 2;
 
@@ -157,7 +156,7 @@ export function DashboardClient({
                   Progress
                 </h2>
                 <span className="text-sm text-gray-500">
-                  {completedMissions} of {totalMissions} missions
+                  {codingCompleted} of {codingTotal} missions
                 </span>
               </div>
 
@@ -206,7 +205,7 @@ export function DashboardClient({
               >
                 <div className="flex items-start gap-4">
                   <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center text-3xl shrink-0">
-                    {missionEmojis[nextMission.sequenceNumber - 1] || "🎯"}
+                    {"🎯"}
                   </div>
                   <div className="flex-1">
                     <p className="text-white/70 text-sm mb-1">Up Next</p>
@@ -254,91 +253,6 @@ export function DashboardClient({
               </motion.div>
             )}
 
-            {/* Mission Timeline */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="card"
-            >
-              <h2 className="text-lg font-bold text-[var(--color-navy)] mb-6">
-                All Missions
-              </h2>
-
-              <div className="space-y-4">
-                {missions.map((mission, index) => {
-                  const isLocked = mission.status === "LOCKED";
-                  const isCompleted = mission.status === "COMPLETED";
-                  const isAvailable = mission.status === "AVAILABLE";
-                  const needsUpgrade = isFree && mission.sequenceNumber > maxFreeMissions && isLocked;
-
-                  return (
-                    <div
-                      key={mission.id}
-                      className={`flex items-center gap-4 p-4 rounded-xl transition-all ${
-                        isAvailable
-                          ? "bg-[var(--color-cream)] ring-2 ring-[var(--color-violet)]"
-                          : isCompleted
-                          ? "bg-green-50"
-                          : "bg-gray-50"
-                      }`}
-                    >
-                      <div
-                        className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0 ${
-                          isCompleted
-                            ? "bg-green-100"
-                            : isAvailable
-                            ? "bg-gradient-to-br from-[var(--color-indigo)] to-[var(--color-violet)]"
-                            : "bg-gray-200"
-                        }`}
-                      >
-                        {isCompleted ? (
-                          <CheckCircle className="w-6 h-6 text-green-600" />
-                        ) : isLocked ? (
-                          needsUpgrade ? (
-                            <Crown className="w-5 h-5 text-amber-500" />
-                          ) : (
-                            <Lock className="w-5 h-5 text-gray-400" />
-                          )
-                        ) : (
-                          missionEmojis[index] || "🎯"
-                        )}
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-gray-500 mb-0.5">
-                          Mission {mission.sequenceNumber}
-                        </p>
-                        <h3
-                          className={`font-semibold truncate ${
-                            isLocked && !isAvailable ? "text-gray-400" : "text-[var(--color-navy)]"
-                          }`}
-                        >
-                          {mission.title}
-                        </h3>
-                        {isCompleted && mission.completedAt && (
-                          <p className="text-xs text-green-600">
-                            Completed {format(new Date(mission.completedAt), "MMM d, yyyy")}
-                          </p>
-                        )}
-                        {needsUpgrade && (
-                          <p className="text-xs text-amber-600">Upgrade to unlock</p>
-                        )}
-                      </div>
-
-                      {isAvailable && (
-                        <Link
-                          href={`/mission/${mission.id}`}
-                          className="btn-primary py-2 px-4 text-sm shrink-0"
-                        >
-                          Start
-                        </Link>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </motion.div>
           </div>
 
           {/* Sidebar */}
@@ -447,7 +361,7 @@ export function DashboardClient({
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Missions Completed</span>
                   <span className="font-bold text-[var(--color-navy)]">
-                    {completedMissions}/{totalMissions}
+                    {codingCompleted}/{codingTotal}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
