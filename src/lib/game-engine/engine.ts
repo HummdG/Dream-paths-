@@ -648,8 +648,20 @@ export class PlatformerEngine {
   // ==========================================================================
 
   private handleKeyDown(e: KeyboardEvent): void {
+    // Only prevent page scroll when focus is NOT inside a text input / editor.
+    // If the user is typing in the code editor, arrow keys must move the cursor normally.
+    const tag = (document.activeElement?.tagName ?? '').toLowerCase();
+    const isEditable =
+      tag === 'textarea' ||
+      tag === 'input' ||
+      (document.activeElement as HTMLElement | null)?.isContentEditable;
+
+    if (!isEditable && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) {
+      e.preventDefault();
+    }
+
     const key = this.normalizeKey(e.key);
-    
+
     if (!this.state.keysPressed.has(key)) {
       this.state.keysPressed.add(key);
       

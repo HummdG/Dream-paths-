@@ -98,6 +98,14 @@ export default async function PlayPage({ params }: PlayPageProps) {
     .filter(sp => sp.missionId === missionId && sp.status === "COMPLETED")
     .map(sp => sp.stepId);
 
+  // Build a map of saved code per step so the user can resume where they left off
+  const savedCodes: Record<string, string> = {};
+  for (const sp of project.stepProgress) {
+    if (sp.missionId === missionId && sp.currentCode) {
+      savedCodes[sp.stepId] = sp.currentCode;
+    }
+  }
+
   // Find the current step index (first non-completed step)
   let currentStepIndex = 0;
   for (let i = 0; i < mission.steps.length; i++) {
@@ -133,6 +141,7 @@ export default async function PlayPage({ params }: PlayPageProps) {
       childName={child.firstName}
       projectId={project.id}
       completedStepIds={completedStepIds}
+      savedCodes={savedCodes}
       initialStepIndex={currentStepIndex}
       heroPixels={heroPixels}
       levelData={levelData}

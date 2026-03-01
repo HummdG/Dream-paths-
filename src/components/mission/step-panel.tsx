@@ -332,8 +332,8 @@ export function StepPanel({
           Previous
         </button>
 
-        {allStepsComplete ? (
-          // All steps done — show Next Mission or Back to Map
+        {(allStepsComplete || (!hasNextStep && isCompleted)) ? (
+          // No more steps — show Next Mission or Back to Map
           nextMissionId ? (
             <Link
               href={`/play/${nextMissionId}`}

@@ -66,9 +66,13 @@ function loadLevelIntoEngine(eng: PlatformerEngine, levelData: LevelData): void 
 interface MissionWorkspaceProps {
   mission: Mission;
   initialStepIndex?: number;
+  completedStepIds?: string[];
+  /** Saved code per stepId — restores the user's last run code when they return */
+  savedCodes?: Record<string, string>;
   childName: string;
   childId: string;
   onStepComplete?: (stepId: string, stars: number, badge?: string) => void;
+  onSaveCode?: (stepId: string, code: string) => void;
   onMissionComplete?: (missionId: string) => void;
   heroPixels?: string[][];
   onHeroSaved?: (pixels: string[][]) => void;
@@ -80,9 +84,12 @@ interface MissionWorkspaceProps {
 export function MissionWorkspace({
   mission,
   initialStepIndex = 0,
+  completedStepIds = [],
+  savedCodes,
   childName,
   childId,
   onStepComplete,
+  onSaveCode,
   onMissionComplete,
   heroPixels,
   onHeroSaved,
@@ -92,7 +99,9 @@ export function MissionWorkspace({
 }: MissionWorkspaceProps) {
   const [currentStepIndex, setCurrentStepIndex] = useState(initialStepIndex);
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
-  const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
+  // Initialise from server-provided completed step IDs so returning to a mission
+  // that is partially or fully done doesn't re-trigger validation incorrectly.
+  const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set(completedStepIds));
   const [showCelebration, setShowCelebration] = useState(false);
   const [engine, setEngine] = useState<PlatformerEngine | null>(null);
   const [currentCode, setCurrentCode] = useState("");
@@ -116,11 +125,11 @@ export function MissionWorkspace({
 
   const currentStep = mission.steps[currentStepIndex];
 
-  // Reset state when step changes
+  // Reset state when step changes — use the user's last saved code if available
   useEffect(() => {
     if (currentStep) {
       setValidationResult(null);
-      setCurrentCode(currentStep.starterCode);
+      setCurrentCode(savedCodes?.[currentStep.stepId] ?? currentStep.starterCode);
       setHasRunCode(false); // resets the scroll-to-game trigger for the new step
       const windowEngine = (window as unknown as { gameEngine?: PlatformerEngine }).gameEngine;
       if (windowEngine) {
@@ -144,14 +153,44 @@ export function MissionWorkspace({
     setCurrentCode(code);
     setHasRunCode(true);
 
+    // Persist the code so the user can resume from here on their next visit
+    if (currentStep) {
+      onSaveCode?.(currentStep.stepId, code);
+    }
+
     try {
       // Keep the engine running — player position is preserved between runs so kids
       // can experiment freely. Python's _reset_game_state() (called inside wrapUserCode)
-      // already clears stale callbacks and events before each run.
+      // clears stale callbacks and events. We also reset platforms to the level-designer
+      // base here (in JS) so Python-added platforms don't stack across multiple runs.
       const windowEngine = (window as unknown as { gameEngine?: PlatformerEngine }).gameEngine;
       const activeEngine = windowEngine || engine;
       if (activeEngine) {
         activeEngine.start(); // no-op if already running (double-start guard in place)
+
+        // Reset platforms before Python runs to prevent stacking across multiple runs.
+        // If the Python code itself calls add_platform(), let it manage all platforms
+        // and just provide a flat ground. If not (e.g. M6 teaching pure jumping),
+        // load the user's level-designer platforms as the base.
+        activeEngine.clearPlatforms();
+        const pythonAddsPlatforms = code.includes('add_platform(');
+        if (pythonAddsPlatforms) {
+          // Python will add elevated platforms — just restore the user's level base
+          activeLevelData.objects
+            .filter((o) => o.type === 'platform')
+            .forEach((p) =>
+              activeEngine.addPlatform(
+                p.x * GRID_SIZE,
+                p.y * GRID_SIZE,
+                p.width * GRID_SIZE,
+                p.height * GRID_SIZE,
+              )
+            );
+        } else {
+          // Python doesn't add platforms — provide a simple flat ground only
+          // so elevated platforms aren't present before that concept is taught
+          activeEngine.addPlatform(0, 380, 800, 20);
+        }
       }
 
       const win = window as unknown as { pyodide?: { runPythonAsync: (code: string) => Promise<string> } };
@@ -203,7 +242,9 @@ __captured_output__
           setCompletedSteps(newCompleted);
           onStepComplete?.(currentStep.stepId, currentStep.reward.stars, currentStep.reward.badge);
 
-          if (currentStepIndex === mission.steps.length - 1) {
+          // Celebrate only when EVERY step in the mission is now done.
+          // Checking newCompleted (not completedSteps) because state updates are async.
+          if (newCompleted.size === mission.steps.length) {
             setShowCelebration(true);
             onMissionComplete?.(mission.missionId);
           }
@@ -534,7 +575,7 @@ __captured_output__
           {/* Left side: Code editor + Game preview — natural height, scrollable on small screens */}
           <div className="flex flex-col gap-4">
             <SimpleEditor
-              initialCode={currentStep?.starterCode || ""}
+              initialCode={currentStep ? (savedCodes?.[currentStep.stepId] ?? currentStep.starterCode) : ""}
               hint={currentStep?.hint}
               onRun={handleRunCode}
               onCodeChange={setCurrentCode}

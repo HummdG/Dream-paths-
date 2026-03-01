@@ -17,6 +17,7 @@ interface PlayClientProps {
   childName: string;
   projectId: string;
   completedStepIds: string[];
+  savedCodes?: Record<string, string>;
   initialStepIndex: number;
   heroPixels?: string[][];
   levelData?: LevelData;
@@ -28,6 +29,7 @@ export function PlayClient({
   childName,
   projectId,
   completedStepIds,
+  savedCodes,
   initialStepIndex,
   heroPixels: initialHeroPixels,
   levelData: initialLevelData,
@@ -82,6 +84,24 @@ export function PlayClient({
     }
   };
 
+  const handleSaveCode = async (stepId: string, code: string) => {
+    try {
+      await fetch("/api/progress/save-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId,
+          missionId: mission.missionId,
+          stepId,
+          code,
+          triggerType: "RUN_CODE",
+        }),
+      });
+    } catch (error) {
+      console.error("Failed to save code:", error);
+    }
+  };
+
   const handleMissionComplete = async (missionId: string) => {
     try {
       await fetch("/api/progress/mission-complete", {
@@ -105,7 +125,10 @@ export function PlayClient({
         childId={childId}
         childName={childName}
         initialStepIndex={initialStepIndex}
+        completedStepIds={completedStepIds}
+        savedCodes={savedCodes}
         onStepComplete={handleStepComplete}
+        onSaveCode={handleSaveCode}
         onMissionComplete={handleMissionComplete}
         heroPixels={heroPixels}
         onHeroSaved={(pixels) => setHeroPixels(pixels)}
@@ -154,7 +177,10 @@ export function PlayClient({
           childId={childId}
           childName={childName}
           initialStepIndex={initialStepIndex}
+          completedStepIds={completedStepIds}
+          savedCodes={savedCodes}
           onStepComplete={handleStepComplete}
+          onSaveCode={handleSaveCode}
           onMissionComplete={handleMissionComplete}
           heroPixels={heroPixels}
           onHeroSaved={(pixels) => setHeroPixels(pixels)}

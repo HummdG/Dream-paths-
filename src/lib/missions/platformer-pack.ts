@@ -389,10 +389,10 @@ print('Player moved!')
   {
     missionId: 'm4_input_and_conditionals',
     title: 'Mission 4: Keyboard Controls',
-    purpose: 'Introduce events + if statements.',
+    purpose: 'Introduce events + if statements, then smooth held-key movement.',
     storyIntro: "Functions are awesome! 🚀 Now let's connect them to the keyboard so YOU can control the player. We'll learn about `if` - teaching the computer to make decisions!",
-    estimatedMinutes: 20,
-    learningOutcomes: ['events', 'if/elif statements', 'keyboard input'],
+    estimatedMinutes: 25,
+    learningOutcomes: ['events', 'if/elif statements', 'keyboard input', 'on_update', 'is_key_pressed'],
     steps: [
       {
         stepId: 'm4_s1_left_right_keys',
@@ -433,6 +433,52 @@ print('Add move() inside each if/elif block above! ⬅️ ➡️')
           ]
         },
         reward: { stars: 2, badge: 'Controls Unlocked' }
+      },
+      {
+        stepId: 'm4_s2_smooth_movement',
+        concepts: ['on_update', 'is_key_pressed', 'game loop'],
+        instruction: 'Make the movement smooth! Hold an arrow key and your hero should keep moving — like Mario.',
+        detailedExplanation: "on_key_down() fires once per tap — like pressing Enter. But Mario moves as long as you HOLD the key! To do that we use on_update() which runs 60 times per second, and is_key_pressed() which checks if a key is still being held down.",
+        starterCode: `# is_key_pressed() returns True while you HOLD the key
+# on_update() runs this function 60 times per second!
+
+speed = 5
+
+def update():
+    # YOUR CODE: check if LEFT or RIGHT is held, then call move()
+    # Hint: if is_key_pressed('LEFT'):
+    #           move(-speed)
+    pass
+
+# This connects your update() to the game loop
+on_update(update)
+
+print('Hold LEFT or RIGHT — your hero should move smoothly!')
+`,
+        hint: "Delete 'pass' and add two if statements: one for 'LEFT' calling move(-speed), one for 'RIGHT' calling move(speed).",
+        solutionCode: `speed = 5
+
+def update():
+    if is_key_pressed('LEFT'):
+        move(-speed)
+    if is_key_pressed('RIGHT'):
+        move(speed)
+
+on_update(update)`,
+        successCriteria: [
+          "Use on_update() to run your function every frame",
+          "Use is_key_pressed() to check which keys are held",
+          "Holding LEFT moves left, holding RIGHT moves right"
+        ],
+        validation: {
+          type: 'ast',
+          checks: [
+            { type: 'ast_calls_function', name: 'on_update' },
+            { type: 'ast_calls_function', name: 'is_key_pressed' },
+            { type: 'ast_has_if' }
+          ]
+        },
+        reward: { stars: 3, badge: 'Smooth Mover' }
       }
     ]
   },
@@ -545,18 +591,23 @@ print(f'Loaded {LEVEL_PRESET} preset with YOUR changes!')
         concepts: ['set_player_vy', 'on_key_down'],
         instruction: 'Complete the jump() function so pressing SPACE launches the player upward.',
         detailedExplanation: "set_player_vy() sets the player's vertical speed. Negative = moving UP, positive = moving DOWN. -15 is a good jump strength — try it and see! The game's gravity will pull the player back down automatically.",
-        starterCode: `# ✅ Arrow keys from Mission 4 — already working!
-on_key_down('LEFT', lambda: move(-5))
-on_key_down('RIGHT', lambda: move(5))
+        starterCode: `# ✅ Smooth movement from Mission 4 (hold the key to keep moving!)
+speed = 5
+def movement():
+    if is_key_pressed('LEFT'):
+        move(-speed)
+    if is_key_pressed('RIGHT'):
+        move(speed)
+on_update(movement)
 
-# set_player_vy() sets the player's upward speed
-# Negative = up, positive = down. -15 is a good jump height!
+# set_player_vy() sets the player's upward speed.
+# Negative = UP, positive = DOWN. -15 is a good jump height!
 
 def jump():
     # YOUR CODE: call set_player_vy(-15) to launch the player upward!
     pass
 
-# Connect SPACE key to your jump() function
+# Connect the SPACE key to your jump() function
 on_key_down('SPACE', jump)
 
 print('Add set_player_vy(-15) inside jump(), then Run Code and press SPACE!')
@@ -582,9 +633,14 @@ print('Add set_player_vy(-15) inside jump(), then Run Code and press SPACE!')
         concepts: ['is_on_ground', 'if statements'],
         instruction: 'Add a ground check — only allow jumping when the player is on the ground!',
         detailedExplanation: "Right now the player can jump again while in mid-air (double jump). Real platformers check if the player is on the ground before jumping. is_on_ground() returns True when touching a platform. Use an if statement to check before jumping!",
-        starterCode: `# ✅ Arrow keys from Mission 4 — already working!
-on_key_down('LEFT', lambda: move(-5))
-on_key_down('RIGHT', lambda: move(5))
+        starterCode: `# ✅ Smooth movement from Mission 4 (hold the key to keep moving!)
+speed = 5
+def movement():
+    if is_key_pressed('LEFT'):
+        move(-speed)
+    if is_key_pressed('RIGHT'):
+        move(speed)
+on_update(movement)
 
 # Jump height — try changing this number!
 JUMP_STRENGTH = -15
@@ -620,9 +676,14 @@ print('Add the if is_on_ground() check to stop double-jumping!')
         concepts: ['variables', 'experimentation'],
         instruction: 'Tune your jump! Change JUMP_STRENGTH to find the perfect jump height for your level.',
         detailedExplanation: "Game designers test and tweak numbers to make a game feel right. A bigger number (like -25) makes a huge jump. A smaller number (like -10) makes a tiny hop. Try a few values and pick one that works with YOUR level's platform heights!",
-        starterCode: `# ✅ Arrow keys from Mission 4 — already working!
-on_key_down('LEFT', lambda: move(-5))
-on_key_down('RIGHT', lambda: move(5))
+        starterCode: `# ✅ Smooth movement from Mission 4 (hold the key to keep moving!)
+speed = 5
+def movement():
+    if is_key_pressed('LEFT'):
+        move(-speed)
+    if is_key_pressed('RIGHT'):
+        move(speed)
+on_update(movement)
 
 # Try different values here and see how they feel!
 # -10 = small hop, -15 = normal jump, -20 = high jump, -25 = huge leap
@@ -655,57 +716,175 @@ print(f'Jump strength is {JUMP_STRENGTH} — try changing it!')
   },
 
   // --------------------------------------------------------------------------
-  // MISSION 7: Collision Detection
+  // MISSION 7: Level Objects — Coins and Goals
   // --------------------------------------------------------------------------
   {
     missionId: 'm7_collisions',
-    title: 'Mission 7: Collision Detection',
-    purpose: 'Teach boolean logic and checking interactions.',
-    storyIntro: "Oops! 😅 The player falls through platforms. We need to teach the game to check when things TOUCH each other. This is called collision detection!",
-    estimatedMinutes: 20,
-    learningOutcomes: ['booleans', 'collision detection', 'if statements'],
+    title: 'Mission 7: Add Coins and a Goal!',
+    purpose: 'Teach add_coin() and add_goal() — placing interactive objects in the level.',
+    storyIntro: "Your level has platforms to jump on — but it needs THINGS to collect and a FINISH LINE! 🪙🏁 Let's add coins and a goal flag. Watch them appear live in the game as you write the code!",
+    estimatedMinutes: 15,
+    learningOutcomes: ['add_coin', 'add_goal', 'coordinates', 'level design'],
     steps: [
       {
-        stepId: 'm7_s1_platform_collision',
-        concepts: ['booleans', 'if statements'],
-        instruction: 'Stop the player from falling through platforms!',
-        detailedExplanation: "We check if the player would collide with a platform BEFORE moving them. If they would, we stop their fall and put them on top of the platform.",
-        starterCode: `vy = 0
-gravity = 1
+        stepId: 'm7_s1_add_coins',
+        concepts: ['add_coin', 'coordinates'],
+        instruction: 'Place coins in your level using add_coin(x, y)!',
+        detailedExplanation: "add_coin(x, y) places a shiny collectible at that position. x moves the coin LEFT and RIGHT (0 = far left, 800 = far right). y moves it UP and DOWN (0 = top of screen, 500 = bottom). Place coins above platforms so players have to jump to reach them! The coins will appear instantly when you run your code.",
+        starterCode: `# ✅ Platforms from Mission 5
+platforms = [
+    (0,   300, 400, 40),  # Ground platform
+    (450, 250, 200, 40),  # Middle platform
+    (700, 200, 150, 40),  # High platform
+]
+for p in platforms:
+    add_platform(p[0], p[1], p[2], p[3])
 
-def update():
-    global vy
-    
-    # Apply gravity
-    vy = vy + gravity
-    
-    # Check for platform collision BEFORE moving
-    if will_collide_below(vy):
-        # Stop falling!
-        vy = 0
-        # Snap to top of platform
-        snap_to_platform()
-        print('Landed! 🛬')
-    else:
-        # No platform below, keep falling
-        move_player_y(vy)
+# ✅ Smooth movement + jump from Missions 4 & 6
+speed = 5
+def movement():
+    if is_key_pressed('LEFT'):
+        move(-speed)
+    if is_key_pressed('RIGHT'):
+        move(speed)
+on_update(movement)
 
-on_update(update)
+JUMP_STRENGTH = -15
+def jump():
+    if is_on_ground():
+        set_player_vy(JUMP_STRENGTH)
+on_key_down('SPACE', jump)
 
-print('Now you can land on platforms! 🎯')
+# --- Mission 7: Place coins in your level! ---
+# add_coin(x, y) makes a coin appear at that position.
+add_coin(120, 260)   # Above the ground platform — done for you!
+# YOUR CODE: add 2 more coins above the other platforms!
+
+print('Coins added! Jump around — but you cannot collect them yet 🪙')
 `,
-        hint: "The magic is in checking BEFORE moving. will_collide_below() looks ahead!",
+        hint: "The middle platform is at y=250. A coin just above it would be at y=210. Try add_coin(520, 210)!",
+        solutionCode: `platforms = [
+    (0,   300, 400, 40),
+    (450, 250, 200, 40),
+    (700, 200, 150, 40),
+]
+for p in platforms:
+    add_platform(p[0], p[1], p[2], p[3])
+
+speed = 5
+def movement():
+    if is_key_pressed('LEFT'):
+        move(-speed)
+    if is_key_pressed('RIGHT'):
+        move(speed)
+on_update(movement)
+
+JUMP_STRENGTH = -15
+def jump():
+    if is_on_ground():
+        set_player_vy(JUMP_STRENGTH)
+on_key_down('SPACE', jump)
+
+add_coin(120, 260)
+add_coin(520, 210)
+add_coin(750, 160)
+
+print('3 coins placed! 🪙')
+`,
         successCriteria: [
-          'Player lands on platforms and stops falling',
-          'vy resets to 0 when landing'
+          'Use add_coin() at least 2 times',
+          'Coins appear at different positions in the game'
         ],
         validation: {
-          type: 'runtime',
+          type: 'ast',
           checks: [
-            { type: 'player_lands_on_platform' }
+            { type: 'ast_calls_function', name: 'add_coin' }
           ]
         },
-        reward: { stars: 4, badge: 'Collision Crusher' }
+        reward: { stars: 2, badge: 'Coin Placer' }
+      },
+      {
+        stepId: 'm7_s2_add_goal',
+        concepts: ['add_goal', 'coordinates'],
+        instruction: 'Add a GOAL flag — the finish line of your level!',
+        detailedExplanation: "add_goal(x, y) places a shining flag that marks the END of your level. Put it somewhere challenging — maybe on the highest platform! When you run your code the flag will appear. In the next mission you will write code to make the game react when the player TOUCHES the flag.",
+        starterCode: `# ✅ Platforms from Mission 5
+platforms = [
+    (0,   300, 400, 40),
+    (450, 250, 200, 40),
+    (700, 200, 150, 40),
+]
+for p in platforms:
+    add_platform(p[0], p[1], p[2], p[3])
+
+# ✅ Smooth movement + jump from Missions 4 & 6
+speed = 5
+def movement():
+    if is_key_pressed('LEFT'):
+        move(-speed)
+    if is_key_pressed('RIGHT'):
+        move(speed)
+on_update(movement)
+
+JUMP_STRENGTH = -15
+def jump():
+    if is_on_ground():
+        set_player_vy(JUMP_STRENGTH)
+on_key_down('SPACE', jump)
+
+# ✅ Coins from Mission 7 Step 1
+add_coin(120, 260)
+add_coin(520, 210)
+add_coin(750, 160)
+
+# --- Mission 7 Step 2: Place the finish line! ---
+# add_goal(x, y) places a flag the player needs to reach.
+# YOUR CODE: add the goal somewhere hard to reach!
+
+print('Goal placed! Next mission: write code that reacts when you touch it!')
+`,
+        hint: "The highest platform is at x=700-850, y=200. Try add_goal(720, 160) to put it near the top!",
+        solutionCode: `platforms = [
+    (0,   300, 400, 40),
+    (450, 250, 200, 40),
+    (700, 200, 150, 40),
+]
+for p in platforms:
+    add_platform(p[0], p[1], p[2], p[3])
+
+speed = 5
+def movement():
+    if is_key_pressed('LEFT'):
+        move(-speed)
+    if is_key_pressed('RIGHT'):
+        move(speed)
+on_update(movement)
+
+JUMP_STRENGTH = -15
+def jump():
+    if is_on_ground():
+        set_player_vy(JUMP_STRENGTH)
+on_key_down('SPACE', jump)
+
+add_coin(120, 260)
+add_coin(520, 210)
+add_coin(750, 160)
+add_goal(720, 160)
+
+print('Level set! Can you reach the goal? 🏁')
+`,
+        successCriteria: [
+          'Use add_goal() to place a goal flag',
+          'Goal appears in the game'
+        ],
+        validation: {
+          type: 'ast',
+          checks: [
+            { type: 'ast_calls_function', name: 'add_goal' },
+            { type: 'ast_calls_function', name: 'add_coin' }
+          ]
+        },
+        reward: { stars: 3, badge: 'Level Builder' }
       }
     ]
   },
@@ -715,59 +894,113 @@ print('Now you can land on platforms! 🎯')
   // --------------------------------------------------------------------------
   {
     missionId: 'm8_collectibles_and_score',
-    title: 'Mission 8: Coins and Score',
-    purpose: 'Teach counters, events, and simple game mechanics.',
-    storyIntro: "Your platformer is taking shape! 🎮 Now let's add COINS to collect. Every great game has rewards - it makes players want to keep playing!",
+    title: 'Mission 8: Collect Coins and Score!',
+    purpose: 'Teach collides_with(), score tracking, and win conditions.',
+    storyIntro: "Your coins and goal are in the level — but touching them does NOTHING yet! 🪙 Let's write code to collect coins, keep score, and win the game!",
     estimatedMinutes: 25,
     learningOutcomes: ['variables', 'increment', 'conditionals', 'score tracking'],
     steps: [
       {
         stepId: 'm8_s1_score_counter',
-        concepts: ['variables', 'increment', 'conditionals'],
-        instruction: 'Collect coins to increase your score!',
-        detailedExplanation: "`score += 1` is a shortcut for `score = score + 1`. We check for coin collision each frame and update the score when touching one.",
-        starterCode: `# Start with 0 points
-score = 0
+        concepts: ['collides_with', 'score', 'increment'],
+        instruction: 'Write code to collect coins and keep score!',
+        detailedExplanation: "collides_with('COIN') returns True every frame that your hero is touching a coin. When that happens: remove_colliding('COIN') makes it disappear, score += 1 adds 1 to the score (a shortcut for score = score + 1), and show_score(score) updates the number on screen.",
+        starterCode: `# ✅ Platforms from Mission 5
+platforms = [
+    (0,   300, 400, 40),
+    (450, 250, 200, 40),
+    (700, 200, 150, 40),
+]
+for p in platforms:
+    add_platform(p[0], p[1], p[2], p[3])
 
-# Add some coins to the level
+# ✅ Smooth movement + jump from Missions 4 & 6
+speed = 5
+def movement():
+    if is_key_pressed('LEFT'):
+        move(-speed)
+    if is_key_pressed('RIGHT'):
+        move(speed)
+on_update(movement)
+
+JUMP_STRENGTH = -15
+def jump():
+    if is_on_ground():
+        set_player_vy(JUMP_STRENGTH)
+on_key_down('SPACE', jump)
+
+# ✅ Coins from Mission 7 — already placed!
 add_coin(120, 260)
-add_coin(520, 240)
-add_coin(750, 220)
+add_coin(520, 210)
+add_coin(750, 160)
+
+# --- Mission 8: Make coins collectable! ---
+score = 0
+show_score(score)
 
 def update():
     global score
-    
-    # Check if touching a coin
+    # YOUR CODE: check if touching a COIN, then:
+    #   remove_colliding('COIN')   — make it disappear
+    #   score += 1                 — add 1 to score
+    #   show_score(score)          — update the display
+    pass
+
+on_update(update)
+print('Jump into the coins — nothing happens yet! Add your code to collect them.')
+`,
+        hint: "Inside update(), replace 'pass' with: if collides_with('COIN'):  (new line)      remove_colliding('COIN') (new line)      score += 1 (new line)      show_score(score)",
+        solutionCode: `platforms = [
+    (0,   300, 400, 40),
+    (450, 250, 200, 40),
+    (700, 200, 150, 40),
+]
+for p in platforms:
+    add_platform(p[0], p[1], p[2], p[3])
+
+speed = 5
+def movement():
+    if is_key_pressed('LEFT'):
+        move(-speed)
+    if is_key_pressed('RIGHT'):
+        move(speed)
+on_update(movement)
+
+JUMP_STRENGTH = -15
+def jump():
+    if is_on_ground():
+        set_player_vy(JUMP_STRENGTH)
+on_key_down('SPACE', jump)
+
+add_coin(120, 260)
+add_coin(520, 210)
+add_coin(750, 160)
+
+score = 0
+show_score(score)
+
+def update():
+    global score
     if collides_with('COIN'):
-        # Remove the coin we touched
         remove_colliding('COIN')
-        
-        # Add to score
         score += 1
-        
-        # Show the new score
         show_score(score)
-        
-        # Play a happy sound!
         play_sound('coin')
         print(f'Got a coin! Score: {score} 🪙')
 
 on_update(update)
-
-print('Collect all the coins! 🪙')
-show_score(score)
 `,
-        hint: "Try adding more coins with add_coin(x, y) at different positions!",
         successCriteria: [
-          'Coins disappear when collected',
+          'Coins disappear when touched',
           'Score increases with each coin',
           'Score displays on screen'
         ],
         validation: {
-          type: 'runtime',
+          type: 'ast',
           checks: [
-            { type: 'coin_collected' },
-            { type: 'score_increments' }
+            { type: 'ast_calls_function', name: 'collides_with' },
+            { type: 'ast_calls_function', name: 'remove_colliding' },
+            { type: 'ast_has_assignment', variable: 'score' }
           ]
         },
         reward: { stars: 4, badge: 'Treasure Hunter' }
@@ -777,31 +1010,57 @@ show_score(score)
         concepts: ['conditionals', 'variables'],
         instruction: 'Pick how players win: reach the goal OR collect enough coins!',
         detailedExplanation: "Different games have different win conditions. You get to choose what makes YOUR game winnable!",
-        starterCode: `# 🏆 CHOOSE HOW TO WIN!
-# 'reach_goal' - touch the flag to win
-# 'collect_coins' - collect X coins to win
+        starterCode: `# ✅ Platforms, controls + jump from previous missions
+platforms = [
+    (0,   300, 400, 40),
+    (450, 250, 200, 40),
+    (700, 200, 150, 40),
+]
+for p in platforms:
+    add_platform(p[0], p[1], p[2], p[3])
+
+speed = 5
+def movement():
+    if is_key_pressed('LEFT'):
+        move(-speed)
+    if is_key_pressed('RIGHT'):
+        move(speed)
+on_update(movement)
+
+JUMP_STRENGTH = -15
+def jump():
+    if is_on_ground():
+        set_player_vy(JUMP_STRENGTH)
+on_key_down('SPACE', jump)
+
+# ✅ Coins + goal from Mission 7
+add_coin(120, 260)
+add_coin(520, 210)
+add_coin(750, 160)
+add_goal(720, 160)
+
+# ✅ Coin collection from Mission 8 Step 1
+score = 0
+show_score(score)
+
+# --- Mission 8 Step 2: Choose your win rule! ---
+# 'reach_goal'    — touch the flag to win
+# 'collect_coins' — collect all 3 coins to win
 WIN_RULE = 'collect_coins'
 COINS_TO_WIN = 3
 
-score = 0
-
-def check_win():
+def update():
     global score
-    
-    if WIN_RULE == 'reach_goal':
-        if collides_with('GOAL'):
-            you_win()
-    elif WIN_RULE == 'collect_coins':
-        if score >= COINS_TO_WIN:
-            you_win()
+    if collides_with('COIN'):
+        remove_colliding('COIN')
+        score += 1
+        show_score(score)
+        if WIN_RULE == 'collect_coins' and score >= COINS_TO_WIN:
+            show_message('🎉 YOU WIN! 🎉')
+            play_sound('victory')
+    # YOUR CODE: add an if check for collides_with('GOAL') to win another way!
 
-def you_win():
-    show_message('🎉 YOU WIN! 🎉')
-    play_sound('victory')
-    stop_game()
-
-# (Include in your main update loop)
-# check_win()
+on_update(update)
 
 rule_text = f'{WIN_RULE}: {COINS_TO_WIN} coins' if WIN_RULE == 'collect_coins' else WIN_RULE
 print(f'Win condition: {rule_text}')
@@ -834,174 +1093,410 @@ print(f'Win condition: {rule_text}')
     missionId: 'm9_enemy_and_game_over',
     title: 'Mission 9: Enemies and Game Over',
     purpose: 'Teach basic AI (looping movement) and game states.',
-    storyIntro: "Coins are great, but games need DANGER too! 😈 Let's add enemies that move around. If they catch you... GAME OVER!",
+    storyIntro: "Coins are great, but games need DANGER too! 😈 Let's add a slime that patrols your level. If it catches you, you lose a life — run out of lives and it is GAME OVER!",
     estimatedMinutes: 30,
-    learningOutcomes: ['state', 'direction', 'AI movement', 'game over'],
+    learningOutcomes: ['add_enemy', 'set_enemy_x', 'direction variable', 'collides_with ENEMY', 'lives'],
     steps: [
       {
         stepId: 'm9_s1_enemy_patrol',
-        concepts: ['state', 'direction', 'conditionals'],
-        instruction: 'Make an enemy patrol back and forth on a platform.',
-        detailedExplanation: "The enemy needs to remember which direction it's going. When it reaches the edge, we flip the direction (multiply by -1).",
-        starterCode: `# Enemy starting position
-enemy_x = 400
-enemy_speed = 2
-enemy_dir = 1  # 1 = right, -1 = left
+        concepts: ['direction variable', 'set_enemy_x', 'on_update'],
+        instruction: 'Add a slime and make it patrol — write the code inside update_enemy!',
+        detailedExplanation: "add_enemy('slime', x, y) places a slime on screen. To make it move we use a direction variable: enemy_dir = 1 means moving RIGHT, -1 means moving LEFT. Every frame (60 times per second) we add enemy_speed × enemy_dir to enemy_x, then call set_enemy_x('slime', enemy_x) to actually move the slime on screen. When enemy_x passes right_bound we flip enemy_dir to -1 (turn left). When it passes left_bound we flip to 1 (turn right). We need 'global enemy_x, enemy_dir' inside the function so Python knows we are changing the outer variables, not creating new ones.",
+        starterCode: `# ✅ Platforms, controls + jump from previous missions
+platforms = [
+    (0,   300, 400, 40),
+    (450, 250, 200, 40),
+    (700, 200, 150, 40),
+]
+for p in platforms:
+    add_platform(p[0], p[1], p[2], p[3])
 
-# Patrol boundaries
-left_bound = 350
-right_bound = 550
+speed = 5
+def movement():
+    if is_key_pressed('LEFT'):
+        move(-speed)
+    if is_key_pressed('RIGHT'):
+        move(speed)
+on_update(movement)
 
-# Add the enemy to the game
+JUMP_STRENGTH = -15
+def jump():
+    if is_on_ground():
+        set_player_vy(JUMP_STRENGTH)
+on_key_down('SPACE', jump)
+
+# ✅ Coins + goal from Mission 7
+add_coin(120, 260)
+add_coin(520, 210)
+add_coin(750, 160)
+add_goal(720, 160)
+
+# ✅ Coin collection from Mission 8
+score = 0
+show_score(score)
+def collect():
+    global score
+    if collides_with('COIN'):
+        remove_colliding('COIN')
+        score += 1
+        show_score(score)
+on_update(collect)
+
+# --- Mission 9 Step 1: Make the slime patrol! ---
+enemy_x = 400      # slime's starting x position
+enemy_dir = 1      # direction: 1 = RIGHT, -1 = LEFT
+enemy_speed = 2    # pixels moved each frame
+left_bound = 350   # turn around here (left wall)
+right_bound = 550  # turn around here (right wall)
+
 add_enemy('slime', enemy_x, 260)
 
 def update_enemy():
     global enemy_x, enemy_dir
-    
-    # Move in current direction
+
+    # 1. Move the slime: add speed × direction to enemy_x
     enemy_x = enemy_x + (enemy_speed * enemy_dir)
-    
-    # Check boundaries and flip direction
-    if enemy_x >= right_bound:
-        enemy_dir = -1  # Go left
-        print('Enemy turns left!')
-    elif enemy_x <= left_bound:
-        enemy_dir = 1   # Go right
-        print('Enemy turns right!')
-    
-    # Update enemy position
+
+    # 2. YOUR CODE — flip direction at each boundary:
+    #    if enemy_x >= right_bound:   enemy_dir = -1
+    #    if enemy_x <= left_bound:    enemy_dir = 1
+
+    # 3. Move the slime on screen to its new position
     set_enemy_x('slime', enemy_x)
 
 on_update(update_enemy)
-
-print('Watch out for the enemy! 👾')
+print('Add the direction-flip code in Step 2 above! 👾')
 `,
-        hint: "Try changing enemy_speed = 4 to make it faster and more dangerous!",
+        hint: "After the movement line, add:\n    if enemy_x >= right_bound:\n        enemy_dir = -1\n    if enemy_x <= left_bound:\n        enemy_dir = 1",
+        solutionCode: `platforms = [
+    (0,   300, 400, 40),
+    (450, 250, 200, 40),
+    (700, 200, 150, 40),
+]
+for p in platforms:
+    add_platform(p[0], p[1], p[2], p[3])
+
+speed = 5
+def movement():
+    if is_key_pressed('LEFT'):
+        move(-speed)
+    if is_key_pressed('RIGHT'):
+        move(speed)
+on_update(movement)
+
+JUMP_STRENGTH = -15
+def jump():
+    if is_on_ground():
+        set_player_vy(JUMP_STRENGTH)
+on_key_down('SPACE', jump)
+
+add_coin(120, 260)
+add_coin(520, 210)
+add_coin(750, 160)
+add_goal(720, 160)
+
+score = 0
+show_score(score)
+def collect():
+    global score
+    if collides_with('COIN'):
+        remove_colliding('COIN')
+        score += 1
+        show_score(score)
+on_update(collect)
+
+enemy_x = 400
+enemy_dir = 1
+enemy_speed = 2
+left_bound = 350
+right_bound = 550
+
+add_enemy('slime', enemy_x, 260)
+
+def update_enemy():
+    global enemy_x, enemy_dir
+    enemy_x = enemy_x + (enemy_speed * enemy_dir)
+    if enemy_x >= right_bound:
+        enemy_dir = -1
+    if enemy_x <= left_bound:
+        enemy_dir = 1
+    set_enemy_x('slime', enemy_x)
+
+on_update(update_enemy)
+print('Watch out for the slime! 👾')
+`,
         successCriteria: [
-          'Enemy moves continuously',
-          'Enemy reverses direction at boundaries'
+          'Slime moves left and right on screen',
+          'Slime reverses direction at the boundaries'
         ],
         validation: {
-          type: 'runtime',
+          type: 'ast',
           checks: [
-            { type: 'enemy_moves' },
-            { type: 'enemy_reverses' }
+            { type: 'ast_calls_function', name: 'set_enemy_x' },
+            { type: 'ast_calls_function', name: 'add_enemy' },
+            { type: 'ast_has_if' }
           ]
         },
         reward: { stars: 4, badge: 'Enemy Engineer' }
       },
       {
         stepId: 'm9_s2_game_over',
-        concepts: ['if', 'functions', 'reset'],
-        instruction: 'Game Over when the player touches an enemy!',
-        detailedExplanation: "We check for enemy collision each frame. If the player touches an enemy, show Game Over and restart the level.",
-        starterCode: `lives = 3
+        concepts: ['collides_with', 'lives', 'game over'],
+        instruction: 'Lose a life when the slime touches you — write the body of the if block!',
+        detailedExplanation: "collides_with('ENEMY') works exactly like collides_with('COIN') from Mission 8 — it returns True when the player is touching any enemy. When that happens we want to: take away one life (lives -= 1), update the hearts on screen (show_lives), send the player back to the start (reset_player_position), and if lives reach zero show a Game Over message. The patrol() function call keeps the slime moving every frame.",
+        starterCode: `# ✅ Platforms, controls + jump from previous missions
+platforms = [
+    (0,   300, 400, 40),
+    (450, 250, 200, 40),
+    (700, 200, 150, 40),
+]
+for p in platforms:
+    add_platform(p[0], p[1], p[2], p[3])
+
+speed = 5
+def movement():
+    if is_key_pressed('LEFT'):
+        move(-speed)
+    if is_key_pressed('RIGHT'):
+        move(speed)
+on_update(movement)
+
+JUMP_STRENGTH = -15
+def jump():
+    if is_on_ground():
+        set_player_vy(JUMP_STRENGTH)
+on_key_down('SPACE', jump)
+
+# ✅ Coins + goal from Mission 7
+add_coin(120, 260)
+add_coin(520, 210)
+add_coin(750, 160)
+add_goal(720, 160)
+
+# ✅ Coin collection from Mission 8
+score = 0
+show_score(score)
+def collect():
+    global score
+    if collides_with('COIN'):
+        remove_colliding('COIN')
+        score += 1
+        show_score(score)
+on_update(collect)
+
+# ✅ Slime patrol from Step 1
+enemy_x = 400
+enemy_dir = 1
+enemy_speed = 2
+add_enemy('slime', enemy_x, 260)
+def patrol():
+    global enemy_x, enemy_dir
+    enemy_x = enemy_x + (enemy_speed * enemy_dir)
+    if enemy_x >= 550:
+        enemy_dir = -1
+    if enemy_x <= 350:
+        enemy_dir = 1
+    set_enemy_x('slime', enemy_x)
+
+# --- Mission 9 Step 2: Lose a life when touched! ---
+lives = 3
+show_lives(lives)
 
 def update():
     global lives
-    
-    # Check if touching an enemy
+    patrol()  # keep the slime moving every frame
+
     if collides_with('ENEMY'):
-        lives = lives - 1
-        show_message(f'Ouch! Lives: {lives}')
-        play_sound('hurt')
-        
-        # Reset player position
-        reset_player_position()
-        
-        # Check for game over
-        if lives <= 0:
-            show_message('💀 GAME OVER 💀')
-            play_sound('game_over')
-            restart_level()
+        # YOUR CODE — write 4 lines inside this if block:
+        # 1. lives -= 1
+        # 2. show_lives(lives)
+        # 3. reset_player_position()
+        # 4. if lives <= 0:
+        #        show_message('💀 GAME OVER 💀')
+        pass
 
 on_update(update)
-
-print(f'Lives: {lives} ❤️')
-show_lives(lives)
+print(f'You have {lives} lives ❤️  — walk into the slime to test!')
 `,
-        hint: "Try changing lives = 5 to give the player more chances!",
+        hint: "Replace 'pass' with the 4 lines. Each line goes inside the 'if collides_with' block — indent them 8 spaces (2 tabs). The inner 'if lives <= 0' needs its show_message indented one more level.",
+        solutionCode: `platforms = [
+    (0,   300, 400, 40),
+    (450, 250, 200, 40),
+    (700, 200, 150, 40),
+]
+for p in platforms:
+    add_platform(p[0], p[1], p[2], p[3])
+
+speed = 5
+def movement():
+    if is_key_pressed('LEFT'):
+        move(-speed)
+    if is_key_pressed('RIGHT'):
+        move(speed)
+on_update(movement)
+
+JUMP_STRENGTH = -15
+def jump():
+    if is_on_ground():
+        set_player_vy(JUMP_STRENGTH)
+on_key_down('SPACE', jump)
+
+add_coin(120, 260)
+add_coin(520, 210)
+add_coin(750, 160)
+add_goal(720, 160)
+
+score = 0
+show_score(score)
+def collect():
+    global score
+    if collides_with('COIN'):
+        remove_colliding('COIN')
+        score += 1
+        show_score(score)
+on_update(collect)
+
+enemy_x = 400
+enemy_dir = 1
+enemy_speed = 2
+add_enemy('slime', enemy_x, 260)
+def patrol():
+    global enemy_x, enemy_dir
+    enemy_x = enemy_x + (enemy_speed * enemy_dir)
+    if enemy_x >= 550:
+        enemy_dir = -1
+    if enemy_x <= 350:
+        enemy_dir = 1
+    set_enemy_x('slime', enemy_x)
+
+lives = 3
+show_lives(lives)
+
+def update():
+    global lives
+    patrol()
+    if collides_with('ENEMY'):
+        lives -= 1
+        show_lives(lives)
+        reset_player_position()
+        if lives <= 0:
+            show_message('💀 GAME OVER 💀')
+
+on_update(update)
+print(f'Lives: {lives} ❤️')
+`,
         successCriteria: [
-          'Touching an enemy reduces lives',
-          'Game Over shows when lives reach 0',
-          'Level can restart'
+          'Touching the slime reduces lives',
+          'Hearts on screen update',
+          'Player returns to start when hit',
+          'Game Over shows when all lives are gone'
         ],
         validation: {
-          type: 'runtime',
+          type: 'ast',
           checks: [
-            { type: 'game_over_on_enemy_collision' },
-            { type: 'level_restarts' }
+            { type: 'ast_calls_function', name: 'collides_with' },
+            { type: 'ast_calls_function', name: 'reset_player_position' },
+            { type: 'ast_calls_function', name: 'show_lives' }
           ]
         },
         reward: { stars: 5, badge: 'Game Maker' }
       },
       {
         stepId: 'm9_s3_choose_enemy_type',
-        concepts: ['strings', 'if/elif'],
-        instruction: 'Choose your enemy type and its behavior!',
-        detailedExplanation: "Different enemies can have different behaviors. Pick one that matches the feel you want for your game!",
-        starterCode: `# 👾 CHOOSE YOUR ENEMY!
-# 'slime' - patrols left/right on ground
-# 'bat' - hovers up and down in the air  
-# 'robot' - fast burst, then pauses
+        concepts: ['variables', 'difficulty', 'experimentation'],
+        instruction: 'Make your game harder — tune the enemy and add your own challenge!',
+        detailedExplanation: "Game designers call this 'balancing' — tweaking numbers until the game feels fun but challenging. Try changing enemy_speed (higher = faster), patrol zone (wider = bigger threat area), and lives (more lives = more forgiving). Then try the challenge: add play_sound('hurt') and play_sound('game_over') to the right places to make the game feel more alive!",
+        starterCode: `# ✅ Platforms, controls + jump from previous missions
+platforms = [
+    (0,   300, 400, 40),
+    (450, 250, 200, 40),
+    (700, 200, 150, 40),
+]
+for p in platforms:
+    add_platform(p[0], p[1], p[2], p[3])
 
-ENEMY_TYPE = 'slime'
+speed = 5
+def movement():
+    if is_key_pressed('LEFT'):
+        move(-speed)
+    if is_key_pressed('RIGHT'):
+        move(speed)
+on_update(movement)
 
+JUMP_STRENGTH = -15
+def jump():
+    if is_on_ground():
+        set_player_vy(JUMP_STRENGTH)
+on_key_down('SPACE', jump)
+
+# ✅ Coins + goal from Mission 7
+add_coin(120, 260)
+add_coin(520, 210)
+add_coin(750, 160)
+add_goal(720, 160)
+
+# ✅ Coin collection from Mission 8
+score = 0
+show_score(score)
+def collect():
+    global score
+    if collides_with('COIN'):
+        remove_colliding('COIN')
+        score += 1
+        show_score(score)
+on_update(collect)
+
+# ✅ Slime patrol + lives from Steps 1 & 2
 enemy_x = 400
-enemy_y = 260
-move_dir = 1
-move_timer = 0
+enemy_dir = 1
+add_enemy('slime', enemy_x, 260)
+def patrol():
+    global enemy_x, enemy_dir
+    enemy_x = enemy_x + (enemy_speed * enemy_dir)
+    if enemy_x >= right_bound:
+        enemy_dir = -1
+    if enemy_x <= left_bound:
+        enemy_dir = 1
+    set_enemy_x('slime', enemy_x)
 
-def update_enemy():
-    global enemy_x, enemy_y, move_dir, move_timer
-    
-    if ENEMY_TYPE == 'slime':
-        # Patrol left/right
-        enemy_x += 2 * move_dir
-        if enemy_x > 550 or enemy_x < 350:
-            move_dir *= -1
-            
-    elif ENEMY_TYPE == 'bat':
-        # Hover up/down
-        enemy_y += 2 * move_dir
-        if enemy_y > 280 or enemy_y < 200:
-            move_dir *= -1
-            
-    elif ENEMY_TYPE == 'robot':
-        # Fast then pause
-        move_timer += 1
-        if move_timer < 30:
-            enemy_x += 4 * move_dir
-        elif move_timer > 60:
-            move_timer = 0
-            if enemy_x > 550 or enemy_x < 350:
-                move_dir *= -1
-    
-    set_enemy_position(ENEMY_TYPE, enemy_x, enemy_y)
+lives = 3
+show_lives(lives)
 
-add_enemy(ENEMY_TYPE, enemy_x, enemy_y)
-on_update(update_enemy)
+def update():
+    global lives
+    patrol()
+    if collides_with('ENEMY'):
+        lives -= 1
+        show_lives(lives)
+        reset_player_position()
+        # YOUR CODE: add play_sound('hurt') here
+        if lives <= 0:
+            show_message('💀 GAME OVER 💀')
+            # YOUR CODE: add play_sound('game_over') here
 
-print(f'Enemy type: {ENEMY_TYPE} 👾')
+on_update(update)
+
+# --- Mission 9 Step 3: Tune these values! ---
+# Try changing them and pressing Run Code to feel the difference.
+enemy_speed = 2    # 1 = slow, 3 = tricky, 5 = very fast
+left_bound = 350   # patrol left wall  (try 100 to make it cover more ground)
+right_bound = 550  # patrol right wall (try 700 to match)
+
+print(f'Speed={enemy_speed} | Zone: {left_bound}–{right_bound} | Lives={lives}')
 `,
-        hint: "Try ENEMY_TYPE = 'bat' for a flying enemy, or 'robot' for unpredictable movement!",
+        hint: "Find the two '# YOUR CODE' comments inside the update() function and replace them with play_sound('hurt') and play_sound('game_over'). Then try changing enemy_speed to 3 or 4 and pressing Run Code to feel the difference!",
         successCriteria: [
-          'Enemy appears in the game',
-          'Behavior matches the chosen type'
+          'play_sound called when player is hit',
+          'play_sound called on game over',
+          'Enemy tuning variables adjusted'
         ],
         validation: {
-          type: 'runtime',
+          type: 'ast',
           checks: [
-            { type: 'enemy_moves' },
-            { type: 'enemy_behavior_matches_type' }
+            { type: 'ast_calls_function', name: 'play_sound' }
           ]
         },
-        reward: { stars: 4, badge: 'Boss Builder' },
-        customization: {
-          type: 'mechanics',
-          description: 'Choose enemy type and behavior',
-          options: ['slime', 'bat', 'robot']
-        }
+        reward: { stars: 4, badge: 'Boss Builder' }
       }
     ]
   },
@@ -1022,35 +1517,54 @@ print(f'Enemy type: {ENEMY_TYPE} 👾')
         concepts: ['conditionals', 'state'],
         instruction: 'Add a goal flag. Reach it to win the game!',
         detailedExplanation: "The goal is the finish line of your game. When the player touches it, they win! This is the moment all the gameplay leads to.",
-        starterCode: `# Add the goal flag at the end of the level
-add_goal(780, 160)
+        starterCode: `# ✅ Platforms, controls + jump from previous missions
+platforms = [
+    (0,   300, 400, 40),
+    (450, 250, 200, 40),
+    (700, 200, 150, 40),
+]
+for p in platforms:
+    add_platform(p[0], p[1], p[2], p[3])
 
+speed = 5
+def movement():
+    if is_key_pressed('LEFT'):
+        move(-speed)
+    if is_key_pressed('RIGHT'):
+        move(speed)
+on_update(movement)
+
+JUMP_STRENGTH = -15
+def jump():
+    if is_on_ground():
+        set_player_vy(JUMP_STRENGTH)
+on_key_down('SPACE', jump)
+
+# ✅ Coins + goal from Mission 7, collection from Mission 8
+score = 0
+add_coin(120, 260)
+add_coin(520, 210)
+add_coin(750, 160)
+add_goal(720, 160)
+show_score(score)
+
+# --- Mission 10: Make reaching the goal trigger a WIN! ---
 has_won = False
 
 def update():
-    global has_won
-    
-    # Only check if we haven't won yet
-    if not has_won:
-        # Check if touching the goal
-        if collides_with('GOAL'):
-            has_won = True
-            
-            # Victory!
-            show_message('🎉 YOU WIN! 🎉')
-            show_message('You completed the level!')
-            play_sound('victory')
-            
-            # Stop all enemies
-            freeze_enemies()
-            
-            # Unlock the next level
-            unlock_next_level()
-            
-            print('VICTORY! 🏆')
+    global score, has_won
+    if collides_with('COIN'):
+        remove_colliding('COIN')
+        score += 1
+        show_score(score)
+    if not has_won and collides_with('GOAL'):
+        has_won = True
+        show_message('🎉 YOU WIN! 🎉')
+        play_sound('victory')
+        freeze_enemies()
+        print('VICTORY! 🏆')
 
 on_update(update)
-
 print('Reach the flag to WIN! 🚩')
 `,
         hint: "Try moving the goal to different positions with add_goal(x, y) to make it easier or harder to reach!",
