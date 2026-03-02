@@ -67,6 +67,8 @@ export function SnakeTour({ missionId }: SnakeTourProps) {
   const [tourStep, setTourStep] = useState(0);
   const [visible, setVisible] = useState(false);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
+  // While true the card is hidden — we're scrolling/measuring before revealing it
+  const [isMeasuring, setIsMeasuring] = useState(false);
 
   // Show the tour the first time the user visits the first snake mission.
   // Runs once on mount — the parent only renders this component for snake missions.
@@ -84,20 +86,29 @@ export function SnakeTour({ missionId }: SnakeTourProps) {
 
     const step = TOUR_STEPS[tourStep];
 
-    // Clear immediately so targetless steps always show centered
+    // Clear rect. For steps that need to scroll+measure, also hide the card
+    // so it doesn't briefly flash in the center before snapping to its final position.
     setTargetRect(null);
-    if (!step.target) return;
+
+    if (!step.target) {
+      setIsMeasuring(false);
+      return;
+    }
+
+    setIsMeasuring(true); // hide card until we've scrolled and measured
 
     const run = async () => {
       const el = document.querySelector(`[data-tour="${step.target}"]`);
-      if (!el) return;
+      if (!el) { setIsMeasuring(false); return; }
 
       if (step.scrollIntoView) {
         el.scrollIntoView({ behavior: "smooth", block: "center" });
+        // Wait for the smooth scroll to settle before measuring
         await new Promise<void>(r => setTimeout(r, 650));
       }
 
       setTargetRect(el.getBoundingClientRect());
+      setIsMeasuring(false); // reveal card in its correct position
     };
 
     const t = setTimeout(run, 80);
@@ -122,7 +133,7 @@ export function SnakeTour({ missionId }: SnakeTourProps) {
 
   // Only show spotlight when the CURRENT tour step declares a target AND we've measured it.
   // This prevents a stale rect from a previous step bleeding into a targetless step.
-  const showSpotlight = !!step.target && !!targetRect;
+  const showSpotlight = !!step.target && !!targetRect && !isMeasuring;
 
   // ── Card inner content (shared between centered and positioned variants) ──────
   const cardContent = (
@@ -226,8 +237,8 @@ export function SnakeTour({ missionId }: SnakeTourProps) {
         />
       )}
 
-      {/* ── Card ───────────────────────────────────────────────────────────── */}
-      {showSpotlight ? (
+      {/* ── Card (hidden while scrolling/measuring to avoid flash-of-center) ── */}
+      {!isMeasuring && showSpotlight ? (
         /*
          * SPOTLIGHT MODE — card sits beside the highlighted element.
          * Position is set via left/right/top; no CSS transform needed.
@@ -242,7 +253,7 @@ export function SnakeTour({ missionId }: SnakeTourProps) {
         >
           {cardContent}
         </motion.div>
-      ) : (
+      ) : !isMeasuring ? (
         /*
          * CENTERED MODE — a flexbox wrapper centers the card on any screen.
          * The motion.div animates with `y` freely; no CSS transform conflict.
@@ -269,7 +280,7 @@ export function SnakeTour({ missionId }: SnakeTourProps) {
             {cardContent}
           </motion.div>
         </div>
-      )}
+      ) : null}
     </>
   );
 }
