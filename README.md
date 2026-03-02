@@ -1,10 +1,10 @@
-# 🚀 DreamPath Kids
+# 🚀 DreamPaths
 
 **Turn your child's love of games into real coding skills!**
 
-DreamPath Kids is a web application where parents enroll their child (ages 8-12) into a "dream career" learning path, and kids complete weekly missions to build real skills. This MVP focuses on the **Junior Game Developer** path.
+DreamPaths is a web application where parents enroll their child (ages 8-12) into a "dream career" learning path, and kids complete weekly missions to build real skills. This MVP focuses on the **Junior Game Developer** path.
 
-![DreamPath Kids](https://placeholder.com/dreampath-hero.png)
+![DreamPaths](https://placeholder.com/dreampaths-hero.png)
 
 ## ✨ Features
 
@@ -70,7 +70,7 @@ DreamPath Kids is a web application where parents enroll their child (ages 8-12)
 
    # Email (Resend) - Optional for development
    RESEND_API_KEY="re_xxxxxxxxxxxx"
-   FROM_EMAIL="DreamPath Kids <noreply@yourdomain.com>"
+   FROM_EMAIL="DreamPaths <noreply@yourdomain.com>"
 
    # App URL
    APP_URL="http://localhost:3000"
@@ -198,7 +198,7 @@ DATABASE_URL="your-production-db-url"
 NEXTAUTH_URL="https://your-domain.com"
 NEXTAUTH_SECRET="generate-a-secure-secret"
 RESEND_API_KEY="re_xxxxxxxxxxxx"
-FROM_EMAIL="DreamPath Kids <hello@your-domain.com>"
+FROM_EMAIL="DreamPaths <hello@your-domain.com>"
 APP_URL="https://your-domain.com"
 ```
 
@@ -227,7 +227,7 @@ npm run db:studio    # Open Prisma Studio
 
 ## 📄 License
 
-MIT © DreamPath Kids
+MIT © DreamPaths
 
 ---
 

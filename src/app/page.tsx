@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Rocket, Gamepad2, Star, CheckCircle, ArrowRight, Sparkles } from "lucide-react";
+import Image from "next/image";
+import { Gamepad2, Star, CheckCircle, ArrowRight, Sparkles } from "lucide-react";
 
 const features = [
   {
@@ -22,15 +23,22 @@ const features = [
   },
 ];
 
-const missions = [
-  { num: 1, title: "Design Your Hero", emoji: "🎨" },
-  { num: 2, title: "Build Your First Scene", emoji: "🏗️" },
-  { num: 3, title: "Add Movement", emoji: "🏃" },
-  { num: 4, title: "Create Collectibles", emoji: "⭐" },
-  { num: 5, title: "Add Sound Effects", emoji: "🔊" },
-  { num: 6, title: "Build Obstacles", emoji: "🚧" },
-  { num: 7, title: "Create a Start Menu", emoji: "📋" },
-  { num: 8, title: "Polish & Share", emoji: "🚀" },
+const snakeMissions = [
+  { title: "Hello Python", emoji: "🐍" },
+  { title: "Functions & Movement", emoji: "⚙️" },
+  { title: "Keyboard Controls", emoji: "⌨️" },
+  { title: "Score & Game Over", emoji: "🏆" },
+];
+
+const platformerMissions = [
+  { title: "Design Your Hero", emoji: "🎨" },
+  { title: "Run & Explore", emoji: "🏃" },
+  { title: "Build Your Scene", emoji: "🏗️" },
+  { title: "Gravity & Jumping", emoji: "🦘" },
+  { title: "Collisions", emoji: "💥" },
+  { title: "Collect & Score", emoji: "🪙" },
+  { title: "Enemies", emoji: "👾" },
+  { title: "Win & Polish", emoji: "🏁" },
 ];
 
 export default function Home() {
@@ -38,10 +46,16 @@ export default function Home() {
     <div className="min-h-screen bg-[var(--color-cream)]">
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-2xl">🚀</span>
-            <span className="font-bold text-xl text-[var(--color-navy)]">DreamPath Kids</span>
+        <div className="max-w-6xl mx-auto px-6 py-2 flex justify-between items-center">
+          <Link href="/" className="flex items-center">
+            <Image 
+              src="/logo.svg" 
+              alt="DreamPaths" 
+              width={550} 
+              height={180} 
+              priority
+              className="h-12 sm:h-16 md:h-20 lg:h-24 w-auto"
+            />
           </Link>
           <div className="flex items-center gap-4">
             <Link 
@@ -203,30 +217,56 @@ export default function Home() {
               The Junior Game Developer Path
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              8 missions over 4 weeks. By the end, your child will have created their own playable game!
+              Learn real Python by building games from scratch — starting with a free Snake tutorial, then a full platformer.
             </p>
           </motion.div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {missions.map((mission, index) => (
-              <motion.div
-                key={mission.num}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.05 }}
-                className={`card p-5 text-center ${index < 2 ? 'ring-2 ring-[var(--color-violet)] ring-offset-2' : ''}`}
-              >
-                <div className="text-4xl mb-3">{mission.emoji}</div>
-                <p className="text-xs text-[var(--color-violet)] font-medium mb-1">Mission {mission.num}</p>
-                <h3 className="text-sm font-bold text-[var(--color-navy)]">{mission.title}</h3>
-                {index < 2 && (
-                  <span className="inline-block mt-2 text-xs bg-[var(--color-mint)] text-emerald-700 px-2 py-1 rounded-full">
-                    Free
-                  </span>
-                )}
-              </motion.div>
-            ))}
+
+          {/* Snake Tutorial — FREE */}
+          <div className="mb-10">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-2xl">🐍</span>
+              <h3 className="text-lg font-bold text-gray-800">Snake Tutorial</h3>
+              <span className="text-xs font-bold bg-emerald-500 text-white px-2.5 py-1 rounded-full">FREE</span>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {snakeMissions.map((mission, index) => (
+                <motion.div
+                  key={mission.title}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.05 }}
+                  className="card p-5 text-center ring-2 ring-emerald-300 ring-offset-2"
+                >
+                  <div className="text-3xl mb-2">{mission.emoji}</div>
+                  <h3 className="text-sm font-bold text-[var(--color-navy)]">{mission.title}</h3>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Platformer Game */}
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-2xl">🎮</span>
+              <h3 className="text-lg font-bold text-gray-800">Platformer Game</h3>
+              <span className="text-xs font-semibold text-violet-600 bg-violet-100 px-2.5 py-1 rounded-full">Full subscription</span>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {platformerMissions.map((mission, index) => (
+                <motion.div
+                  key={mission.title}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.05 }}
+                  className="card p-5 text-center"
+                >
+                  <div className="text-3xl mb-2">{mission.emoji}</div>
+                  <h3 className="text-sm font-bold text-[var(--color-navy)]">{mission.title}</h3>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -287,7 +327,7 @@ export default function Home() {
               <h3 className="text-xl font-bold text-[var(--color-navy)] mb-2">Founding Family</h3>
               <p className="text-gray-600 mb-6">Full access to all missions</p>
               <div className="text-4xl font-bold text-[var(--color-navy)] mb-6">
-                £9 <span className="text-base font-normal text-gray-500">/month</span>
+                £24.99 <span className="text-base font-normal text-gray-500">/month</span>
               </div>
               <ul className="space-y-3 mb-8">
                 {["All 8 missions unlocked", "New paths as we add them", "Priority support", "Up to 2 child profiles", "Cancel anytime"].map((item) => (
@@ -305,42 +345,21 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-6">
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="card bg-gradient-to-br from-[var(--color-indigo)] to-[var(--color-violet)] text-white text-center p-12"
-          >
-            <div className="text-6xl mb-6">🎮</div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Ready to start the adventure?
-            </h2>
-            <p className="text-lg opacity-90 mb-8 max-w-xl mx-auto">
-              Join hundreds of families turning screen time into creative learning time.
-            </p>
-            <Link 
-              href="/signup" 
-              className="inline-flex items-center gap-2 bg-white text-[var(--color-indigo)] font-bold px-8 py-4 rounded-full hover:bg-gray-100 transition-colors"
-            >
-              <Rocket className="w-5 h-5" />
-              Start Your Free Trial
-            </Link>
-          </motion.div>
-        </div>
-      </section>
-
       {/* Footer */}
       <footer className="py-12 px-6 border-t border-gray-200">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">🚀</span>
-            <span className="font-bold text-[var(--color-navy)]">DreamPath Kids</span>
+          <div className="flex items-center">
+            <Image 
+              src="/logo.svg" 
+              alt="DreamPaths" 
+              width={320} 
+              height={105} 
+              priority
+              className="h-16 sm:h-20 md:h-24 w-auto"
+            />
           </div>
           <p className="text-gray-500 text-sm">
-            © 2026 DreamPath Kids. Made with ❤️ for young creators.
+            © 2026 DreamPaths. Made with ❤️ for young creators.
           </p>
           <div className="flex gap-6 text-sm text-gray-500">
             <Link href="#" className="hover:text-[var(--color-violet)]">Privacy</Link>

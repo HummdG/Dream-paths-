@@ -73,7 +73,7 @@ function getVerificationEmailHtml(verifyUrl: string): string {
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; background-color: #fef7f0; padding: 40px 20px;">
 <div style="max-width: 500px; margin: 0 auto; background: white; border-radius: 24px; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
 <div style="text-align: center; margin-bottom: 32px;">
-<h1 style="color: #1a1a2e; font-size: 24px; margin: 16px 0 8px;">Welcome to DreamPath Kids!</h1>
+<h1 style="color: #1a1a2e; font-size: 24px; margin: 16px 0 8px;">Welcome to DreamPaths!</h1>
 <p style="color: #666; font-size: 16px; margin: 0;">Let's verify your email to get started</p>
 </div>
 <p style="color: #444; font-size: 16px; line-height: 1.6; margin-bottom: 32px;">
@@ -85,7 +85,7 @@ Verify Email Address
 </a>
 </div>
 <p style="color: #888; font-size: 14px; text-align: center;">
-This link expires in 24 hours. If you didn't sign up for DreamPath Kids, you can ignore this email.
+This link expires in 24 hours. If you didn't sign up for DreamPaths, you can ignore this email.
 </p>
 <p style="color: #888; font-size: 12px; text-align: center; margin-top: 24px;">
 Or copy and paste this link: ${verifyUrl}
@@ -100,8 +100,8 @@ export async function sendVerificationEmail(email: string, token: string) {
   
   return sendEmail({
     to: email,
-    subject: 'Verify your DreamPath Kids account',
-    text: `Welcome to DreamPath Kids! Click this link to verify your email: ${verifyUrl}`,
+    subject: 'Verify your DreamPaths account',
+    text: `Welcome to DreamPaths! Click this link to verify your email: ${verifyUrl}`,
     html: getVerificationEmailHtml(verifyUrl),
   })
 }
@@ -187,7 +187,7 @@ export async function sendWelcomeEmail(email: string, parentName: string, childN
   
   return sendEmail({
     to: email,
-    subject: 'Welcome to DreamPath Kids!',
+    subject: 'Welcome to DreamPaths!',
     text: `Hi ${parentName}, ${childName} is enrolled in the Junior Game Developer path! Visit ${dashboardUrl} to get started.`,
     html: `<!DOCTYPE html>
 <html>
