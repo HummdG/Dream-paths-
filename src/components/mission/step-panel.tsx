@@ -208,13 +208,20 @@ export function StepPanel({
           </div>
         </div>
 
-        {/* Detailed explanation */}
+        {/* Detailed explanation — speech bubbles */}
         {step.detailedExplanation && (
-          <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-            <h4 className="font-medium text-blue-900 mb-2">📚 How it works:</h4>
-            <div className="text-blue-800 text-sm">
-              <FormattedText text={step.detailedExplanation} />
-            </div>
+          <div className="space-y-2">
+            {step.detailedExplanation.split(/\n\n+/).filter(p => p.trim()).map((bubble, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.15, duration: 0.3 }}
+                className="bg-blue-50 rounded-2xl rounded-tl-sm px-4 py-3 border border-blue-200 text-sm text-blue-800"
+              >
+                <FormattedText text={bubble} />
+              </motion.div>
+            ))}
           </div>
         )}
 

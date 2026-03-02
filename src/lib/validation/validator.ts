@@ -138,7 +138,7 @@ function performASTCheck(code: string, check: ValidationCheck): CheckResult {
         passed,
         message: passed
           ? `✅ Calls '${check.name}()'`
-          : `❌ Call the function '${check.name}()'`
+          : check.errorHint ?? `❌ Call the function '${check.name}()'`
       };
     }
 

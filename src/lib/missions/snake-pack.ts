@@ -152,44 +152,27 @@ print(snake_name)
         stepId: 'sn1_s3_fstrings',
         concepts: ['f-strings', 'string formatting'],
         instruction:
-`Mix text and variables together using an f-string!
+`Mission: Make your snake talk! 🐍
 
-An **f-string** lets you embed a variable's value right inside a sentence. Put the letter \`f\` before the opening quote, and wrap variable names in curly braces \`{}\`.
+Your snake is called Slimy. Make it say how long it is!
 
-The starter code sets up \`snake_name\` for you. Your job: write a \`print(f"...")\` call that uses \`snake_name\` AND calls \`get_snake_length()\` inside the string.`,
+The starter code is almost complete — replace ___ with the right function call.`,
         detailedExplanation:
-`An **f-string** (formatted string) lets you build sentences that include variable values:
+`🔤 An f-string lets you put a variable inside a sentence — add f before the quote marks!
 
-\`\`\`python
-name = "Slimy"
-length = 3
+🐍 Wrap any variable (or function call) in { } curly braces and Python fills it in for you.
 
-# Without f-string (awkward):
-print("My snake is " + name + " and has " + str(length) + " segments!")
-
-# With f-string (much nicer!):
-print(f"My snake is {name} and has {length} segments!")
-\`\`\`
-
-The key is the **f before the quote** and **{} around the variable name**. Inside the curly braces, you can put any variable or even a function call:
-
-\`\`\`python
-print(f"Score: {get_score()}")
-print(f"Head position: {get_snake_head()}")
-\`\`\`
-
-The f-string automatically converts numbers to text for you — no extra work needed!`,
+💡 There's a built-in function called get_snake_length() — it tells you how many segments the snake has.`,
         starterCode:
 `snake_name = "Slimy"
 
-# Write a print() call using an f-string.
-# Include snake_name AND call get_snake_length() inside the string.
-# Example structure: print(f"My snake is {snake_name} and has {get_snake_length()} segments!")
+# Replace ___ with the function that counts the snake's segments:
+print(f"My snake is {snake_name} and has {___} segments!")
 `,
         hint:
-`Put f before the opening quote: f"..."
-Use {} curly braces to embed variables and function calls.
-Example: print(f"My snake is {snake_name} and has {get_snake_length()} segments!")`,
+`Replace ___ with get_snake_length() — that's the function that counts how many segments your snake has!
+Your finished line should look like:
+print(f"My snake is {snake_name} and has {get_snake_length()} segments!")`,
         solutionCode:
 `snake_name = "Slimy"
 print(f"My snake is {snake_name} and has {get_snake_length()} segments!")
@@ -202,7 +185,7 @@ print(f"My snake is {snake_name} and has {get_snake_length()} segments!")
           type: 'ast_and_runtime',
           checks: [
             { type: 'ast_calls_function', name: 'print' },
-            { type: 'ast_calls_function', name: 'get_snake_length' },
+            { type: 'ast_calls_function', name: 'get_snake_length', errorHint: "Oops! Your snake doesn't know how long it is yet. Try calling: get_snake_length()" },
           ],
         },
         reward: { stars: 1 },
