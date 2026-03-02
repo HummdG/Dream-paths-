@@ -296,13 +296,13 @@ export default function Home() {
               viewport={{ once: true }}
               className="card"
             >
-              <h3 className="text-xl font-bold text-[var(--color-navy)] mb-2">Free Trial</h3>
-              <p className="text-gray-600 mb-6">Try the first 2 missions</p>
+              <h3 className="text-xl font-bold text-[var(--color-navy)] mb-2">Free</h3>
+              <p className="text-gray-600 mb-6">The full Snake tutorial, forever free</p>
               <div className="text-4xl font-bold text-[var(--color-navy)] mb-6">
                 £0 <span className="text-base font-normal text-gray-500">forever</span>
               </div>
               <ul className="space-y-3 mb-8">
-                {["First 2 missions unlocked", "Parent dashboard access", "Email progress updates", "1 child profile"].map((item) => (
+                {["Full Snake tutorial (4 missions)", "Pixel art hero creator", "Parent dashboard", "1 child profile"].map((item) => (
                   <li key={item} className="flex items-center gap-2 text-gray-700">
                     <CheckCircle className="w-5 h-5 text-emerald-500" />
                     {item}
@@ -325,12 +325,12 @@ export default function Home() {
                 Most Popular
               </div>
               <h3 className="text-xl font-bold text-[var(--color-navy)] mb-2">Founding Family</h3>
-              <p className="text-gray-600 mb-6">Full access to all missions</p>
+              <p className="text-gray-600 mb-6">Full access to all games and missions</p>
               <div className="text-4xl font-bold text-[var(--color-navy)] mb-6">
                 £24.99 <span className="text-base font-normal text-gray-500">/month</span>
               </div>
               <ul className="space-y-3 mb-8">
-                {["All 8 missions unlocked", "New paths as we add them", "Priority support", "Up to 2 child profiles", "Cancel anytime"].map((item) => (
+                {["All 15 missions unlocked", "New games as we add them", "Priority support", "Up to 2 child profiles", "Cancel anytime"].map((item) => (
                   <li key={item} className="flex items-center gap-2 text-gray-700">
                     <CheckCircle className="w-5 h-5 text-[var(--color-violet)]" />
                     {item}
