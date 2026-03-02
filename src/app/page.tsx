@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { Rocket, Gamepad2, Star, CheckCircle, ArrowRight, Sparkles } from "lucide-react";
+import { Gamepad2, Star, CheckCircle, ArrowRight, Sparkles } from "lucide-react";
 
 const features = [
   {
@@ -342,33 +342,6 @@ export default function Home() {
               </Link>
             </motion.div>
           </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-6">
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="card bg-gradient-to-br from-[var(--color-indigo)] to-[var(--color-violet)] text-white text-center p-12"
-          >
-            <div className="text-6xl mb-6">🎮</div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Ready to start the adventure?
-            </h2>
-            <p className="text-lg opacity-90 mb-8 max-w-xl mx-auto">
-              Join hundreds of families turning screen time into creative learning time.
-            </p>
-            <Link 
-              href="/signup" 
-              className="inline-flex items-center gap-2 bg-white text-[var(--color-indigo)] font-bold px-8 py-4 rounded-full hover:bg-gray-100 transition-colors"
-            >
-              <Rocket className="w-5 h-5" />
-              Start Your Free Trial
-            </Link>
-          </motion.div>
         </div>
       </section>
 
