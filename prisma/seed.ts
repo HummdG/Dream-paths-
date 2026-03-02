@@ -69,38 +69,6 @@ async function main() {
 
   console.log(`✅ ${missionStubs.length} mission stubs`)
 
-  // ── Dev account ─────────────────────────────────────────────────────────────
-  // A ready-to-use account so you can log in immediately during development
-  // without going through signup + email verification.
-  // Credentials: dev@dreampaths.com / password123
-  const devEmail = 'dev@dreampaths.com'
-  const existing = await prisma.parent.findUnique({ where: { email: devEmail } })
-
-  if (!existing) {
-    const hashedPassword = await bcrypt.hash('password123', 10)
-
-    const devParent = await prisma.parent.create({
-      data: {
-        email: devEmail,
-        passwordHash: hashedPassword,
-        name: 'Dev Parent',
-        emailVerified: true,
-        children: {
-          create: {
-            firstName: 'Alex',
-            age: 10,
-            path: { connect: { slug: 'junior_game_dev' } },
-          },
-        },
-      },
-      include: { children: true },
-    })
-
-    console.log(`✅ Dev account: ${devEmail} / password123`)
-    console.log(`   Child: ${devParent.children[0].firstName}`)
-  } else {
-    console.log(`✅ Dev account already exists (${devEmail})`)
-  }
 
   console.log('')
   console.log('🎉 Done!')
