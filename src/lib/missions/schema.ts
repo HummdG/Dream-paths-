@@ -38,6 +38,10 @@ export type ValidationCheck =
   | { type: 'level_restarts' }
   | { type: 'win_triggered' }
   
+  // Snake runtime checks
+  | { type: 'snake_direction_set' }
+  | { type: 'snake_food_eaten_check' }
+
   // Customization checks
   | { type: 'theme_applied' }
   | { type: 'player_sprite_applied' }
@@ -113,6 +117,9 @@ export interface Mission {
   
   // Special mission type (default is 'coding')
   missionType?: 'coding' | 'creative' | 'level_design' | 'sprite_design';
+
+  // Which game engine renders this mission (default = 'platformer')
+  engineType?: 'platformer' | 'snake';
 }
 
 // =============================================================================
@@ -309,5 +316,9 @@ export type GameEvent =
   | { type: 'win' }
   | { type: 'message_shown'; text: string }
   | { type: 'theme_set'; themeId: string }
-  | { type: 'sprite_set'; spriteId: string };
+  | { type: 'sprite_set'; spriteId: string }
+  // Snake events
+  | { type: 'snake_direction_changed'; direction: string }
+  | { type: 'snake_food_eaten'; score: number }
+  | { type: 'snake_game_over'; score: number };
 

@@ -11,15 +11,19 @@ import {
 import Link from "next/link";
 import { Confetti } from "@/components/confetti";
 import { GamePreview } from "@/components/coding-journey/game-preview";
+import { SnakePreview } from "@/components/game-preview/snake-preview";
 import { StepPanel } from "@/components/mission/step-panel";
 import { Mission } from "@/lib/missions/schema";
 import { PlatformerEngine } from "@/lib/game-engine";
 import { wrapUserCode } from "@/lib/game-engine/python-api";
+import { wrapSnakeUserCode } from "@/lib/game-engine/snake-python-api";
+import { SnakeEngine } from "@/lib/game-engine/snake-engine";
 import { validateStep, ValidationResult, friendlyError } from "@/lib/validation";
 import { CharacterCreator } from "@/components/character-creator";
 import { LevelDesigner, LevelData } from "@/components/level-designer";
 import { SpriteDesigner } from "@/components/sprite-designer";
 import { SimpleEditor } from "@/components/code-editor/simple-editor";
+import { SnakeTour } from "@/components/mission/snake-tour";
 
 // Grid size must match game-preview.tsx's gridSize constant.
 const GRID_SIZE = 20;
@@ -107,7 +111,10 @@ export function MissionWorkspace({
   const [currentCode, setCurrentCode] = useState("");
   const [levelData, setLevelData] = useState<LevelData | undefined>(initialLevelData);
   const [hasRunCode, setHasRunCode] = useState(false);
+  const [snakeRunTrigger, setSnakeRunTrigger] = useState(0);
   const gamePreviewRef = useRef<HTMLDivElement>(null);
+
+  const isSnakeMission = mission.engineType === 'snake';
 
   // Default level data if none provided
   const defaultLevelData: LevelData = {
@@ -131,12 +138,22 @@ export function MissionWorkspace({
       setValidationResult(null);
       setCurrentCode(savedCodes?.[currentStep.stepId] ?? currentStep.starterCode);
       setHasRunCode(false); // resets the scroll-to-game trigger for the new step
-      const windowEngine = (window as unknown as { gameEngine?: PlatformerEngine }).gameEngine;
-      if (windowEngine) {
-        windowEngine.restart();
-        loadLevelIntoEngine(windowEngine, activeLevelData);
-        // Keep the game running at 60fps between steps — don't stop the engine
-        windowEngine.start();
+
+      if (isSnakeMission) {
+        const snakeEng = (window as unknown as { snakeEngine?: SnakeEngine }).snakeEngine;
+        if (snakeEng) {
+          snakeEng.clearCallbacks();
+          snakeEng.clearEvents();
+          snakeEng.restart();
+        }
+      } else {
+        const windowEngine = (window as unknown as { gameEngine?: PlatformerEngine }).gameEngine;
+        if (windowEngine) {
+          windowEngine.restart();
+          loadLevelIntoEngine(windowEngine, activeLevelData);
+          // Keep the game running at 60fps between steps — don't stop the engine
+          windowEngine.start();
+        }
       }
     }
   }, [currentStep?.stepId]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -159,23 +176,89 @@ export function MissionWorkspace({
     }
 
     try {
-      // Keep the engine running — player position is preserved between runs so kids
-      // can experiment freely. Python's _reset_game_state() (called inside wrapUserCode)
-      // clears stale callbacks and events. We also reset platforms to the level-designer
-      // base here (in JS) so Python-added platforms don't stack across multiple runs.
-      const windowEngine = (window as unknown as { gameEngine?: PlatformerEngine }).gameEngine;
+      const win = window as unknown as {
+        pyodide?: { runPythonAsync: (code: string) => Promise<string> };
+        gameEngine?: PlatformerEngine;
+        snakeEngine?: SnakeEngine;
+      };
+
+      if (typeof win.pyodide === "undefined") {
+        return { output: "", error: "Python is still loading... Please wait a moment and try again!" };
+      }
+
+      const pyodide = win.pyodide;
+      let wrappedCode: string;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let events: any[] = [];
+
+      if (isSnakeMission) {
+        // ── Snake execution path ──────────────────────────────────────────────
+        const snakeEng = win.snakeEngine;
+        if (snakeEng) {
+          snakeEng.clearCallbacks();
+          snakeEng.clearEvents();
+          snakeEng.restart();
+          snakeEng.start();
+        }
+
+        wrappedCode = wrapSnakeUserCode(code);
+
+        const snakeRunner = `
+import sys
+from io import StringIO
+
+__old_stdout__ = sys.stdout
+sys.stdout = StringIO()
+
+try:
+${wrappedCode.split("\n").map(line => "    " + line).join("\n")}
+except Exception as e:
+    print(f"Error: {e}")
+
+__captured_output__ = sys.stdout.getvalue()
+sys.stdout = __old_stdout__
+__captured_output__
+`;
+        const result = await pyodide.runPythonAsync(snakeRunner);
+        const printOutput = result || "";
+
+        // Wait for a few ticks to fire before collecting events
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        events = snakeEng?.getEvents() ?? [];
+
+        // Tell SnakePreview the game is now running (removes "click to play" overlay)
+        setSnakeRunTrigger(t => t + 1);
+
+        if (currentStep) {
+          const validation = validateStep(code, printOutput, events, currentStep.validation);
+          setValidationResult(validation);
+
+          if (validation.passed && !completedSteps.has(currentStep.stepId)) {
+            const newCompleted = new Set(completedSteps);
+            newCompleted.add(currentStep.stepId);
+            setCompletedSteps(newCompleted);
+            onStepComplete?.(currentStep.stepId, currentStep.reward.stars, currentStep.reward.badge);
+
+            if (newCompleted.size === mission.steps.length) {
+              setShowCelebration(true);
+              onMissionComplete?.(mission.missionId);
+            }
+          }
+        }
+
+        return { output: printOutput.trim() };
+      }
+
+      // ── Platformer execution path (unchanged) ─────────────────────────────
+      const windowEngine = win.gameEngine;
       const activeEngine = windowEngine || engine;
       if (activeEngine) {
         activeEngine.start(); // no-op if already running (double-start guard in place)
 
         // Reset platforms before Python runs to prevent stacking across multiple runs.
-        // If the Python code itself calls add_platform(), let it manage all platforms
-        // and just provide a flat ground. If not (e.g. M6 teaching pure jumping),
-        // load the user's level-designer platforms as the base.
         activeEngine.clearPlatforms();
         const pythonAddsPlatforms = code.includes('add_platform(');
         if (pythonAddsPlatforms) {
-          // Python will add elevated platforms — just restore the user's level base
           activeLevelData.objects
             .filter((o) => o.type === 'platform')
             .forEach((p) =>
@@ -187,20 +270,11 @@ export function MissionWorkspace({
               )
             );
         } else {
-          // Python doesn't add platforms — provide a simple flat ground only
-          // so elevated platforms aren't present before that concept is taught
           activeEngine.addPlatform(0, 380, 800, 20);
         }
       }
 
-      const win = window as unknown as { pyodide?: { runPythonAsync: (code: string) => Promise<string> } };
-      if (typeof win.pyodide === "undefined") {
-        return { output: "", error: "Python is still loading... Please wait a moment and try again!" };
-      }
-
-      const pyodide = win.pyodide;
-
-      const wrappedCode = wrapUserCode(code);
+      wrappedCode = wrapUserCode(code);
 
       const runnerCode = `
 import sys
@@ -224,8 +298,8 @@ __captured_output__
 
       // Wait for physics frames to run before collecting events
       await new Promise(resolve => setTimeout(resolve, 800));
-      const events = activeEngine?.getEvents() || [];
-      
+      events = activeEngine?.getEvents() || [];
+
       if (currentStep) {
         const validation = validateStep(
           code,
@@ -242,8 +316,6 @@ __captured_output__
           setCompletedSteps(newCompleted);
           onStepComplete?.(currentStep.stepId, currentStep.reward.stars, currentStep.reward.badge);
 
-          // Celebrate only when EVERY step in the mission is now done.
-          // Checking newCompleted (not completedSteps) because state updates are async.
           if (newCompleted.size === mission.steps.length) {
             setShowCelebration(true);
             onMissionComplete?.(mission.missionId);
@@ -398,6 +470,7 @@ __captured_output__
   const isCreativeMission = mission.missionType === 'creative';
   const isLevelDesignMission = mission.missionType === 'level_design';
   const isSpriteDesignMission = mission.missionType === 'sprite_design';
+  // isSnakeMission is declared near top of component
 
   const goToPrevStep = () => {
     if (currentStepIndex > 0) {
@@ -572,31 +645,46 @@ __captured_output__
           />
         ) : (
         <div className="grid lg:grid-cols-[1fr_400px] gap-4">
+          {/* Snake-only UI tour — shown once, on first visit to sn1_hello_python */}
+          {isSnakeMission && <SnakeTour missionId={mission.missionId} />}
+
           {/* Left side: Code editor + Game preview — natural height, scrollable on small screens */}
           <div className="flex flex-col gap-4">
-            <SimpleEditor
-              initialCode={currentStep ? (savedCodes?.[currentStep.stepId] ?? currentStep.starterCode) : ""}
-              hint={currentStep?.hint}
-              onRun={handleRunCode}
-              onCodeChange={setCurrentCode}
-              height="340px"
-              showGameHint
-              validationChecks={validationResult?.checks}
-            />
-
-            {/* Game Preview — always running at 60fps */}
-            <div className="h-[520px]" ref={gamePreviewRef}>
-              <GamePreview
-                levelData={activeLevelData}
-                heroPixels={heroPixels}
-                isPlaying={true}
-                onEngineReady={(e) => setEngine(e)}
+            <div data-tour="code-editor">
+              <SimpleEditor
+                initialCode={currentStep ? (savedCodes?.[currentStep.stepId] ?? currentStep.starterCode) : ""}
+                hint={currentStep?.hint}
+                onRun={handleRunCode}
+                onCodeChange={setCurrentCode}
+                height="340px"
+                showGameHint
+                validationChecks={validationResult?.checks}
               />
+            </div>
+
+            {/* Game Preview — snake or platformer depending on mission */}
+            <div className="h-[520px]" ref={gamePreviewRef} data-tour="game-preview">
+              {isSnakeMission ? (
+                <SnakePreview
+                  runTrigger={snakeRunTrigger}
+                  onPlayClicked={() => handleRunCode(currentCode)}
+                />
+              ) : (
+                <GamePreview
+                  levelData={activeLevelData}
+                  heroPixels={heroPixels}
+                  isPlaying={true}
+                  onEngineReady={(e) => setEngine(e)}
+                />
+              )}
             </div>
           </div>
 
           {/* Right side: sticky so step instructions stay in view as user scrolls */}
-          <div className="lg:sticky lg:top-[72px] lg:self-start lg:max-h-[calc(100vh-88px)] lg:overflow-y-auto">
+          <div
+            data-tour="step-panel"
+            className="lg:sticky lg:top-[72px] lg:self-start lg:max-h-[calc(100vh-88px)] lg:overflow-y-auto"
+          >
             <StepPanel
               step={currentStep}
               stepNumber={currentStepIndex + 1}

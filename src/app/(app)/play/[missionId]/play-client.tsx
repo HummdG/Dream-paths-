@@ -5,7 +5,7 @@ import Script from "next/script";
 import { Loader2 } from "lucide-react";
 import { MissionWorkspace } from "@/components/mission";
 import { Mission } from "@/lib/missions/schema";
-import { platformerMissionPack } from "@/lib/missions";
+import { allMissionPacks } from "@/lib/missions";
 
 // Use the canonical LevelData type from the level designer so all themes
 // (space, jungle, city, ocean, castle, sky, volcano, candy) are accepted.
@@ -13,6 +13,7 @@ import type { LevelData } from "@/components/level-designer/level-designer";
 
 interface PlayClientProps {
   mission: Mission;
+  packId: string;
   childId: string;
   childName: string;
   projectId: string;
@@ -25,6 +26,7 @@ interface PlayClientProps {
 
 export function PlayClient({
   mission,
+  packId,
   childId,
   childName,
   projectId,
@@ -39,14 +41,17 @@ export function PlayClient({
   const [heroPixels, setHeroPixels] = useState<string[][] | undefined>(initialHeroPixels);
   const [levelData, setLevelData] = useState<LevelData | undefined>(initialLevelData);
 
-  // Determine the next mission in the pack (if any)
-  const missionIndex = platformerMissionPack.missions.findIndex(m => m.missionId === mission.missionId);
-  const nextMissionId = missionIndex >= 0 && missionIndex < platformerMissionPack.missions.length - 1
-    ? platformerMissionPack.missions[missionIndex + 1].missionId
-    : undefined;
+  // Determine the next mission in the same pack (if any)
+  const currentPack = allMissionPacks.find(p => p.packId === packId);
+  const missionIndex = currentPack?.missions.findIndex(m => m.missionId === mission.missionId) ?? -1;
+  const nextMissionId =
+    missionIndex >= 0 && currentPack && missionIndex < currentPack.missions.length - 1
+      ? currentPack.missions[missionIndex + 1].missionId
+      : undefined;
 
-  // For creative missions, we don't need Pyodide
+  // For creative/level_design missions, we don't need Pyodide
   const isCreativeMission = mission.missionType === 'creative';
+  const isLevelDesignMission = mission.missionType === 'level_design';
 
   useEffect(() => {
     // Check if Pyodide is already loaded
@@ -117,8 +122,8 @@ export function PlayClient({
     }
   };
 
-  // For creative missions, render directly without waiting for Pyodide
-  if (isCreativeMission) {
+  // For creative/level_design missions, render directly without waiting for Pyodide
+  if (isCreativeMission || isLevelDesignMission) {
     return (
       <MissionWorkspace
         mission={mission}
@@ -193,4 +198,3 @@ export function PlayClient({
     </>
   );
 }
-

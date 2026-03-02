@@ -466,6 +466,28 @@ function performRuntimeCheck(
       };
     }
     
+    case 'snake_direction_set': {
+      const passed = events.some(e => e.type === 'snake_direction_changed');
+      return {
+        check,
+        passed,
+        message: passed
+          ? '✅ Direction set'
+          : '❌ Call set_direction() to steer your snake'
+      };
+    }
+
+    case 'snake_food_eaten_check': {
+      const passed = events.some(e => e.type === 'snake_food_eaten');
+      return {
+        check,
+        passed,
+        message: passed
+          ? '✅ Snake ate food'
+          : '❌ The snake needs to eat — run the game longer!'
+      };
+    }
+
     default:
       // Unknown check type - pass by default
       return {

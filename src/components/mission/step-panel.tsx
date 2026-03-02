@@ -33,6 +33,91 @@ interface StepPanelProps {
   allStepsComplete?: boolean;
 }
 
+// =============================================================================
+// TEXT RENDERER — handles fenced code blocks + inline backtick code + line breaks
+// =============================================================================
+
+function InlineLine({ text }: { text: string }) {
+  // Render inline `code` spans inside a line of text
+  const parts = text.split(/`([^`]+)`/);
+  return (
+    <span>
+      {parts.map((part, i) =>
+        i % 2 === 1 ? (
+          <code
+            key={i}
+            className="bg-slate-800 text-emerald-300 font-mono text-xs px-1.5 py-0.5 rounded mx-0.5"
+          >
+            {part}
+          </code>
+        ) : (
+          part
+        )
+      )}
+    </span>
+  );
+}
+
+/** Renders instruction / explanation text with code fences and inline code. */
+function FormattedText({ text, className }: { text: string; className?: string }) {
+  // Split on fenced code blocks  ```...```
+  const segments: Array<{ type: 'text' | 'code'; content: string }> = [];
+  const fenceRe = /```(?:\w+)?\n([\s\S]*?)```/g;
+  let lastIndex = 0;
+  let m: RegExpExecArray | null;
+
+  while ((m = fenceRe.exec(text)) !== null) {
+    if (m.index > lastIndex) {
+      segments.push({ type: 'text', content: text.slice(lastIndex, m.index) });
+    }
+    segments.push({ type: 'code', content: m[1].replace(/\n$/, '') });
+    lastIndex = m.index + m[0].length;
+  }
+  if (lastIndex < text.length) {
+    segments.push({ type: 'text', content: text.slice(lastIndex) });
+  }
+
+  return (
+    <span className={className}>
+      {segments.map((seg, si) => {
+        if (seg.type === 'code') {
+          return (
+            <pre
+              key={si}
+              className="bg-slate-900 text-emerald-300 text-xs font-mono rounded-xl px-4 py-3 my-2 overflow-x-auto whitespace-pre leading-relaxed"
+            >
+              {seg.content}
+            </pre>
+          );
+        }
+        // Regular text: split into paragraphs on blank lines
+        const paragraphs = seg.content.split(/\n\n+/).filter(p => p.trim());
+        return (
+          <span key={si}>
+            {paragraphs.map((para, pi) => {
+              const lines = para.split('\n');
+              return (
+                <p key={pi} className="mb-2 last:mb-0 leading-relaxed">
+                  {lines.map((line, li) => (
+                    <span key={li}>
+                      {li > 0 && <br />}
+                      <InlineLine text={line} />
+                    </span>
+                  ))}
+                </p>
+              );
+            })}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
+// =============================================================================
+// MAIN COMPONENT
+// =============================================================================
+
 export function StepPanel({
   step,
   stepNumber,
@@ -53,9 +138,15 @@ export function StepPanel({
   const [confirmSolution, setConfirmSolution] = useState(false);
 
   const handleShowSolution = () => {
-    if (!confirmSolution) {
+    if (showSolution) {
+      // Already shown — hide it
+      setShowSolution(false);
+      setConfirmSolution(false);
+    } else if (!confirmSolution) {
+      // First click — ask for confirmation
       setConfirmSolution(true);
     } else {
+      // Second click after confirmation — show solution
       setShowSolution(true);
       setConfirmSolution(false);
     }
@@ -77,7 +168,7 @@ export function StepPanel({
             </div>
           )}
         </div>
-        
+
         {/* Progress dots */}
         <div className="flex items-center gap-1 mt-3">
           {Array.from({ length: totalSteps }, (_, i) => (
@@ -112,14 +203,18 @@ export function StepPanel({
         {/* Main instruction */}
         <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 border-2 border-amber-200">
           <h3 className="font-bold text-amber-900 mb-2">🎯 Your Goal</h3>
-          <p className="text-amber-800 text-lg">{step.instruction}</p>
+          <div className="text-amber-800 text-sm">
+            <FormattedText text={step.instruction} />
+          </div>
         </div>
 
         {/* Detailed explanation */}
         {step.detailedExplanation && (
           <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
             <h4 className="font-medium text-blue-900 mb-2">📚 How it works:</h4>
-            <p className="text-blue-800 text-sm">{step.detailedExplanation}</p>
+            <div className="text-blue-800 text-sm">
+              <FormattedText text={step.detailedExplanation} />
+            </div>
           </div>
         )}
 
@@ -144,7 +239,7 @@ export function StepPanel({
             })}
           </ul>
 
-          {/* Step complete banner — appears automatically when all checks pass */}
+          {/* Step complete banner */}
           {isCompleted && (
             <motion.div
               initial={{ opacity: 0, y: 4 }}
@@ -209,9 +304,9 @@ export function StepPanel({
                   exit={{ height: 0, opacity: 0 }}
                   className="overflow-hidden"
                 >
-                  <p className="p-3 bg-amber-50/50 text-amber-800 text-sm border-t border-amber-200">
-                    💡 {step.hint}
-                  </p>
+                  <div className="p-3 bg-amber-50/50 text-amber-800 text-sm border-t border-amber-200">
+                    <FormattedText text={`💡 ${step.hint}`} />
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -260,7 +355,7 @@ export function StepPanel({
                   exit={{ height: 0, opacity: 0 }}
                   className="overflow-hidden"
                 >
-                  <pre className="p-3 bg-slate-900 text-emerald-400 text-xs font-mono overflow-x-auto border-t border-gray-200">
+                  <pre className="p-3 bg-slate-900 text-emerald-400 text-xs font-mono overflow-x-auto border-t border-gray-200 whitespace-pre">
                     {step.solutionCode}
                   </pre>
                 </motion.div>
@@ -296,17 +391,17 @@ export function StepPanel({
           </div>
         </div>
 
-        {/* Customization info */}
+        {/* Customization options */}
         {step.customization && (
           <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
             <h4 className="font-medium text-purple-800 mb-2">🎨 Make it yours!</h4>
-            <p className="text-purple-700 text-sm">{step.customization.description}</p>
+            <p className="text-purple-700 text-sm mb-3">{step.customization.description}</p>
             {step.customization.options && (
-              <div className="flex flex-wrap gap-2 mt-2">
+              <div className="flex flex-wrap gap-2">
                 {step.customization.options.map((option) => (
                   <span
                     key={option}
-                    className="px-2 py-1 bg-purple-100 text-purple-600 rounded text-xs"
+                    className="px-2 py-1 bg-white border border-purple-200 text-purple-700 rounded-lg text-xs font-mono"
                   >
                     {option}
                   </span>
@@ -333,7 +428,6 @@ export function StepPanel({
         </button>
 
         {(allStepsComplete || (!hasNextStep && isCompleted)) ? (
-          // No more steps — show Next Mission or Back to Map
           nextMissionId ? (
             <Link
               href={`/play/${nextMissionId}`}
@@ -384,9 +478,3 @@ function CheckResultItem({ result }: { result: CheckResult }) {
     </li>
   );
 }
-
-
-
-
-
-

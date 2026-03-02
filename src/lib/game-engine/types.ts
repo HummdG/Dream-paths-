@@ -119,7 +119,7 @@ export interface GameConfig {
 // GAME EVENTS (for validation)
 // =============================================================================
 
-export type GameEventType = 
+export type GameEventType =
   | 'player_moved'
   | 'player_jumped'
   | 'player_landed'
@@ -136,7 +136,11 @@ export type GameEventType =
   | 'theme_set'
   | 'sprite_set'
   | 'platform_added'
-  | 'goal_added';
+  | 'goal_added'
+  // Snake events
+  | 'snake_direction_changed'
+  | 'snake_food_eaten'
+  | 'snake_game_over';
 
 export interface GameEvent {
   type: GameEventType;

@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { DashboardClient } from "./dashboard-client";
-import { platformerMissionPack } from "@/lib/missions";
+import { platformerMissionPack, snakeMissionPack } from "@/lib/missions";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -30,9 +30,10 @@ export default async function DashboardPage() {
               },
             },
           },
+          // Fetch projects for both packs in a single query
           projects: {
             where: {
-              packId: platformerMissionPack.packId,
+              packId: { in: [snakeMissionPack.packId, platformerMissionPack.packId] },
             },
             include: {
               stepProgress: true,
@@ -63,28 +64,48 @@ export default async function DashboardPage() {
     .filter((m) => m.status === "COMPLETED" && m.completedAt)
     .sort((a, b) => new Date(b.completedAt!).getTime() - new Date(a.completedAt!).getTime())[0];
 
-  // Get coding project data
-  const codingProject = child.projects[0];
-  const completedCodingMissionIds: string[] = [];
-  
-  if (codingProject) {
-    // Group completed steps by mission
-    const completedSteps = codingProject.stepProgress.filter(
-      (sp) => sp.status === "COMPLETED"
-    );
-    
-    // Check which missions have all steps completed
-    for (const mission of platformerMissionPack.missions) {
-      const missionStepIds = mission.steps.map((s) => s.stepId);
+  // ── Snake pack progress ─────────────────────────────────────────────────────
+  const snakeProject = child.projects.find(p => p.packId === snakeMissionPack.packId);
+  const completedSnakeMissionIds: string[] = [];
+
+  if (snakeProject) {
+    const completedSteps = snakeProject.stepProgress.filter(sp => sp.status === "COMPLETED");
+    for (const mission of snakeMissionPack.missions) {
+      const missionStepIds = mission.steps.map(s => s.stepId);
       const completedStepIds = completedSteps
-        .filter((sp) => sp.missionId === mission.missionId)
-        .map((sp) => sp.stepId);
-      
-      if (missionStepIds.every((id) => completedStepIds.includes(id))) {
-        completedCodingMissionIds.push(mission.missionId);
+        .filter(sp => sp.missionId === mission.missionId)
+        .map(sp => sp.stepId);
+      if (missionStepIds.every(id => completedStepIds.includes(id))) {
+        completedSnakeMissionIds.push(mission.missionId);
       }
     }
   }
+
+  const snakeComplete = completedSnakeMissionIds.length === snakeMissionPack.missions.length;
+
+  // ── Platformer pack progress ────────────────────────────────────────────────
+  const platformerProject = child.projects.find(p => p.packId === platformerMissionPack.packId);
+  const completedPlatformerMissionIds: string[] = [];
+
+  if (platformerProject) {
+    const completedSteps = platformerProject.stepProgress.filter(sp => sp.status === "COMPLETED");
+    for (const mission of platformerMissionPack.missions) {
+      const missionStepIds = mission.steps.map(s => s.stepId);
+      const completedStepIds = completedSteps
+        .filter(sp => sp.missionId === mission.missionId)
+        .map(sp => sp.stepId);
+      if (missionStepIds.every(id => completedStepIds.includes(id))) {
+        completedPlatformerMissionIds.push(mission.missionId);
+      }
+    }
+  }
+
+  // Combine stars from both projects
+  const totalStars = (snakeProject?.totalStars ?? 0) + (platformerProject?.totalStars ?? 0);
+  const badges = [
+    ...((snakeProject?.badgesJson as string[]) ?? []),
+    ...((platformerProject?.badgesJson as string[]) ?? []),
+  ];
 
   return (
     <DashboardClient
@@ -123,11 +144,17 @@ export default async function DashboardPage() {
           : null
       }
       subscriptionPlan={parent.subscription?.planId || "free"}
-      codingMissions={{
-        completedMissionIds: completedCodingMissionIds,
-        totalStars: codingProject?.totalStars || 0,
-        badges: (codingProject?.badgesJson as string[]) || [],
+      snakeCodingMissions={{
+        completedMissionIds: completedSnakeMissionIds,
+        totalStars: snakeProject?.totalStars ?? 0,
+        badges: (snakeProject?.badgesJson as string[]) ?? [],
       }}
+      platformerCodingMissions={{
+        completedMissionIds: completedPlatformerMissionIds,
+        totalStars,
+        badges,
+      }}
+      snakeComplete={snakeComplete}
       heroCharacter={
         child.heroCharacter
           ? {
@@ -139,4 +166,3 @@ export default async function DashboardPage() {
     />
   );
 }
-

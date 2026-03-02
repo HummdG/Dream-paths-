@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { PlayClient } from "./play-client";
-import { platformerMissionPack, getMissionById } from "@/lib/missions";
+import { getMissionFromAnyPack } from "@/lib/missions";
 import type { LevelData } from "@/components/level-designer/level-designer";
 
 interface PlayPageProps {
@@ -14,7 +14,7 @@ interface PlayPageProps {
 
 export default async function PlayPage({ params }: PlayPageProps) {
   const { missionId } = await params;
-  
+
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     redirect("/login");
@@ -40,19 +40,21 @@ export default async function PlayPage({ params }: PlayPageProps) {
 
   const child = parent.children[0];
 
-  // Get the mission from the pack
-  const mission = getMissionById(missionId);
-  
-  if (!mission) {
+  // Resolve mission from any pack
+  const packResult = getMissionFromAnyPack(missionId);
+
+  if (!packResult) {
     redirect("/dashboard");
   }
+
+  const { pack, mission } = packResult;
 
   // Get or create project for this child and pack
   let project = await db.project.findUnique({
     where: {
       childId_packId: {
         childId: child.id,
-        packId: platformerMissionPack.packId,
+        packId: pack.packId,
       },
     },
     include: {
@@ -62,15 +64,14 @@ export default async function PlayPage({ params }: PlayPageProps) {
 
   if (!project) {
     // Create new project with default config
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     project = await (db.project.create({
       data: {
         childId: child.id,
-        packId: platformerMissionPack.packId,
-        name: "My Platformer Game",
+        packId: pack.packId,
+        name: pack.packId === 'snake_basics_v1' ? "My Snake Game" : "My Platformer Game",
         currentMissionId: missionId,
         currentStepId: mission.steps[0].stepId,
-        gameConfigJson: platformerMissionPack.gameTemplate.defaultConfig as object,
+        gameConfigJson: pack.gameTemplate.defaultConfig as object,
         badgesJson: [],
       },
       include: {
@@ -122,21 +123,21 @@ export default async function PlayPage({ params }: PlayPageProps) {
   // Get hero pixels if available
   const heroPixels = child.heroCharacter?.pixelData as string[][] | undefined;
 
-  // Get the user's most recent level for game preview
-  const userLevel = await db.userLevel.findFirst({
-    where: { childId: child.id },
-    orderBy: { updatedAt: "desc" },
-  });
-
-  // Parse level data if available.
-  // The data was saved by LevelDesigner so we trust its shape. Cast through unknown
-  // to avoid fighting unexported internal types (LevelSize etc.).
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const levelData = userLevel ? (userLevel as unknown as any) as LevelData : undefined;
+  // Get the user's most recent level for game preview (platformer missions only)
+  let levelData: LevelData | undefined;
+  if (mission.engineType !== 'snake') {
+    const userLevel = await db.userLevel.findFirst({
+      where: { childId: child.id },
+      orderBy: { updatedAt: "desc" },
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    levelData = userLevel ? (userLevel as unknown as any) as LevelData : undefined;
+  }
 
   return (
     <PlayClient
       mission={mission}
+      packId={pack.packId}
       childId={child.id}
       childName={child.firstName}
       projectId={project.id}
@@ -148,4 +149,3 @@ export default async function PlayPage({ params }: PlayPageProps) {
     />
   );
 }
-

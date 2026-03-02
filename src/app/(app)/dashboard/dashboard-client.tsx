@@ -19,7 +19,7 @@ import {
   Pencil,
 } from "lucide-react";
 import { CodingMissions } from "@/components/dashboard/coding-missions";
-import { platformerMissionPack } from "@/lib/missions";
+import { snakeMissionPack, platformerMissionPack } from "@/lib/missions";
 
 interface Mission {
   id: string;
@@ -29,6 +29,12 @@ interface Mission {
   estimatedDuration: number;
   status: "LOCKED" | "AVAILABLE" | "COMPLETED";
   completedAt: string | null;
+}
+
+interface CodingMissionsData {
+  completedMissionIds: string[];
+  totalStars: number;
+  badges: string[];
 }
 
 interface DashboardClientProps {
@@ -51,11 +57,10 @@ interface DashboardClientProps {
     completedAt: string;
   } | null;
   subscriptionPlan: string;
-  codingMissions?: {
-    completedMissionIds: string[];
-    totalStars: number;
-    badges: string[];
-  };
+  snakeCodingMissions?: CodingMissionsData;
+  platformerCodingMissions?: CodingMissionsData;
+  /** True when all snake missions are completed — unlocks platformer */
+  snakeComplete?: boolean;
   heroCharacter?: {
     name: string;
     pixels: string[][];
@@ -69,18 +74,23 @@ export function DashboardClient({
   pathName,
   completedMissions,
   totalMissions,
-  missions,
   nextMission,
   lastCompleted,
   subscriptionPlan,
-  codingMissions,
+  snakeCodingMissions,
+  platformerCodingMissions,
+  snakeComplete = false,
   heroCharacter,
 }: DashboardClientProps) {
-  const codingCompleted = codingMissions?.completedMissionIds.length ?? 0;
-  const codingTotal = platformerMissionPack.missions.length;
+  // Progress bar shows snake progress until complete, then platformer
+  const activePack = snakeComplete ? platformerMissionPack : snakeMissionPack;
+  const activeMissions = snakeComplete
+    ? platformerCodingMissions
+    : snakeCodingMissions;
+  const codingCompleted = activeMissions?.completedMissionIds.length ?? 0;
+  const codingTotal = activePack.missions.length;
   const progressPercent = codingTotal > 0 ? (codingCompleted / codingTotal) * 100 : 0;
   const isFree = subscriptionPlan === "free";
-  const maxFreeMissions = 2;
 
   return (
     <div className="min-h-screen bg-[var(--color-cream)]">
@@ -88,11 +98,11 @@ export function DashboardClient({
       <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 py-2 flex justify-between items-center">
           <Link href="/dashboard" className="flex items-center">
-            <Image 
-              src="/logo.svg" 
-              alt="DreamPaths" 
-              width={550} 
-              height={180} 
+            <Image
+              src="/logo.svg"
+              alt="DreamPaths"
+              width={550}
+              height={180}
               priority
               className="h-12 sm:h-16 md:h-20 lg:h-24 w-auto"
             />
@@ -119,7 +129,7 @@ export function DashboardClient({
           className="mb-8"
         >
           <h1 className="text-3xl font-bold text-[var(--color-navy)] mb-2">
-            {childName}'s Dashboard
+            {childName}&apos;s Dashboard
           </h1>
           <div className="flex items-center gap-4 text-gray-600">
             <span className="flex items-center gap-1">
@@ -156,7 +166,7 @@ export function DashboardClient({
                   Progress
                 </h2>
                 <span className="text-sm text-gray-500">
-                  {codingCompleted} of {codingTotal} missions
+                  {codingCompleted} of {codingTotal} missions — {activePack.packTitle}
                 </span>
               </div>
 
@@ -180,27 +190,46 @@ export function DashboardClient({
               )}
             </motion.div>
 
-            {/* Coding Missions Section */}
-            {codingMissions && (
+            {/* Snake Pack — always shown first */}
+            {snakeCodingMissions && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.15 }}
               >
                 <CodingMissions
-                  completedMissionIds={codingMissions.completedMissionIds}
-                  totalStars={codingMissions.totalStars}
-                  badges={codingMissions.badges}
+                  pack={snakeMissionPack}
+                  completedMissionIds={snakeCodingMissions.completedMissionIds}
+                  totalStars={snakeCodingMissions.totalStars}
+                  badges={snakeCodingMissions.badges}
                 />
               </motion.div>
             )}
 
-            {/* Next Mission Card */}
-            {nextMission && (
+            {/* Platformer Pack — locked until snake complete */}
+            {platformerCodingMissions && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
+              >
+                <CodingMissions
+                  pack={platformerMissionPack}
+                  completedMissionIds={platformerCodingMissions.completedMissionIds}
+                  totalStars={platformerCodingMissions.totalStars}
+                  badges={platformerCodingMissions.badges}
+                  locked={!snakeComplete}
+                  lockedMessage="Complete the Snake tutorial to unlock the platformer!"
+                />
+              </motion.div>
+            )}
+
+            {/* Next Mission Card (legacy path system) */}
+            {nextMission && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25 }}
                 className="card bg-gradient-to-br from-[var(--color-indigo)] to-[var(--color-violet)] text-white"
               >
                 <div className="flex items-start gap-4">
@@ -233,11 +262,11 @@ export function DashboardClient({
               </motion.div>
             )}
 
-            {!nextMission && completedMissions === totalMissions && (
+            {!nextMission && completedMissions === totalMissions && totalMissions > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
+                transition={{ delay: 0.25 }}
                 className="card text-center py-12"
               >
                 <div className="text-6xl mb-4">🎉</div>
@@ -252,7 +281,6 @@ export function DashboardClient({
                 </p>
               </motion.div>
             )}
-
           </div>
 
           {/* Sidebar */}
@@ -338,7 +366,7 @@ export function DashboardClient({
                   <h3 className="font-bold text-amber-900">Unlock All Missions</h3>
                 </div>
                 <p className="text-sm text-amber-800 mb-4">
-                  {childName} is doing great! Upgrade to continue with all 8 missions.
+                  {childName} is doing great! Upgrade to continue with all missions.
                 </p>
                 <Link
                   href="/upgrade"
@@ -359,9 +387,17 @@ export function DashboardClient({
               <h3 className="font-bold text-[var(--color-navy)] mb-4">Quick Stats</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Missions Completed</span>
+                  <span className="text-gray-600">Snake Missions</span>
                   <span className="font-bold text-[var(--color-navy)]">
-                    {codingCompleted}/{codingTotal}
+                    {snakeCodingMissions?.completedMissionIds.length ?? 0}/{snakeMissionPack.missions.length}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600">Platformer Missions</span>
+                  <span className={`font-bold ${snakeComplete ? 'text-[var(--color-navy)]' : 'text-gray-400'}`}>
+                    {snakeComplete
+                      ? `${platformerCodingMissions?.completedMissionIds.length ?? 0}/${platformerMissionPack.missions.length}`
+                      : 'Locked'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -399,4 +435,3 @@ export function DashboardClient({
     </div>
   );
 }
-
