@@ -23,15 +23,22 @@ const features = [
   },
 ];
 
-const missions = [
-  { num: 1, title: "Design Your Hero", emoji: "🎨" },
-  { num: 2, title: "Build Your First Scene", emoji: "🏗️" },
-  { num: 3, title: "Add Movement", emoji: "🏃" },
-  { num: 4, title: "Create Collectibles", emoji: "⭐" },
-  { num: 5, title: "Add Sound Effects", emoji: "🔊" },
-  { num: 6, title: "Build Obstacles", emoji: "🚧" },
-  { num: 7, title: "Create a Start Menu", emoji: "📋" },
-  { num: 8, title: "Polish & Share", emoji: "🚀" },
+const snakeMissions = [
+  { title: "Hello Python", emoji: "🐍" },
+  { title: "Functions & Movement", emoji: "⚙️" },
+  { title: "Keyboard Controls", emoji: "⌨️" },
+  { title: "Score & Game Over", emoji: "🏆" },
+];
+
+const platformerMissions = [
+  { title: "Design Your Hero", emoji: "🎨" },
+  { title: "Run & Explore", emoji: "🏃" },
+  { title: "Build Your Scene", emoji: "🏗️" },
+  { title: "Gravity & Jumping", emoji: "🦘" },
+  { title: "Collisions", emoji: "💥" },
+  { title: "Collect & Score", emoji: "🪙" },
+  { title: "Enemies", emoji: "👾" },
+  { title: "Win & Polish", emoji: "🏁" },
 ];
 
 export default function Home() {
@@ -210,30 +217,56 @@ export default function Home() {
               The Junior Game Developer Path
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              8 missions over 4 weeks. By the end, your child will have created their own playable game!
+              Learn real Python by building games from scratch — starting with a free Snake tutorial, then a full platformer.
             </p>
           </motion.div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {missions.map((mission, index) => (
-              <motion.div
-                key={mission.num}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.05 }}
-                className={`card p-5 text-center ${index < 2 ? 'ring-2 ring-[var(--color-violet)] ring-offset-2' : ''}`}
-              >
-                <div className="text-4xl mb-3">{mission.emoji}</div>
-                <p className="text-xs text-[var(--color-violet)] font-medium mb-1">Mission {mission.num}</p>
-                <h3 className="text-sm font-bold text-[var(--color-navy)]">{mission.title}</h3>
-                {index < 2 && (
-                  <span className="inline-block mt-2 text-xs bg-[var(--color-mint)] text-emerald-700 px-2 py-1 rounded-full">
-                    Free
-                  </span>
-                )}
-              </motion.div>
-            ))}
+
+          {/* Snake Tutorial — FREE */}
+          <div className="mb-10">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-2xl">🐍</span>
+              <h3 className="text-lg font-bold text-gray-800">Snake Tutorial</h3>
+              <span className="text-xs font-bold bg-emerald-500 text-white px-2.5 py-1 rounded-full">FREE</span>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {snakeMissions.map((mission, index) => (
+                <motion.div
+                  key={mission.title}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.05 }}
+                  className="card p-5 text-center ring-2 ring-emerald-300 ring-offset-2"
+                >
+                  <div className="text-3xl mb-2">{mission.emoji}</div>
+                  <h3 className="text-sm font-bold text-[var(--color-navy)]">{mission.title}</h3>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Platformer Game */}
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-2xl">🎮</span>
+              <h3 className="text-lg font-bold text-gray-800">Platformer Game</h3>
+              <span className="text-xs font-semibold text-violet-600 bg-violet-100 px-2.5 py-1 rounded-full">Full subscription</span>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {platformerMissions.map((mission, index) => (
+                <motion.div
+                  key={mission.title}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.05 }}
+                  className="card p-5 text-center"
+                >
+                  <div className="text-3xl mb-2">{mission.emoji}</div>
+                  <h3 className="text-sm font-bold text-[var(--color-navy)]">{mission.title}</h3>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -294,7 +327,7 @@ export default function Home() {
               <h3 className="text-xl font-bold text-[var(--color-navy)] mb-2">Founding Family</h3>
               <p className="text-gray-600 mb-6">Full access to all missions</p>
               <div className="text-4xl font-bold text-[var(--color-navy)] mb-6">
-                £9 <span className="text-base font-normal text-gray-500">/month</span>
+                £24.99 <span className="text-base font-normal text-gray-500">/month</span>
               </div>
               <ul className="space-y-3 mb-8">
                 {["All 8 missions unlocked", "New paths as we add them", "Priority support", "Up to 2 child profiles", "Cancel anytime"].map((item) => (

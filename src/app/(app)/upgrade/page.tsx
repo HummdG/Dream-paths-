@@ -53,7 +53,7 @@ export default function UpgradePage() {
 
           <div className="text-center pt-4 pb-6 border-b border-gray-100 mb-6">
             <div className="text-5xl font-bold text-[var(--color-navy)] mb-2">
-              £9 <span className="text-base font-normal text-gray-500">/month</span>
+              £24.99 <span className="text-base font-normal text-gray-500">/month</span>
             </div>
             <p className="text-gray-500">Cancel anytime</p>
           </div>

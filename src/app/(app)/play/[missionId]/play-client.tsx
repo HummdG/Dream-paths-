@@ -41,10 +41,14 @@ export function PlayClient({
   const [heroPixels, setHeroPixels] = useState<string[][] | undefined>(initialHeroPixels);
   const [levelData, setLevelData] = useState<LevelData | undefined>(initialLevelData);
 
-  // Determine the next mission in the same pack (if any)
+  // Determine the next mission in the same pack (if any).
+  // The hero design mission (m0_design_hero) is a standalone prerequisite — after
+  // completing it, the user should return to the dashboard rather than jump straight
+  // into the next platformer mission.
   const currentPack = allMissionPacks.find(p => p.packId === packId);
   const missionIndex = currentPack?.missions.findIndex(m => m.missionId === mission.missionId) ?? -1;
   const nextMissionId =
+    mission.missionId !== 'm0_design_hero' &&
     missionIndex >= 0 && currentPack && missionIndex < currentPack.missions.length - 1
       ? currentPack.missions[missionIndex + 1].missionId
       : undefined;

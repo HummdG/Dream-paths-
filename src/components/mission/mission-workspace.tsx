@@ -534,7 +534,7 @@ __captured_output__
                 transition={{ delay: 0.4 }}
                 className="text-lg text-gray-600 mb-6"
               >
-                You completed {mission.title}!
+                You completed {mission.title.replace(/^Mission \d+:\s*/i, '')}!
               </motion.p>
 
               <motion.div
@@ -601,7 +601,7 @@ __captured_output__
           </Link>
 
           <div className="flex items-center gap-4">
-            <span className="text-white font-bold">{mission.title}</span>
+            <span className="text-white font-bold">{mission.title.replace(/^Mission \d+:\s*/i, '')}</span>
             <span className="text-white/50">•</span>
             <span className="text-white/70 text-sm">
               Step {currentStepIndex + 1} of {mission.steps.length}
@@ -689,7 +689,7 @@ __captured_output__
               step={currentStep}
               stepNumber={currentStepIndex + 1}
               totalSteps={mission.steps.length}
-              missionTitle={mission.title}
+              missionTitle={mission.title.replace(/^Mission \d+:\s*/i, '')}
               validationResult={validationResult || undefined}
               isCompleted={completedSteps.has(currentStep.stepId)}
               onCompleteStep={handleCompleteStep}

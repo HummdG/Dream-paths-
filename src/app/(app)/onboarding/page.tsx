@@ -220,37 +220,21 @@ export default function OnboardingPage() {
                 </p>
               </div>
 
-              {/* Path card - only one for MVP */}
-              <div className="card ring-2 ring-[var(--color-violet)] ring-offset-2 bg-gradient-to-br from-white to-[var(--color-cream)]">
-                <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-[var(--color-indigo)] to-[var(--color-violet)] rounded-2xl flex items-center justify-center text-3xl shrink-0">
-                    🎮
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-lg font-bold text-[var(--color-navy)]">
-                        Junior Game Developer
-                      </h3>
-                      <span className="text-xs bg-[var(--color-mint)] text-emerald-700 px-2 py-0.5 rounded-full">
-                        Perfect for {childAge}yo
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-3">
-                      8 missions over 4 weeks. {childName} will design characters, build scenes, and create a playable game!
-                    </p>
-                    <div className="flex items-center gap-4 text-sm text-gray-500">
-                      <span>📅 4 weeks</span>
-                      <span>🎯 8 missions</span>
-                      <span>⏱️ 30-45 min each</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-[var(--color-peach)] rounded-xl p-4 text-center">
-                <p className="text-amber-800 text-sm">
-                  ✨ The first 2 missions are free! Upgrade anytime to unlock all 8.
+              {/* Path card */}
+              <div className="card ring-2 ring-[var(--color-violet)] ring-offset-2">
+                <h3 className="text-lg font-bold text-[var(--color-navy)] mb-1">
+                  Junior Game Developer
+                </h3>
+                <p className="text-sm text-gray-500 mb-4">
+                  {childName} will learn real Python by building games from scratch — no experience needed.
                 </p>
+
+                <div className="flex items-center gap-4 text-sm text-gray-500 flex-wrap">
+                  <span>🎯 15 missions</span>
+                  <span>⏱️ 30–45 min each</span>
+                  <span>🐍 Real Python</span>
+                  <span className="text-xs font-semibold bg-emerald-500 text-white px-2 py-0.5 rounded-full">Snake tutorial is free</span>
+                </div>
               </div>
             </motion.div>
           )}
