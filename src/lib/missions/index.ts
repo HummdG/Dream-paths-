@@ -7,6 +7,9 @@
 // Schema and types
 export * from './schema';
 
+// Pack progress utilities
+export * from './progress';
+
 // Mission packs
 export {
   platformerMissionPack,

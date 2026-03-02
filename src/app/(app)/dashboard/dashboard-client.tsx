@@ -1,66 +1,23 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { signOut } from "next-auth/react";
-import { formatDistanceToNow } from "date-fns";
-import {
-  Rocket,
-  Trophy,
-  Clock,
-  CheckCircle,
-  Play,
-  Settings,
-  LogOut,
-  Star,
-  Crown,
-  Sparkles,
-  Pencil,
-} from "lucide-react";
-import { CodingMissions } from "@/components/dashboard/coding-missions";
-import { snakeMissionPack, platformerMissionPack } from "@/lib/missions";
+import { LogOut, Crown, Pencil, Settings, ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
+import { GamePath } from "@/components/dashboard/game-path";
+import type { PackProgress } from "@/lib/missions";
 
-interface Mission {
-  id: string;
-  sequenceNumber: number;
-  title: string;
-  storyIntro: string;
-  estimatedDuration: number;
-  status: "LOCKED" | "AVAILABLE" | "COMPLETED";
-  completedAt: string | null;
-}
-
-interface CodingMissionsData {
-  completedMissionIds: string[];
-  totalStars: number;
-  badges: string[];
-}
+const PACK_EMOJIS: Record<string, string> = {
+  snake_basics_v1: "🐍",
+  platformer_v1: "🎮",
+};
 
 interface DashboardClientProps {
   parentName: string;
   childName: string;
-  childAge: number;
-  pathName: string;
-  completedMissions: number;
-  totalMissions: number;
-  missions: Mission[];
-  nextMission: {
-    id: string;
-    sequenceNumber: number;
-    title: string;
-    storyIntro: string;
-    estimatedDuration: number;
-  } | null;
-  lastCompleted: {
-    title: string;
-    completedAt: string;
-  } | null;
   subscriptionPlan: string;
-  snakeCodingMissions?: CodingMissionsData;
-  platformerCodingMissions?: CodingMissionsData;
-  /** True when all snake missions are completed — unlocks platformer */
-  snakeComplete?: boolean;
+  packsWithProgress: PackProgress[];
   heroCharacter?: {
     name: string;
     pixels: string[][];
@@ -70,33 +27,17 @@ interface DashboardClientProps {
 export function DashboardClient({
   parentName,
   childName,
-  childAge,
-  pathName,
-  completedMissions,
-  totalMissions,
-  nextMission,
-  lastCompleted,
   subscriptionPlan,
-  snakeCodingMissions,
-  platformerCodingMissions,
-  snakeComplete = false,
+  packsWithProgress,
   heroCharacter,
 }: DashboardClientProps) {
-  // Progress bar shows snake progress until complete, then platformer
-  const activePack = snakeComplete ? platformerMissionPack : snakeMissionPack;
-  const activeMissions = snakeComplete
-    ? platformerCodingMissions
-    : snakeCodingMissions;
-  const codingCompleted = activeMissions?.completedMissionIds.length ?? 0;
-  const codingTotal = activePack.missions.length;
-  const progressPercent = codingTotal > 0 ? (codingCompleted / codingTotal) * 100 : 0;
   const isFree = subscriptionPlan === "free";
 
   return (
     <div className="min-h-screen bg-[var(--color-cream)]">
       {/* Header */}
       <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 py-2 flex justify-between items-center">
+        <div className="max-w-4xl mx-auto px-6 py-2 flex justify-between items-center">
           <Link href="/dashboard" className="flex items-center">
             <Image
               src="/logo.svg"
@@ -107,7 +48,6 @@ export function DashboardClient({
               className="h-12 sm:h-16 md:h-20 lg:h-24 w-auto"
             />
           </Link>
-
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-600">Hi, {parentName}!</span>
             <button
@@ -121,316 +61,150 @@ export function DashboardClient({
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-6 py-8">
-        {/* Welcome & Summary */}
+      <main className="max-w-4xl mx-auto px-6 py-8">
+
+        {/* ── Profile bar ─────────────────────────────────────────────── */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6 flex items-center gap-5"
         >
-          <h1 className="text-3xl font-bold text-[var(--color-navy)] mb-2">
-            {childName}&apos;s Dashboard
-          </h1>
-          <div className="flex items-center gap-4 text-gray-600">
-            <span className="flex items-center gap-1">
-              <Rocket className="w-4 h-4 text-[var(--color-violet)]" />
-              {pathName}
-            </span>
-            <span>•</span>
-            <span>{childAge} years old</span>
-            {isFree && (
+          {/* Hero avatar */}
+          <div className="relative shrink-0">
+            {heroCharacter ? (
               <>
-                <span>•</span>
-                <span className="flex items-center gap-1 text-amber-600">
-                  <Star className="w-4 h-4" />
+                <div className="w-16 h-16 bg-gradient-to-br from-violet-100 to-indigo-100 rounded-2xl overflow-hidden flex items-center justify-center">
+                  <div
+                    className="grid"
+                    style={{
+                      gridTemplateColumns: `repeat(16, 4px)`,
+                      imageRendering: "pixelated",
+                    }}
+                  >
+                    {heroCharacter.pixels.map((row, y) =>
+                      row.map((color, x) => (
+                        <div
+                          key={`${x}-${y}`}
+                          style={{
+                            width: 4,
+                            height: 4,
+                            backgroundColor:
+                              color === "transparent" ? "transparent" : color,
+                          }}
+                        />
+                      ))
+                    )}
+                  </div>
+                </div>
+                <Link
+                  href="/play/m0_design_hero"
+                  title="Edit hero"
+                  className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-white rounded-full border border-gray-200 shadow-sm flex items-center justify-center hover:bg-gray-50 transition-colors"
+                >
+                  <Pencil className="w-2.5 h-2.5 text-gray-500" />
+                </Link>
+              </>
+            ) : (
+              <Link
+                href="/play/m0_design_hero"
+                className="block w-16 h-16 bg-gradient-to-br from-violet-50 to-indigo-50 rounded-2xl border-2 border-dashed border-violet-300 flex items-center justify-center hover:border-violet-500 transition-colors"
+                title="Create your hero"
+              >
+                <span className="text-2xl">🎨</span>
+              </Link>
+            )}
+          </div>
+
+          {/* Name + pack stats */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
+              <h1 className="text-xl font-bold text-[var(--color-navy)]">
+                {childName}&apos;s Journey
+              </h1>
+              {isFree && (
+                <span className="text-xs text-amber-600 font-medium bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
                   Free Trial
                 </span>
-              </>
+              )}
+            </div>
+
+            <div className="flex flex-wrap gap-x-5 gap-y-1">
+              {packsWithProgress.map(pp => (
+                <div key={pp.pack.packId} className="flex items-center gap-1.5 text-sm">
+                  <span>{PACK_EMOJIS[pp.pack.packId] ?? "⭐"}</span>
+                  <span className="text-gray-600">{pp.pack.packTitle}</span>
+                  {pp.locked ? (
+                    <span className="text-gray-400 text-xs">· 🔒 Locked</span>
+                  ) : (
+                    <span className="text-gray-400">
+                      · {pp.completedMissionIds.length}/{pp.pack.missions.length} &nbsp;⭐ {pp.totalStars}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="shrink-0 flex items-center gap-2">
+            {isFree && (
+              <Link
+                href="/upgrade"
+                className="flex items-center gap-1.5 text-sm font-semibold bg-gradient-to-r from-amber-400 to-orange-400 text-white px-4 py-2 rounded-xl hover:from-amber-500 hover:to-orange-500 transition-all"
+              >
+                <Crown className="w-3.5 h-3.5" />
+                Upgrade
+              </Link>
             )}
+            <Link
+              href="/settings"
+              title="Account settings"
+              className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors"
+            >
+              <Settings className="w-4 h-4" />
+            </Link>
           </div>
         </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Progress Card */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="card"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-[var(--color-navy)] flex items-center gap-2">
-                  <Trophy className="w-5 h-5 text-[var(--color-coral)]" />
-                  Progress
-                </h2>
-                <span className="text-sm text-gray-500">
-                  {codingCompleted} of {codingTotal} missions — {activePack.packTitle}
-                </span>
-              </div>
-
-              <div className="h-4 bg-gray-100 rounded-full overflow-hidden mb-4">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progressPercent}%` }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="h-full bg-gradient-to-r from-[var(--color-indigo)] to-[var(--color-violet)] rounded-full"
-                />
-              </div>
-
-              {lastCompleted && (
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-emerald-500" />
-                  Last completed: <strong>{lastCompleted.title}</strong>
-                  <span className="text-gray-400">
-                    ({formatDistanceToNow(new Date(lastCompleted.completedAt), { addSuffix: true })})
-                  </span>
+        {/* ── New-user: hero creation CTA ─────────────────────────────── */}
+        {!heroCharacter && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="mb-6"
+          >
+            <Link href="/play/m0_design_hero" className="block group">
+              <div className="flex items-center gap-4 p-5 bg-gradient-to-r from-violet-500 to-indigo-600 rounded-2xl text-white hover:from-violet-600 hover:to-indigo-700 transition-all shadow-md">
+                <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center text-3xl shrink-0">
+                  🎨
                 </div>
-              )}
-            </motion.div>
-
-            {/* Snake Pack — always shown first */}
-            {snakeCodingMissions && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15 }}
-              >
-                <CodingMissions
-                  pack={snakeMissionPack}
-                  completedMissionIds={snakeCodingMissions.completedMissionIds}
-                  totalStars={snakeCodingMissions.totalStars}
-                  badges={snakeCodingMissions.badges}
-                />
-              </motion.div>
-            )}
-
-            {/* Platformer Pack — locked until snake complete */}
-            {platformerCodingMissions && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <CodingMissions
-                  pack={platformerMissionPack}
-                  completedMissionIds={platformerCodingMissions.completedMissionIds}
-                  totalStars={platformerCodingMissions.totalStars}
-                  badges={platformerCodingMissions.badges}
-                  locked={!snakeComplete}
-                  lockedMessage="Complete the Snake tutorial to unlock the platformer!"
-                />
-              </motion.div>
-            )}
-
-            {/* Next Mission Card (legacy path system) */}
-            {nextMission && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25 }}
-                className="card bg-gradient-to-br from-[var(--color-indigo)] to-[var(--color-violet)] text-white"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center text-3xl shrink-0">
-                    {"🎯"}
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-white/70 text-sm mb-1">Up Next</p>
-                    <h3 className="text-xl font-bold mb-2">
-                      Mission {nextMission.sequenceNumber}: {nextMission.title}
-                    </h3>
-                    <p className="text-white/80 text-sm mb-4 line-clamp-2">
-                      {nextMission.storyIntro}
-                    </p>
-                    <div className="flex items-center gap-4">
-                      <span className="flex items-center gap-1 text-sm text-white/70">
-                        <Clock className="w-4 h-4" />
-                        ~{nextMission.estimatedDuration} min
-                      </span>
-                      <Link
-                        href={`/mission/${nextMission.id}`}
-                        className="inline-flex items-center gap-2 bg-white text-[var(--color-indigo)] font-bold px-6 py-2 rounded-full hover:bg-gray-100 transition-colors"
-                      >
-                        <Play className="w-4 h-4" />
-                        Start Mission
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {!nextMission && completedMissions === totalMissions && totalMissions > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25 }}
-                className="card text-center py-12"
-              >
-                <div className="text-6xl mb-4">🎉</div>
-                <h2 className="text-2xl font-bold text-[var(--color-navy)] mb-2">
-                  Congratulations!
-                </h2>
-                <p className="text-gray-600 mb-6">
-                  {childName} has completed all missions in the Junior Game Developer path!
-                </p>
-                <p className="text-sm text-gray-500">
-                  More paths coming soon...
-                </p>
-              </motion.div>
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Hero Character Card */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.35 }}
-              className="card"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-bold text-[var(--color-navy)] flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-violet-500" />
-                  My Hero
-                </h3>
-                {heroCharacter && (
-                  <Link
-                    href="/play/m0_design_hero"
-                    className="text-violet-600 hover:text-violet-700 transition-colors"
-                    title="Edit Hero"
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </Link>
-                )}
-              </div>
-
-              {heroCharacter ? (
-                <div className="flex flex-col items-center">
-                  <div className="bg-gradient-to-br from-violet-100 to-indigo-100 p-4 rounded-xl mb-3">
-                    <div
-                      className="grid"
-                      style={{
-                        gridTemplateColumns: `repeat(16, 5px)`,
-                        imageRendering: "pixelated",
-                      }}
-                    >
-                      {heroCharacter.pixels.map((row, y) =>
-                        row.map((color, x) => (
-                          <div
-                            key={`${x}-${y}`}
-                            style={{
-                              width: 5,
-                              height: 5,
-                              backgroundColor:
-                                color === "transparent" ? "transparent" : color,
-                            }}
-                          />
-                        ))
-                      )}
-                    </div>
-                  </div>
-                  <p className="font-medium text-[var(--color-navy)]">
-                    {heroCharacter.name}
+                <div className="flex-1 min-w-0">
+                  <p className="text-white/70 text-xs font-medium mb-0.5 uppercase tracking-wide">
+                    Start here
+                  </p>
+                  <h3 className="font-bold text-lg leading-tight">Design your hero character!</h3>
+                  <p className="text-white/75 text-sm mt-0.5">
+                    Create your pixel art avatar to begin your coding adventure
                   </p>
                 </div>
-              ) : (
-                <Link
-                  href="/play/m0_design_hero"
-                  className="block text-center py-6 bg-gradient-to-br from-violet-50 to-indigo-50 rounded-xl border-2 border-dashed border-violet-200 hover:border-violet-400 transition-all group"
-                >
-                  <div className="text-4xl mb-2">🎨</div>
-                  <p className="text-violet-700 font-medium group-hover:text-violet-900">
-                    Start Mission 0!
-                  </p>
-                  <p className="text-xs text-violet-500 mt-1">
-                    Design your pixel art hero
-                  </p>
-                </Link>
-              )}
-            </motion.div>
-
-            {/* Upgrade Card (if free) */}
-            {isFree && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="card bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200"
-              >
-                <div className="flex items-center gap-2 mb-3">
-                  <Crown className="w-5 h-5 text-amber-500" />
-                  <h3 className="font-bold text-amber-900">Unlock All Missions</h3>
-                </div>
-                <p className="text-sm text-amber-800 mb-4">
-                  {childName} is doing great! Upgrade to continue with all missions.
-                </p>
-                <Link
-                  href="/upgrade"
-                  className="block w-full text-center bg-gradient-to-r from-amber-400 to-orange-400 text-white font-bold py-3 px-4 rounded-xl hover:from-amber-500 hover:to-orange-500 transition-all"
-                >
-                  Upgrade for £9/month
-                </Link>
-              </motion.div>
-            )}
-
-            {/* Quick Stats */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="card"
-            >
-              <h3 className="font-bold text-[var(--color-navy)] mb-4">Quick Stats</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Snake Missions</span>
-                  <span className="font-bold text-[var(--color-navy)]">
-                    {snakeCodingMissions?.completedMissionIds.length ?? 0}/{snakeMissionPack.missions.length}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Platformer Missions</span>
-                  <span className={`font-bold ${snakeComplete ? 'text-[var(--color-navy)]' : 'text-gray-400'}`}>
-                    {snakeComplete
-                      ? `${platformerCodingMissions?.completedMissionIds.length ?? 0}/${platformerMissionPack.missions.length}`
-                      : 'Locked'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Current Path</span>
-                  <span className="font-medium text-[var(--color-violet)]">{pathName}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Plan</span>
-                  <span
-                    className={`font-medium ${isFree ? "text-amber-600" : "text-green-600"}`}
-                  >
-                    {isFree ? "Free Trial" : "Founding Family"}
-                  </span>
-                </div>
+                <ArrowRight className="w-5 h-5 text-white/70 shrink-0 group-hover:translate-x-1 transition-transform" />
               </div>
-            </motion.div>
+            </Link>
+          </motion.div>
+        )}
 
-            {/* Settings Link */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-            >
-              <Link
-                href="/settings"
-                className="card flex items-center gap-3 hover:bg-gray-50 transition-colors"
-              >
-                <Settings className="w-5 h-5 text-gray-400" />
-                <span className="text-gray-600">Account Settings</span>
-              </Link>
-            </motion.div>
-          </div>
-        </div>
+        {/* ── Game path map ────────────────────────────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+        >
+          <GamePath
+            packs={packsWithProgress}
+            heroPixels={heroCharacter?.pixels ?? null}
+          />
+        </motion.div>
       </main>
     </div>
   );
