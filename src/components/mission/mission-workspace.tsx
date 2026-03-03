@@ -109,6 +109,9 @@ export function MissionWorkspace({
   const [showCelebration, setShowCelebration] = useState(false);
   const [engine, setEngine] = useState<PlatformerEngine | null>(null);
   const [currentCode, setCurrentCode] = useState("");
+  // Tracks the current display code per step so "Start Over" survives step navigation.
+  // Initialised from savedCodes; updated on every onCodeChange (including Start Over).
+  const [displayCodes, setDisplayCodes] = useState<Record<string, string>>(savedCodes ?? {});
   const [levelData, setLevelData] = useState<LevelData | undefined>(initialLevelData);
   const [hasRunCode, setHasRunCode] = useState(false);
   const [snakeRunTrigger, setSnakeRunTrigger] = useState(0);
@@ -652,11 +655,17 @@ __captured_output__
           <div className="flex flex-col gap-4">
             <div data-tour="code-editor">
               <SimpleEditor
-                initialCode={currentStep ? (savedCodes?.[currentStep.stepId] ?? currentStep.starterCode) : ""}
+                key={currentStep?.stepId ?? ''}
+                initialCode={currentStep ? (displayCodes[currentStep.stepId] ?? currentStep.starterCode) : ""}
                 starterCode={currentStep?.starterCode ?? ""}
                 hint={currentStep?.hint}
                 onRun={handleRunCode}
-                onCodeChange={setCurrentCode}
+                onCodeChange={(code) => {
+                  setCurrentCode(code);
+                  if (currentStep) {
+                    setDisplayCodes(prev => ({ ...prev, [currentStep.stepId]: code }));
+                  }
+                }}
                 height="340px"
                 showGameHint
                 validationChecks={validationResult?.checks}

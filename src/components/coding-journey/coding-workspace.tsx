@@ -400,7 +400,9 @@ __captured_output__
             {/* Simple Code Editor */}
             <div className="flex-1 min-h-0">
               <SimpleEditor
+                key={currentStep.id}
                 initialCode={currentStep.starterCode}
+                starterCode={currentStep.starterCode}
                 hint={currentStep.hints[hintLevel]}
                 onRun={handleRunCode}
                 onCodeChange={setCurrentCode}
