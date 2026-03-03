@@ -38,31 +38,17 @@ const missions: Mission[] = [
         stepId: 'sn1_s1_comments_and_print',
         concepts: ['comments', 'print'],
         instruction:
-`Write a comment explaining what your code does, then write a print() call to greet the snake world!
+`Mission: Say hello to the snake world! 🐍
 
-A **comment** starts with # — Python ignores that line completely. It's a note for you (and other humans reading your code).
+Write a comment and use print() to say hello.
 
-The **print()** function shows text on screen. Whatever you put inside the brackets and quotes appears in the output below.
-
-The starter code shows you the structure — you need to write the print() call yourself!`,
+Add your comment and print() call in the starter code below.`,
         detailedExplanation:
-`**Comments** are notes you write in your code. They start with a # symbol:
+`💬 A comment starts with # — Python ignores that line. Use it to leave notes for yourself!
 
-\`\`\`python
-# This is a comment — Python ignores this line
-# You can write anything here!
-\`\`\`
+🖨️ print() shows a message on screen. Whatever's inside the quotes appears in the Output below.
 
-Why use comments? They help you remember what your code does, and help other people understand it too. Professional programmers write comments all the time!
-
-**print()** shows a message on screen:
-
-\`\`\`python
-print("Hello, world!")
-print("I love coding!")
-\`\`\`
-
-Whatever text you put inside the quotes will appear in the Output panel below the editor. Try changing the message!`,
+✏️ Try it: print("Hello, snake!") — include the word "Hello" to pass the check!`,
         starterCode:
 `# This is a comment! Python ignores lines that start with #
 # Add a comment below explaining what this program does:
@@ -95,32 +81,17 @@ print("Hello, snake!")
         stepId: 'sn1_s2_variables',
         concepts: ['variables', 'assignment'],
         instruction:
-`Give your snake a name by creating a variable!
+`Mission: Give your snake a name! 🐍
 
-A **variable** is like a labelled box that stores information. You choose the name, then use = to put something in the box.
+Create a variable called snake_name and print it.
 
-The starter code has comments telling you what to write — you need to add both lines yourself: create a variable called \`snake_name\` and then print it.`,
+Add both lines in the starter code below.`,
         detailedExplanation:
-`**Variables** store values so you can use them later:
+`📦 A variable is like a labelled box — choose a name, then store something with =
 
-\`\`\`python
-snake_name = "Slimy"
-my_score = 0
-player_lives = 3
-\`\`\`
+🐍 Try it: snake_name = "Slimy"  (text values need quotes around them)
 
-The name goes on the LEFT of =, and the value goes on the RIGHT.
-
-Variable names can contain letters, numbers, and underscores (_), but they can't start with a number. Use lowercase with underscores (like \`snake_name\`, not \`SnakeName\`).
-
-Once you have a variable, you can use it with print():
-
-\`\`\`python
-snake_name = "Slimy"
-print(snake_name)
-\`\`\`
-
-Notice: no quotes around \`snake_name\` when printing it! That tells Python to print the VALUE stored inside the variable, not the word "snake_name".`,
+🖨️ To print the value: print(snake_name) — no quotes around the variable name!`,
         starterCode:
 `# Create a variable called snake_name and store your snake's name in it:
 # (text values need quotes around them, like "Slimy")
@@ -210,36 +181,17 @@ print(f"My snake is {snake_name} and has {get_snake_length()} segments!")
         stepId: 'sn2_s1_define_and_call',
         concepts: ['def', 'calling functions'],
         instruction:
-`Create your first function!
+`Mission: Write your first function! ⚙️
 
-A function is a block of code you can run whenever you want. Use the \`def\` keyword to define one.
+Define a function called greet, put a print() inside it, then call it.
 
-The starter code gives you the function shell — you need to:
-1. Add a \`print("Let's play!")\` line **inside** the function (with 4 spaces before it)
-2. **Call** the function by typing \`greet()\` after it`,
+The shell is ready in the starter code — fill it in!`,
         detailedExplanation:
-`Think of a function like a **recipe card**. You write the recipe once (define it), and you can cook it as many times as you want (call it).
+`⚙️ A function is like a recipe — you write it once and can run it whenever you want!
 
-Here's how to define a function:
+📝 Start with def, then the name, then (): — then indent 4 spaces to write the code inside.
 
-\`\`\`python
-def greet():
-    print("Let's play!")
-\`\`\`
-
-Three things to notice:
-1. Start with \`def\` (short for "define")
-2. Then the function name followed by ()
-3. Then a colon :
-4. The code INSIDE the function is **indented** (4 spaces to the right)
-
-After defining it, you need to CALL it:
-
-\`\`\`python
-greet()
-\`\`\`
-
-Without calling it, the function just sits there and never runs. It's like writing a recipe but never cooking it!`,
+▶️ After defining it, you must call it: greet() — otherwise it just sits there and never runs!`,
         starterCode:
 `# Define the function — add a print() inside it (4 spaces before print!)
 def greet():
@@ -281,29 +233,15 @@ greet()
         stepId: 'sn2_s2_indentation',
         concepts: ['indentation', 'fixing bugs'],
         instruction:
-`Python uses indentation (spaces at the start of a line) to know what belongs inside a function.
+`Mission: Spot the bug! 🐛
 
-Every line inside a function MUST start with exactly 4 spaces. There's a deliberate bug in the starter code — one line has the wrong number of spaces. Can you spot and fix it?`,
+There's a deliberate indentation error in the starter code. Can you fix it?`,
         detailedExplanation:
-`**Indentation** is one of Python's most important rules. Unlike most languages, Python uses spaces to show what code belongs together.
+`📏 Python uses spaces to know what belongs inside a function — all lines must line up!
 
-CORRECT — both lines have 4 spaces before them:
-\`\`\`python
-def greet():
-    print("Welcome to Snake!")   ← 4 spaces
-    print("Get ready to code!")  ← 4 spaces (same!)
-\`\`\`
+🔍 Find the line with only 2 spaces before print — it should have 4 spaces.
 
-WRONG — the second line only has 2 spaces:
-\`\`\`python
-def greet():
-    print("Welcome to Snake!")   ← 4 spaces
-  print("Get ready to code!")  ← only 2 spaces! BUG!
-\`\`\`
-
-Python will show an IndentationError if the spaces don't match. Count carefully!
-
-**Pro tip:** In this editor, press Tab to add 4 spaces automatically, or use the Space key 4 times.`,
+💡 Press Tab to add 4 spaces automatically, or count them out by hand.`,
         starterCode:
 `def greet():
     print("Welcome to Snake!")
@@ -340,33 +278,15 @@ greet()
         stepId: 'sn2_s3_customise_snake',
         concepts: ['calling API functions', 'customisation'],
         instruction:
-`Customise your snake using two built-in functions!
+`Mission: Customise your snake! 🎨
 
-The starter code is empty — you need to write both function calls yourself:
-1. Call \`set_snake_color()\` with a colour of your choice (see the options below!)
-2. Call \`set_game_speed()\` with a number between 100 and 300 (lower = faster)
-
-Then hit Run Code and watch your snake change!`,
+Pick a colour and a speed for your snake using the two function calls below.`,
         detailedExplanation:
-`The Snake API gives you special functions to customise the game.
+`🎨 set_snake_color() changes the snake's colour — try "lime", "cyan", or "magenta"!
 
-**Change the colour:**
-\`\`\`python
-set_snake_color("lime")
-set_snake_color("cyan")
-set_snake_color("orange")
-set_snake_color("#ff6b6b")  # hex colour codes work too!
-\`\`\`
+⚡ set_game_speed() controls how fast the snake moves. Lower number = faster snake!
 
-**Change the speed** (milliseconds between each step — lower = faster):
-\`\`\`python
-set_game_speed(200)  # default speed
-set_game_speed(150)  # a bit faster
-set_game_speed(100)  # very fast!
-set_game_speed(300)  # slow and relaxed
-\`\`\`
-
-Pick your favourite colour from the list in the "Make it yours!" box, then set a speed you enjoy. The snake updates as soon as you click Run Code!`,
+🐍 Click Run Code and watch your snake change instantly!`,
         starterCode:
 `# Pick a colour from the list on the right and call set_snake_color():
 # Example: set_snake_color("lime")
@@ -428,34 +348,17 @@ print("Snake customised!")
         stepId: 'sn3_s1_start_game_loop',
         concepts: ['set_direction', 'on_tick', 'lambda', 'game loop'],
         instruction:
-`Start the snake moving by setting a direction and starting the game loop!
+`Mission: Start the snake moving! 🐍
 
-The starter code is empty — write both lines yourself:
-1. Call \`set_direction('RIGHT')\` to point the snake right
-2. Call \`on_tick(lambda: None)\` to start the game loop (the snake will begin moving!)
+Set the direction and start the game loop.
 
-Once you run the code, click on the game and watch the snake go!`,
+Write both lines in the starter code below.`,
         detailedExplanation:
-`**set_direction()** tells the snake which way to go:
-\`\`\`python
-set_direction('RIGHT')   # move right (default)
-set_direction('LEFT')    # move left
-set_direction('UP')      # move up
-set_direction('DOWN')    # move down
-\`\`\`
+`🧭 set_direction() points the snake — try 'RIGHT', 'UP', 'DOWN', or 'LEFT'. (Use capital letters and quotes!)
 
-**on_tick()** starts the game loop — it runs a function every time the snake moves. For now, we'll pass it a lambda that does nothing (\`lambda: None\`). We'll make it more useful in later missions.
+🔄 on_tick(lambda: None) starts the game loop — the snake begins moving as soon as you call it!
 
-What is a **lambda**? It's a quick way to write a tiny function in one line:
-\`\`\`python
-# This lambda does nothing — just tells the engine to start ticking
-on_tick(lambda: None)
-
-# This lambda would print something every tick
-on_tick(lambda: print("tick!"))
-\`\`\`
-
-Once you call on_tick(), the snake will start moving!`,
+🎮 After clicking Run Code, click on the game area to see your snake go!`,
         starterCode:
 `# Call set_direction() to point the snake — try 'RIGHT', 'UP', 'DOWN', or 'LEFT':
 
@@ -486,35 +389,17 @@ on_tick(lambda: None)
         stepId: 'sn3_s2_arrow_keys',
         concepts: ['on_key_down', 'lambda', 'event handlers'],
         instruction:
-`Now add arrow key controls using \`on_key_down()\`!
+`Mission: Add keyboard controls! ⌨️
 
-The game loop is set up for you. Your job: add **4 lines** using \`on_key_down()\` — one for each arrow key.
+Add on_key_down() for all 4 arrow keys so you can steer the snake.
 
-Pattern: \`on_key_down('UP', lambda: set_direction('UP'))\`
-
-After running the code, click on the game area and use your arrow keys to steer the snake. Avoid the walls!`,
+The game loop is already set up — add the 4 key lines below it.`,
         detailedExplanation:
-`**on_key_down()** connects a key press to a function:
+`⌨️ on_key_down() watches for a key press and runs a function when it happens.
 
-\`\`\`python
-on_key_down('UP', lambda: set_direction('UP'))
-\`\`\`
+🐍 Pattern: on_key_down('UP', lambda: set_direction('UP')) — do this for all 4 directions!
 
-This means: "When the UP arrow key is pressed, call set_direction('UP')".
-
-You need all 4 directions:
-\`\`\`python
-on_key_down('UP',    lambda: set_direction('UP'))
-on_key_down('DOWN',  lambda: set_direction('DOWN'))
-on_key_down('LEFT',  lambda: set_direction('LEFT'))
-on_key_down('RIGHT', lambda: set_direction('RIGHT'))
-\`\`\`
-
-The pattern is always the same:
-- First argument: the key name in quotes (UPPERCASE: 'UP', 'DOWN', 'LEFT', 'RIGHT')
-- Second argument: the function to call (here we use a lambda for simplicity)
-
-**After clicking Run Code**, click on the game area and press the arrow keys to steer!`,
+🎮 After clicking Run Code, click the game area and use your arrow keys to steer!`,
         starterCode:
 `set_direction('RIGHT')
 on_tick(lambda: None)
@@ -551,34 +436,15 @@ on_key_down('RIGHT', lambda: set_direction('RIGHT'))
         stepId: 'sn3_s3_anti_reverse_guard',
         concepts: ['if statement', 'get_direction', 'guard clause'],
         instruction:
-`Add safety checks so the snake can't reverse into itself!
+`Mission: Add safety checks! 🛡️
 
-The starter code has \`go_up()\` and \`go_down()\` functions, but they're incomplete — they just say \`pass\` (do nothing).
-
-**Your job:** Replace \`pass\` in each function with an \`if\` statement that checks the current direction before changing it. Use \`get_direction()\` to check what direction the snake is moving.
-
-Try pressing UP or DOWN — nothing happens yet. Add the \`if\` statements to make them work!`,
+Replace the pass in go_up() and go_down() with if statements so the snake can't reverse into itself.`,
         detailedExplanation:
-`**The problem:** If the snake is moving RIGHT and you press LEFT, the head would immediately run into the body!
+`⚠️ If the snake is going RIGHT and you press LEFT, the head would crash straight into its own body!
 
-**The fix — use an if statement:**
-\`\`\`python
-def go_up():
-    if get_direction() != 'DOWN':
-        set_direction('UP')
-\`\`\`
+🛡️ Use an if statement to check first: if get_direction() != 'DOWN': — then set_direction('UP')
 
-This says: "Only go UP if we're not currently going DOWN (which would be a direct reversal)."
-
-The \`!=\` symbol means "is NOT equal to". So \`get_direction() != 'DOWN'\` means "the current direction is NOT DOWN".
-
-Here are all the opposite pairs:
-- UP is the opposite of DOWN
-- DOWN is the opposite of UP
-- LEFT is the opposite of RIGHT
-- RIGHT is the opposite of LEFT
-
-For each direction, check that the snake isn't already going the OPPOSITE way.`,
+❓ The != symbol means "is NOT equal to" — so this says "only go UP if we're not already going DOWN".`,
         starterCode:
 `set_direction('RIGHT')
 on_tick(lambda: None)
@@ -657,34 +523,15 @@ on_key_down('RIGHT', lambda: set_direction('RIGHT') if get_direction() != 'LEFT'
         stepId: 'sn4_s1_food_callback',
         concepts: ['global', 'on_food_eaten', 'show_message'],
         instruction:
-`Track the score using a global variable and \`on_food_eaten()\`!
+`Mission: Track the score! 🍎
 
-The starter code sets up \`score = 0\` and shows the structure. Your job: fill in the body of \`ate_food()\`:
-1. Add \`global score\` so the function can modify the outer variable
-2. Add \`score += 1\` to increase the score
-3. Add \`show_message(f"Score: {score}")\` to show it on screen
-
-Then register it: \`on_food_eaten(ate_food)\``,
+Fill in the ate_food() function to update the score when the snake eats, then register it with on_food_eaten().`,
         detailedExplanation:
-`When a function is called, it normally can't change variables that were created OUTSIDE the function. The \`global\` keyword fixes this:
+`🌍 A global variable lives outside functions — write global score inside ate_food() so it can change it!
 
-\`\`\`python
-score = 0  # created outside the function
+➕ score += 1 is a shortcut for score = score + 1 — it adds 1 each time the snake eats.
 
-def ate_food():
-    global score      # tell Python to use the OUTER score variable
-    score += 1        # now we can change it!
-    show_message(f"Score: {score}")
-\`\`\`
-
-Without \`global score\`, Python would create a NEW local score variable inside the function and the outer one would never change.
-
-**on_food_eaten()** registers a callback — a function that gets called automatically when the snake eats food:
-\`\`\`python
-on_food_eaten(ate_food)  # pass the function NAME (no parentheses!)
-\`\`\`
-
-Notice we write \`ate_food\` not \`ate_food()\`. We're handing Python the function itself, not calling it right now.`,
+📺 show_message() displays text on the game screen. Use an f-string to show the current score!`,
         starterCode:
 `score = 0
 
@@ -742,32 +589,15 @@ on_key_down('RIGHT', lambda: set_direction('RIGHT') if get_direction() != 'LEFT'
         stepId: 'sn4_s2_game_over_callback',
         concepts: ['on_game_over', 'def', 'show_message'],
         instruction:
-`Handle the game ending by writing a \`died()\` function!
+`Mission: Handle game over! 💀
 
-The \`ate_food()\` function from the last step is already here. Your job:
-1. Write a new function called \`died()\` that calls \`show_message()\` with a "Game Over" message including the final score
-2. Register it: \`on_game_over(died)\`
-
-Steer your snake into a wall to test it!`,
+Write a died() function that shows a message when the snake crashes, then register it with on_game_over().`,
         detailedExplanation:
-`**on_game_over()** works just like on_food_eaten() — it calls your function when something happens in the game:
+`💀 on_game_over() calls your function when the snake hits a wall or itself.
 
-\`\`\`python
-def died():
-    show_message(f"Game Over! Final score: {score}")
+🖨️ Use show_message() to display a "Game Over" message — include the final score with an f-string!
 
-on_game_over(died)
-\`\`\`
-
-The function name can be anything you want — \`died\`, \`game_ended\`, \`oh_no\` — as long as you use the same name in on_game_over().
-
-**show_message()** displays text in the middle of the game screen:
-\`\`\`python
-show_message("You won!")
-show_message(f"Score: {score}")
-\`\`\`
-
-The score variable is accessible inside \`died()\` without \`global\` because we're only READING it, not changing it. The \`global\` keyword is only needed when you want to MODIFY a variable from inside a function.`,
+💡 You don't need global inside died() — you're only reading score, not changing it!`,
         starterCode:
 `score = 0
 
@@ -831,36 +661,15 @@ on_key_down('RIGHT', lambda: set_direction('RIGHT') if get_direction() != 'LEFT'
         stepId: 'sn4_s3_difficulty_scaling',
         concepts: ['if statement', 'set_game_speed', 'difficulty scaling'],
         instruction:
-`Make the game get harder as your score increases!
+`Mission: Make it harder! ⚡
 
-The full game is running. Your job: add an \`if\` statement **inside** \`ate_food()\` (after \`score += 1\`) that speeds up the snake when the score reaches 5.
-
-Use \`set_game_speed(120)\` to make the snake faster. The \`>=\` operator means "greater than or equal to".`,
+Add an if statement inside ate_food() that speeds the snake up when the score reaches 5.`,
         detailedExplanation:
-`Adding difficulty scaling makes the game feel rewarding — the better you play, the harder it gets!
+`⚡ set_game_speed() changes the speed — lower number means the snake moves faster!
 
-Inside \`ate_food()\`, after updating the score, add:
-\`\`\`python
-def ate_food():
-    global score
-    score += 1
-    show_message(f"Score: {score}")
+🔢 score >= 5 means "score is 5 or more". The >= symbol means "greater than or equal to".
 
-    if score >= 5:
-        set_game_speed(120)  # faster when score is 5 or more!
-\`\`\`
-
-The \`>=\` symbol means "greater than or equal to". So \`score >= 5\` means "score is 5 or higher".
-
-You could even add multiple speed tiers:
-\`\`\`python
-if score >= 10:
-    set_game_speed(80)   # very fast at score 10
-elif score >= 5:
-    set_game_speed(120)  # fast at score 5
-\`\`\`
-
-Notice the if statement is INSIDE the function, indented 4 spaces. And set_game_speed() is INSIDE the if, indented 8 spaces total (4 for the function + 4 for the if).`,
+🎯 Add the if statement after score += 1 — remember to indent it 4 spaces inside ate_food()!`,
         starterCode:
 `score = 0
 

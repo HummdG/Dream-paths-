@@ -653,6 +653,7 @@ __captured_output__
             <div data-tour="code-editor">
               <SimpleEditor
                 initialCode={currentStep ? (savedCodes?.[currentStep.stepId] ?? currentStep.starterCode) : ""}
+                starterCode={currentStep?.starterCode ?? ""}
                 hint={currentStep?.hint}
                 onRun={handleRunCode}
                 onCodeChange={setCurrentCode}

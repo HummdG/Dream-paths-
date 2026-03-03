@@ -8,6 +8,7 @@ import type { CheckResult } from "@/lib/validation/validator";
 
 interface SimpleEditorProps {
   initialCode: string;
+  starterCode?: string; // The original template — what "Start Over" resets to
   expectedOutput?: string;
   hint?: string;
   onCodeChange?: (code: string) => void;
@@ -21,6 +22,7 @@ interface SimpleEditorProps {
 
 export function SimpleEditor({
   initialCode,
+  starterCode = initialCode,
   expectedOutput,
   hint,
   onCodeChange,
@@ -131,12 +133,12 @@ __captured_output__
   };
 
   const resetCode = () => {
-    setCode(initialCode);
+    setCode(starterCode);
     setOutput("");
     setError("");
     setIsSuccess(false);
     setHasRun(false);
-    onCodeChange?.(initialCode);
+    onCodeChange?.(starterCode);
   };
 
   const visibleChecks = validationChecks?.filter(c => c.message !== "") ?? [];
