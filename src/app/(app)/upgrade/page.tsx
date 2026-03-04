@@ -14,14 +14,22 @@ export default async function UpgradePage({
 
   let planId = 'free'
   let hasStripeCustomer = false
+  let purchasedPathIds: string[] = []
 
   if (session?.user?.id) {
-    const subscription = await prisma.subscription.findUnique({
-      where: { parentId: session.user.id },
-      select: { planId: true, stripeCustomerId: true },
-    })
+    const [subscription, pathSubs] = await Promise.all([
+      prisma.subscription.findUnique({
+        where: { parentId: session.user.id },
+        select: { planId: true, stripeCustomerId: true },
+      }),
+      prisma.pathSubscription.findMany({
+        where: { parentId: session.user.id, status: 'ACTIVE' },
+        select: { pathId: true },
+      }),
+    ])
     planId = subscription?.planId ?? 'free'
     hasStripeCustomer = Boolean(subscription?.stripeCustomerId)
+    purchasedPathIds = pathSubs.map(ps => ps.pathId)
   }
 
   return (
@@ -29,6 +37,7 @@ export default async function UpgradePage({
       currentPlanId={planId}
       hasStripeCustomer={hasStripeCustomer}
       isSuccess={isSuccess}
+      purchasedPathIds={purchasedPathIds}
     />
   )
 }

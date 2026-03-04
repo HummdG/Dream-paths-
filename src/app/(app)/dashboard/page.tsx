@@ -29,6 +29,10 @@ export default async function DashboardPage() {
         },
       },
       subscription: true,
+      pathSubscriptions: {
+        where: { status: 'ACTIVE' },
+        select: { pathId: true },
+      },
     },
   });
 
@@ -38,13 +42,15 @@ export default async function DashboardPage() {
 
   const child = parent.children[0];
   const subscriptionPlan = parent.subscription?.planId ?? 'free'
-  const packsWithProgress = computeAllPackProgress(allMissionPacks, child.projects, subscriptionPlan);
+  const purchasedPathIds = parent.pathSubscriptions.map(ps => ps.pathId)
+  const packsWithProgress = computeAllPackProgress(allMissionPacks, child.projects, subscriptionPlan, purchasedPathIds);
 
   return (
     <DashboardClient
       parentName={parent.name || "Parent"}
       childName={child.firstName}
       subscriptionPlan={subscriptionPlan}
+      purchasedPathIds={purchasedPathIds}
       packsWithProgress={packsWithProgress}
       heroCharacter={
         child.heroCharacter

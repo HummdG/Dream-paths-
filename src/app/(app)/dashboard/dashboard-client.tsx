@@ -7,7 +7,7 @@ import { LogOut, Crown, Pencil, Settings, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { GamePath } from "@/components/dashboard/game-path";
 import type { PackProgress } from "@/lib/missions";
-import { PLANS, PLAN_FEATURES } from "@/lib/plans";
+import { PLANS } from "@/lib/plans";
 
 const PACK_EMOJIS: Record<string, string> = {
   snake_basics_v1: "🐍",
@@ -18,6 +18,7 @@ interface DashboardClientProps {
   parentName: string;
   childName: string;
   subscriptionPlan: string;
+  purchasedPathIds: string[];
   packsWithProgress: PackProgress[];
   heroCharacter?: {
     name: string;
@@ -29,12 +30,17 @@ export function DashboardClient({
   parentName,
   childName,
   subscriptionPlan,
+  purchasedPathIds,
   packsWithProgress,
   heroCharacter,
 }: DashboardClientProps) {
-  const isFree = subscriptionPlan === PLANS.FREE;
-  const isPaid = !isFree;
-  const planLabel = PLAN_FEATURES[subscriptionPlan]?.label ?? null;
+  const isDreamStudio = subscriptionPlan === PLANS.DREAM_STUDIO;
+  const isFree = !isDreamStudio && purchasedPathIds.length === 0;
+  const planLabel = isDreamStudio
+    ? 'Dream Studio'
+    : purchasedPathIds.length > 0
+    ? 'Path Subscriber'
+    : null;
 
   return (
     <div className="min-h-screen bg-[var(--color-cream)]">
@@ -126,7 +132,7 @@ export function DashboardClient({
               </h1>
               {isFree ? (
                 <span className="text-xs text-amber-600 font-medium bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
-                  Free Trial
+                  Free
                 </span>
               ) : planLabel ? (
                 <span className="text-xs text-violet-700 font-medium bg-violet-50 border border-violet-200 px-2 py-0.5 rounded-full flex items-center gap-1">

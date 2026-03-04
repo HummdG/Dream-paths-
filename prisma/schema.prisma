@@ -61,10 +61,11 @@ model Parent {
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
   // Relations
-  accounts     Account[]
-  sessions     Session[]
-  children     Child[]
-  subscription Subscription?
+  accounts          Account[]
+  sessions          Session[]
+  children          Child[]
+  subscription      Subscription?
+  pathSubscriptions PathSubscription[]
 
   @@map("parents")
 }
@@ -191,6 +192,21 @@ model Subscription {
   parent Parent @relation(fields: [parentId], references: [id], onDelete: Cascade)
 
   @@map("subscriptions")
+}
+
+model PathSubscription {
+  id                   String             @id @default(cuid())
+  parentId             String             @map("parent_id")
+  pathId               String             @map("path_id")   // e.g. 'computer_scientist'
+  status               SubscriptionStatus @default(ACTIVE)
+  stripeSubscriptionId String?            @unique @map("stripe_subscription_id")
+  createdAt            DateTime           @default(now()) @map("created_at")
+  updatedAt            DateTime           @updatedAt @map("updated_at")
+
+  parent Parent @relation(fields: [parentId], references: [id], onDelete: Cascade)
+
+  @@unique([parentId, pathId])
+  @@map("path_subscriptions")
 }
 
 // Analytics events tracking

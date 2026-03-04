@@ -37,6 +37,11 @@ export default async function GamePage({ params }: GamePageProps) {
           },
         },
       },
+      subscription: true,
+      pathSubscriptions: {
+        where: { status: 'ACTIVE' },
+        select: { pathId: true },
+      },
     },
   });
 
@@ -45,7 +50,9 @@ export default async function GamePage({ params }: GamePageProps) {
   }
 
   const child = parent.children[0];
-  const packsWithProgress = computeAllPackProgress(allMissionPacks, child.projects);
+  const subscriptionPlan = parent.subscription?.planId ?? 'free'
+  const purchasedPathIds = parent.pathSubscriptions.map(ps => ps.pathId)
+  const packsWithProgress = computeAllPackProgress(allMissionPacks, child.projects, subscriptionPlan, purchasedPathIds);
   const thisPackProgress = packsWithProgress.find(pp => pp.pack.packId === packId);
 
   // Redirect locked packs back to the dashboard

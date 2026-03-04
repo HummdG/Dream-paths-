@@ -3,6 +3,13 @@ import { getStripe } from '@/lib/stripe'
 import { prisma } from '@/lib/db'
 import type Stripe from 'stripe'
 
+function deriveDbStatus(s: string): 'TRIALING' | 'ACTIVE' | 'CANCELED' | 'PAST_DUE' {
+  if (s === 'trialing') return 'TRIALING'
+  if (s === 'canceled') return 'CANCELED'
+  if (s === 'past_due') return 'PAST_DUE'
+  return 'ACTIVE'
+}
+
 export async function POST(request: Request) {
   const body = await request.text()
   const sig = request.headers.get('stripe-signature')
@@ -27,30 +34,70 @@ export async function POST(request: Request) {
         if (checkoutSession.mode !== 'subscription') break
 
         const parentId = checkoutSession.metadata?.parentId
-        const planId = checkoutSession.metadata?.planId
+        const type = checkoutSession.metadata?.type
+        const pathId = checkoutSession.metadata?.pathId
         const stripeSubscriptionId = checkoutSession.subscription as string
         const stripeCustomerId = checkoutSession.customer as string
 
-        if (!parentId || !planId) {
+        if (!parentId || !type) {
           console.error('checkout.session.completed: missing metadata', checkoutSession.metadata)
           break
         }
 
-        await prisma.subscription.update({
-          where: { parentId },
-          data: {
-            planId,
-            status: 'ACTIVE',
-            stripeCustomerId,
-            stripeSubscriptionId,
-          },
-        })
+        if (type === 'dream_studio') {
+          await prisma.subscription.update({
+            where: { parentId },
+            data: {
+              planId: 'dream_studio',
+              status: 'ACTIVE',
+              stripeCustomerId,
+              stripeSubscriptionId,
+            },
+          })
+        } else if (type === 'path' && pathId) {
+          await prisma.$transaction([
+            prisma.pathSubscription.upsert({
+              where: { parentId_pathId: { parentId, pathId } },
+              create: {
+                parentId,
+                pathId,
+                status: 'ACTIVE',
+                stripeSubscriptionId,
+              },
+              update: {
+                status: 'ACTIVE',
+                stripeSubscriptionId,
+              },
+            }),
+            prisma.subscription.update({
+              where: { parentId },
+              data: { stripeCustomerId },
+            }),
+          ])
+        } else {
+          console.error('checkout.session.completed: unknown type or missing pathId', checkoutSession.metadata)
+        }
         break
       }
 
       case 'customer.subscription.updated': {
         const stripeSub = event.data.object as Stripe.Subscription
+        const dbStatus = deriveDbStatus(stripeSub.status)
 
+        // Check PathSubscription first
+        const pathSub = await prisma.pathSubscription.findUnique({
+          where: { stripeSubscriptionId: stripeSub.id },
+        })
+
+        if (pathSub) {
+          await prisma.pathSubscription.update({
+            where: { stripeSubscriptionId: stripeSub.id },
+            data: { status: dbStatus },
+          })
+          break
+        }
+
+        // Fall through to main Subscription
         const subscription = await prisma.subscription.findUnique({
           where: { stripeSubscriptionId: stripeSub.id },
         })
@@ -63,14 +110,7 @@ export async function POST(request: Request) {
         // Derive planId from price ID if we can match it; otherwise keep current
         const priceId = stripeSub.items.data[0]?.price.id
         let planId = subscription.planId
-        if (priceId === process.env.STRIPE_FOUNDING_FAMILY_PRICE_ID) planId = 'founding_family'
-        else if (priceId === process.env.STRIPE_DREAM_STUDIO_PRICE_ID) planId = 'dream_studio'
-
-        const stripeStatus = stripeSub.status
-        let dbStatus: 'TRIALING' | 'ACTIVE' | 'CANCELED' | 'PAST_DUE' = 'ACTIVE'
-        if (stripeStatus === 'trialing') dbStatus = 'TRIALING'
-        else if (stripeStatus === 'canceled') dbStatus = 'CANCELED'
-        else if (stripeStatus === 'past_due') dbStatus = 'PAST_DUE'
+        if (priceId === process.env.STRIPE_DREAM_STUDIO_PRICE_ID) planId = 'dream_studio'
 
         await prisma.subscription.update({
           where: { stripeSubscriptionId: stripeSub.id },
@@ -82,6 +122,20 @@ export async function POST(request: Request) {
       case 'customer.subscription.deleted': {
         const stripeSub = event.data.object as Stripe.Subscription
 
+        // Check PathSubscription first
+        const pathSub = await prisma.pathSubscription.findUnique({
+          where: { stripeSubscriptionId: stripeSub.id },
+        })
+
+        if (pathSub) {
+          await prisma.pathSubscription.update({
+            where: { stripeSubscriptionId: stripeSub.id },
+            data: { status: 'CANCELED' },
+          })
+          break
+        }
+
+        // Fall through to main Subscription
         await prisma.subscription.updateMany({
           where: { stripeSubscriptionId: stripeSub.id },
           data: {

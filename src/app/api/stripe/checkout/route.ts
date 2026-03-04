@@ -3,11 +3,20 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { getStripe } from '@/lib/stripe'
 import { prisma } from '@/lib/db'
-import { PLANS, type PlanId } from '@/lib/plans'
+import { PLANS, PATH_PACKS } from '@/lib/plans'
 
-const PRICE_IDS: Record<string, string | undefined> = {
-  [PLANS.FOUNDING_FAMILY]: process.env.STRIPE_FOUNDING_FAMILY_PRICE_ID,
-  [PLANS.DREAM_STUDIO]: process.env.STRIPE_DREAM_STUDIO_PRICE_ID,
+type CheckoutBody =
+  | { type: 'path'; pathId: string }
+  | { type: 'dream_studio' }
+
+function resolvePriceId(body: CheckoutBody): string | null {
+  if (body.type === 'dream_studio') {
+    return process.env.STRIPE_DREAM_STUDIO_PRICE_ID ?? null
+  }
+  // Validate pathId is a known path
+  if (!(body.pathId in PATH_PACKS)) return null
+  const envKey = `STRIPE_PATH_${body.pathId.toUpperCase()}_PRICE_ID`
+  return process.env[envKey] ?? null
 }
 
 export async function POST(request: Request) {
@@ -17,15 +26,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { planId } = (await request.json()) as { planId: PlanId }
+    const body = (await request.json()) as CheckoutBody
 
-    if (planId !== PLANS.FOUNDING_FAMILY && planId !== PLANS.DREAM_STUDIO) {
-      return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
+    if (body.type !== 'path' && body.type !== 'dream_studio') {
+      return NextResponse.json({ error: 'Invalid checkout type' }, { status: 400 })
     }
 
-    const priceId = PRICE_IDS[planId]
+    if (body.type === 'path' && !body.pathId) {
+      return NextResponse.json({ error: 'pathId is required for path checkout' }, { status: 400 })
+    }
+
+    if (body.type === 'path' && !(body.pathId in PATH_PACKS)) {
+      return NextResponse.json({ error: 'Unknown pathId' }, { status: 400 })
+    }
+
+    const priceId = resolvePriceId(body)
     if (!priceId) {
-      return NextResponse.json({ error: 'Price not configured for this plan' }, { status: 500 })
+      return NextResponse.json({ error: 'Price not configured for this option' }, { status: 500 })
     }
 
     const parent = await prisma.parent.findUnique({
@@ -64,7 +81,11 @@ export async function POST(request: Request) {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${baseUrl}/upgrade?success=true`,
       cancel_url: `${baseUrl}/upgrade`,
-      metadata: { parentId: parent.id, planId },
+      metadata: {
+        parentId: parent.id,
+        type: body.type,
+        pathId: body.type === 'path' ? body.pathId : '',
+      },
     })
 
     return NextResponse.json({ url: checkoutSession.url })

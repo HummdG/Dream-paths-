@@ -4,7 +4,6 @@ import { prisma } from '@/lib/db'
 import { authOptions } from '@/lib/auth'
 import { trackEvent } from '@/lib/analytics'
 import { sendNewMissionEmail } from '@/lib/email'
-import { getMaxMissions } from '@/lib/plans'
 
 export async function POST(
   request: Request,
@@ -74,46 +73,37 @@ export async function POST(
       },
     })
 
-    // Unlock next mission if exists and user has access
-    const subscription = await prisma.subscription.findUnique({
-      where: { parentId: session.user.id },
+    // Unlock next mission unconditionally (access is gated at pack level, not mission count)
+    const nextMission = await prisma.mission.findFirst({
+      where: {
+        pathId: mission.pathId,
+        sequenceNumber: mission.sequenceNumber + 1,
+      },
     })
 
-    const maxMissions = getMaxMissions(subscription?.planId)
-    const nextSequence = mission.sequenceNumber + 1
-
-    if (nextSequence <= maxMissions) {
-      const nextMission = await prisma.mission.findFirst({
+    if (nextMission) {
+      await prisma.missionProgress.update({
         where: {
-          pathId: mission.pathId,
-          sequenceNumber: nextSequence,
+          childId_missionId: {
+            childId: child.id,
+            missionId: nextMission.id,
+          },
         },
+        data: { status: 'AVAILABLE' },
       })
 
-      if (nextMission) {
-        await prisma.missionProgress.update({
-          where: {
-            childId_missionId: {
-              childId: child.id,
-              missionId: nextMission.id,
-            },
-          },
-          data: { status: 'AVAILABLE' },
-        })
+      // Send email about new mission
+      const parent = await prisma.parent.findUnique({
+        where: { id: session.user.id },
+      })
 
-        // Send email about new mission
-        const parent = await prisma.parent.findUnique({
-          where: { id: session.user.id },
-        })
-
-        if (parent?.email && parent.name) {
-          await sendNewMissionEmail(
-            parent.email,
-            parent.name,
-            child.firstName,
-            nextMission.title
-          )
-        }
+      if (parent?.email && parent.name) {
+        await sendNewMissionEmail(
+          parent.email,
+          parent.name,
+          child.firstName,
+          nextMission.title
+        )
       }
     }
 
@@ -129,4 +119,3 @@ export async function POST(
     )
   }
 }
-

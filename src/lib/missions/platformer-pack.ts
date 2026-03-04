@@ -1852,7 +1852,7 @@ print('Reach the flag to WIN! 🚩')`,
 
 export const platformerMissionPack: MissionPack = {
   packId: 'platformer_v1',
-  packTitle: 'Build Your First Platformer',
+  packTitle: 'Platformer Game',
   description: 'Learn Python by building a real platformer game! Move, jump, collect coins, defeat enemies, and reach the goal.',
   targetAgeRange: '8-14',
   gameTemplate: platformerTemplate,

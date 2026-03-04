@@ -75,7 +75,7 @@ export function isPackComplete(
  * Compute PackProgress for every pack in display order.
  *
  * Two lock sources:
- *  1. Subscription — pack index is outside the plan's allowed range.
+ *  1. Subscription — pack is not in free tier AND not covered by any purchased path.
  *  2. Progression — previous pack is not yet complete (only checked if subscription allows).
  *
  * Pack[0] is never progression-locked. Works for any N packs — no hardcoding.
@@ -83,8 +83,11 @@ export function isPackComplete(
 export function computeAllPackProgress(
   packs: MissionPack[],
   projects: ProjectWithSteps[],
-  planId?: string | null
+  planId?: string | null,
+  purchasedPathIds?: string[]
 ): PackProgress[] {
+  const purchased = purchasedPathIds ?? [];
+
   return packs.map((pack, index) => {
     const project = projects.find(p => p.packId === pack.packId);
     const completedMissionIds = getCompletedMissionIds(pack, project);
@@ -92,7 +95,7 @@ export function computeAllPackProgress(
     const badges = (project?.badgesJson as string[]) ?? [];
 
     // Subscription gate: plan doesn't include this pack
-    if (!canAccessPack(index, planId)) {
+    if (!canAccessPack(pack.packId, planId, purchased)) {
       return {
         pack,
         completedMissionIds,
@@ -100,7 +103,7 @@ export function computeAllPackProgress(
         badges,
         locked: true,
         lockReason: 'subscription',
-        lockedMessage: 'Upgrade your plan to unlock this game!',
+        lockedMessage: 'Purchase this path to unlock!',
       };
     }
 

@@ -5,67 +5,66 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { ArrowLeft, CheckCircle, Crown, Sparkles, Star } from 'lucide-react'
-import { PLANS, PLAN_FEATURES } from '@/lib/plans'
+import { ArrowLeft, CheckCircle } from 'lucide-react'
+import { PLANS } from '@/lib/plans'
 
 interface UpgradeClientProps {
   currentPlanId: string
   hasStripeCustomer: boolean
   isSuccess: boolean
+  purchasedPathIds: string[]
 }
 
-const PLAN_CARDS = [
+const CAREER_PATH_CARDS = [
   {
-    id: PLANS.FOUNDING_FAMILY,
-    label: 'Founding Family',
+    pathId: 'computer_scientist',
+    label: 'Computer Scientist',
+    emoji: '💻',
     price: '£24.99',
-    tagline: 'Perfect for growing families',
+    tagline: 'Python through real game-building',
     features: [
-      'All missions in every current learning path',
-      'Snake game + Platformer game paths',
-      'Up to 2 child profiles',
-      'Priority email support',
-      'Early access to new features',
+      '12 missions across 2 games',
+      'Snake + Platformer paths',
+      '1 child profile',
     ],
-    gradient: 'from-[var(--color-indigo)] to-[var(--color-violet)]',
-    ring: 'ring-[var(--color-violet)]',
-    icon: <Crown className="w-4 h-4" />,
-  },
-  {
-    id: PLANS.DREAM_STUDIO,
-    label: 'Dream Studio',
-    price: '£39.99',
-    tagline: 'Unlimited creativity, unlimited kids',
-    features: [
-      'Everything in Founding Family',
-      'Unlimited child profiles',
-      'All current + future learning paths',
-      'Dedicated support',
-      'Founding member badge',
-    ],
-    gradient: 'from-amber-500 to-orange-500',
-    ring: 'ring-amber-400',
-    icon: <Star className="w-4 h-4" />,
   },
 ]
 
-export function UpgradeClient({ currentPlanId, hasStripeCustomer, isSuccess }: UpgradeClientProps) {
+export function UpgradeClient({ currentPlanId, hasStripeCustomer, isSuccess, purchasedPathIds }: UpgradeClientProps) {
   const { update: updateSession } = useSession()
   const router = useRouter()
   const [loading, setLoading] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const isPaid = currentPlanId === PLANS.FOUNDING_FAMILY || currentPlanId === PLANS.DREAM_STUDIO
-  const currentFeatures = PLAN_FEATURES[currentPlanId]
+  const isDreamStudio = currentPlanId === PLANS.DREAM_STUDIO
+  const isPaid = isDreamStudio || purchasedPathIds.length > 0
 
-  async function handleSubscribe(planId: string) {
-    setLoading(planId)
+  async function handleSubscribePath(pathId: string) {
+    setLoading(pathId)
     setError(null)
     try {
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ planId }),
+        body: JSON.stringify({ type: 'path', pathId }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Something went wrong')
+      window.location.href = data.url
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to start checkout')
+      setLoading(null)
+    }
+  }
+
+  async function handleSubscribeDreamStudio() {
+    setLoading('dream_studio')
+    setError(null)
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'dream_studio' }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? 'Something went wrong')
@@ -95,11 +94,14 @@ export function UpgradeClient({ currentPlanId, hasStripeCustomer, isSuccess }: U
     updateSession().then(() => router.replace('/upgrade'))
   }
 
+  const csCard = CAREER_PATH_CARDS[0]
+  const csActive = purchasedPathIds.includes(csCard.pathId)
+
   return (
     <div className="min-h-screen bg-[var(--color-cream)]">
       {/* Header */}
       <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center">
           <Link
             href="/dashboard"
             className="flex items-center gap-2 text-gray-600 hover:text-[var(--color-navy)] transition-colors"
@@ -110,7 +112,7 @@ export function UpgradeClient({ currentPlanId, hasStripeCustomer, isSuccess }: U
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-6 py-12">
+      <main className="max-w-5xl mx-auto px-6 py-12">
         {/* Success banner */}
         {isSuccess && (
           <motion.div
@@ -120,7 +122,7 @@ export function UpgradeClient({ currentPlanId, hasStripeCustomer, isSuccess }: U
           >
             <CheckCircle className="w-5 h-5 shrink-0 text-green-500" />
             <div>
-              <p className="font-semibold">Welcome to {currentFeatures?.label ?? 'your new plan'}!</p>
+              <p className="font-semibold">You&apos;re all set!</p>
               <p className="text-sm text-green-700">Your subscription is now active. Enjoy the full adventure!</p>
             </div>
           </motion.div>
@@ -132,100 +134,156 @@ export function UpgradeClient({ currentPlanId, hasStripeCustomer, isSuccess }: U
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-10"
         >
-          <div className="inline-flex items-center gap-2 bg-[var(--color-peach)] text-amber-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
-            <Sparkles className="w-4 h-4" />
-            {isPaid ? 'Your subscription' : 'Upgrade to continue'}
-          </div>
-
-          <h1 className="text-3xl md:text-4xl font-bold text-[var(--color-navy)] mb-4">
-            {isPaid ? 'You\'re on the full adventure' : 'Unlock the Full Adventure'}
+          <h1 className="text-3xl md:text-4xl font-bold text-[var(--color-navy)] mb-3">
+            {isPaid ? 'Your Plan' : 'Choose your plan'}
           </h1>
-          <p className="text-lg text-gray-600">
-            {isPaid
-              ? `Currently on ${currentFeatures?.label ?? currentPlanId} — ${currentFeatures?.price ?? ''}`
-              : 'Choose a plan and keep the learning journey going.'}
+          <p className="text-gray-500">
+            {isPaid ? 'Manage your subscription below.' : 'Start free, upgrade when ready.'}
           </p>
         </motion.div>
 
-        {/* If already on paid plan: manage button */}
-        {isPaid && (
+        {isPaid && hasStripeCustomer && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="card text-center mb-8"
+            className="text-center mb-8"
           >
-            <p className="text-gray-600 mb-4">
-              Manage or cancel your subscription at any time from the billing portal.
-            </p>
-            {hasStripeCustomer ? (
-              <button
-                onClick={handleManage}
-                disabled={loading === 'portal'}
-                className="btn-primary px-8 py-3"
-              >
-                {loading === 'portal' ? 'Opening…' : 'Manage Subscription'}
-              </button>
-            ) : (
-              <p className="text-sm text-gray-400">Billing portal unavailable — contact support.</p>
-            )}
+            <button
+              onClick={handleManage}
+              disabled={loading === 'portal'}
+              className="btn-primary px-8 py-3"
+            >
+              {loading === 'portal' ? 'Opening…' : 'Manage Subscription'}
+            </button>
           </motion.div>
         )}
 
-        {/* Plan cards (always shown if free, or after success so they see what they got) */}
-        {!isPaid && (
-          <>
-            {error && (
-              <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-5 py-3 rounded-xl text-sm">
-                {error}
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-5 py-3 rounded-xl text-sm">
+            {error}
+          </div>
+        )}
+
+        {!isDreamStudio && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
+
+            {/* Free card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 }}
+              className="bg-white rounded-2xl p-6 flex flex-col border border-gray-100"
+            >
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3 h-5">Free</p>
+              <div className="mb-5 h-10 flex items-baseline gap-1">
+                <span className="text-3xl font-bold text-[var(--color-navy)]">£0</span>
+                <span className="text-gray-400 text-sm">forever</span>
               </div>
-            )}
+              <ul className="space-y-2 mb-6 flex-1">
+                {['Snake tutorial (4 missions)', 'Pixel art hero creator', '1 child profile'].map((f) => (
+                  <li key={f} className="flex items-center gap-2 text-sm text-gray-500">
+                    <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-auto">
+                <div className="w-full py-3 text-center rounded-full bg-gray-100 text-gray-400 text-sm font-semibold">
+                  Current plan
+                </div>
+              </div>
+            </motion.div>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              {PLAN_CARDS.map((plan, i) => (
-                <motion.div
-                  key={plan.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 + i * 0.1 }}
-                  className={`card ring-2 ${plan.ring} relative`}
-                >
-                  <div
-                    className={`absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r ${plan.gradient} text-white px-4 py-1 rounded-full text-sm font-medium flex items-center gap-1`}
-                  >
-                    {plan.icon}
-                    {plan.label}
+            {/* Computer Scientist card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-white rounded-2xl p-6 flex flex-col ring-2 ring-[var(--color-violet)]"
+            >
+              <div className="flex items-center justify-between mb-3 h-5">
+                <p className="text-xs font-semibold text-[var(--color-violet)] uppercase tracking-wide">{csCard.label}</p>
+                <span className="bg-[var(--color-violet)] text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">Popular</span>
+              </div>
+              <div className="mb-5 h-10 flex items-baseline gap-1">
+                <span className="text-3xl font-bold text-[var(--color-navy)]">{csCard.price}</span>
+                <span className="text-gray-400 text-sm">/month</span>
+              </div>
+              <ul className="space-y-2 mb-6 flex-1">
+                {csCard.features.map((f) => (
+                  <li key={f} className="flex items-center gap-2 text-sm text-gray-500">
+                    <CheckCircle className="w-3.5 h-3.5 text-[var(--color-violet)] shrink-0" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-auto">
+                {csActive ? (
+                  <div className="w-full py-3 text-center rounded-full bg-emerald-50 text-emerald-700 text-sm font-semibold">
+                    ✓ Active
                   </div>
-
-                  <div className="text-center pt-4 pb-5 border-b border-gray-100 mb-5">
-                    <div className="text-4xl font-bold text-[var(--color-navy)] mb-1">
-                      {plan.price}{' '}
-                      <span className="text-base font-normal text-gray-500">/month</span>
-                    </div>
-                    <p className="text-sm text-gray-500">{plan.tagline}</p>
-                  </div>
-
-                  <ul className="space-y-3 mb-7">
-                    {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-2.5">
-                        <CheckCircle className="w-4 h-4 text-[var(--color-violet)] shrink-0 mt-0.5" />
-                        <span className="text-sm text-gray-700">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-
+                ) : (
                   <button
-                    onClick={() => handleSubscribe(plan.id)}
+                    onClick={() => handleSubscribePath(csCard.pathId)}
                     disabled={loading !== null}
-                    className="btn-primary w-full py-3 text-center"
+                    className="w-full py-3 rounded-full font-semibold text-sm bg-gradient-to-r from-[var(--color-indigo)] to-[var(--color-violet)] text-white hover:opacity-90 transition-opacity disabled:opacity-50"
                   >
-                    {loading === plan.id ? 'Redirecting…' : 'Subscribe Now'}
+                    {loading === csCard.pathId ? 'Redirecting…' : 'Get Started'}
                   </button>
-                  <p className="text-center text-xs text-gray-400 mt-2">Cancel anytime</p>
-                </motion.div>
-              ))}
-            </div>
-          </>
+                )}
+              </div>
+            </motion.div>
+
+            {/* Dream Studio card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="bg-white rounded-2xl p-6 flex flex-col ring-2 ring-amber-400"
+            >
+              <div className="flex items-center justify-between mb-3 h-5">
+                <p className="text-xs font-semibold text-amber-600 uppercase tracking-wide">Dream Studio</p>
+                <span className="bg-amber-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">All Access</span>
+              </div>
+              <div className="mb-5 h-10 flex items-baseline gap-1">
+                <span className="text-3xl font-bold text-[var(--color-navy)]">£39.99</span>
+                <span className="text-gray-400 text-sm">/month</span>
+              </div>
+              <ul className="space-y-2 mb-6 flex-1">
+                {['All career paths', 'Future paths included', 'Unlimited child profiles', 'Priority support'].map((f) => (
+                  <li key={f} className="flex items-center gap-2 text-sm text-gray-500">
+                    <CheckCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-auto">
+                <button
+                  onClick={handleSubscribeDreamStudio}
+                  disabled={loading !== null}
+                  className="w-full py-3 rounded-full font-semibold text-sm bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:opacity-90 transition-opacity disabled:opacity-50"
+                >
+                  {loading === 'dream_studio' ? 'Redirecting…' : 'Get Dream Studio'}
+                </button>
+              </div>
+            </motion.div>
+
+          </div>
+        )}
+
+        {/* Dream Studio active state */}
+        {isDreamStudio && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="card ring-2 ring-amber-400 text-center"
+          >
+            <div className="text-5xl mb-4">🌟</div>
+            <h3 className="text-xl font-bold text-[var(--color-navy)] mb-2">Dream Studio</h3>
+            <p className="text-gray-500">You have unlimited access to all paths, current and future.</p>
+          </motion.div>
         )}
       </main>
     </div>
