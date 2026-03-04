@@ -10,9 +10,10 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "DreamPaths - Turn Gaming Passion into Real Skills",
-  description: "Guide your child through fun, hands-on missions that turn their love of games into real coding and creative skills. Weekly missions for kids aged 8-12.",
-  keywords: ["kids coding", "game development for kids", "learn to code", "educational games", "STEM for kids"],
+  metadataBase: new URL('https://dreampaths.co.uk'),
+  title: "DreamPaths – Kids Learn Real Skills Through the Career They Love",
+  description: "DreamPaths helps kids aged 8–14 discover their dream career through hands-on missions. Pick a path, build real projects, and develop genuine skills — one mission a week.",
+  keywords: ["kids coding", "learn Python for kids", "STEM for kids", "kids career learning", "game development for kids", "educational platform", "coding missions", "ages 8-14"],
   icons: {
     icon: [
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
@@ -28,9 +29,22 @@ export const metadata: Metadata = {
   },
   manifest: "/site.webmanifest",
   openGraph: {
-    title: "DreamPaths - Turn Gaming Passion into Real Skills",
-    description: "Guide your child through fun, hands-on missions that turn their love of games into real coding and creative skills.",
+    title: "DreamPaths – Kids Learn Real Skills Through the Career They Love",
+    description: "DreamPaths helps kids aged 8–14 discover their dream career through hands-on missions. Pick a path, build real projects, and develop genuine skills — one mission a week.",
+    url: "https://dreampaths.co.uk",
+    siteName: "DreamPaths",
     images: ["/logo.svg"],
+    locale: "en_GB",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DreamPaths – Kids Learn Real Skills Through the Career They Love",
+    description: "DreamPaths helps kids aged 8–14 discover their dream career through hands-on missions.",
+    images: ["/logo.svg"],
+  },
+  alternates: {
+    canonical: "https://dreampaths.co.uk",
   },
 };
 

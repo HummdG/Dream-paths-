@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { CheckCircle, ArrowRight, Sparkles, Star, Lock } from "lucide-react";
+import { CheckCircle, ArrowRight, Sparkles, Lock } from "lucide-react";
 
 const CAREER_PATHS = [
   {
@@ -43,7 +43,7 @@ const HOW_IT_WORKS = [
     step: '2',
     emoji: '🚀',
     title: 'Complete one mission a week',
-    description: 'Bite-sized 30–45 minute missions that fit around school and activities — no pressure.',
+    description: 'Each mission takes around 30 to 45 minutes. Short enough to fit around school, long enough to feel like real progress.',
   },
   {
     step: '3',
@@ -126,11 +126,11 @@ export default function Home() {
               </h1>
 
               <p className="text-lg text-gray-600 mb-4 leading-relaxed">
-                Kids explore real careers — Computer Scientist, Astronaut, AI Engineer — by completing hands-on missions that build genuine skills.
+                Kids pick a career they love and learn towards it through hands-on missions that build real skills along the way.
               </p>
 
               <div className="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-full text-sm mb-8">
-                🗓️ One mission per week — fits any schedule
+                🗓️ One mission a week. Fits around school.
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
@@ -209,7 +209,7 @@ export default function Home() {
               Choose Your Dream Path
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Each career path is a guided journey of missions — from beginner to builder.
+              Each path takes your child from complete beginner to something they've actually built.
             </p>
           </motion.div>
 
@@ -365,33 +365,33 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-6 items-stretch">
             {/* Free Plan */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="card"
+              className="bg-white rounded-2xl p-6 flex flex-col border border-gray-100"
             >
-              <h3 className="text-xl font-bold text-[var(--color-navy)] mb-2">Free</h3>
-              <p className="text-gray-600 mb-6">The full Snake tutorial, forever free</p>
-              <div className="text-4xl font-bold text-[var(--color-navy)] mb-6">
-                £0 <span className="text-base font-normal text-gray-500">forever</span>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3 h-5">Free</p>
+              <div className="mb-5 h-10 flex items-baseline gap-1">
+                <span className="text-3xl font-bold text-[var(--color-navy)]">£0</span>
+                <span className="text-gray-400 text-sm">forever</span>
               </div>
-              <ul className="space-y-3 mb-8">
+              <ul className="space-y-2 mb-6 flex-1">
                 {[
                   "Full Snake Tutorial (4 missions)",
                   "Pixel art hero creator",
                   "Parent dashboard",
                   "1 child profile",
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-gray-700">
-                    <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
+                  <li key={item} className="flex items-center gap-2 text-sm text-gray-500">
+                    <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     {item}
                   </li>
                 ))}
               </ul>
-              <Link href="/signup" className="btn-secondary w-full text-center block">
+              <Link href="/signup" className="mt-auto w-full py-3 text-center rounded-full font-semibold text-sm border-2 border-gray-200 text-gray-500 hover:border-gray-300 transition-colors block">
                 Start Free
               </Link>
             </motion.div>
@@ -402,18 +402,17 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
               viewport={{ once: true }}
-              className="card ring-2 ring-[var(--color-violet)] relative"
+              className="bg-white rounded-2xl p-6 flex flex-col ring-2 ring-[var(--color-violet)]"
             >
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[var(--color-indigo)] to-[var(--color-violet)] text-white px-4 py-1 rounded-full text-sm font-medium flex items-center gap-1">
-                <Star className="w-3.5 h-3.5" />
-                Most Popular
+              <div className="flex items-center justify-between mb-3 h-5">
+                <p className="text-xs font-semibold text-[var(--color-violet)] uppercase tracking-wide">Computer Scientist</p>
+                <span className="bg-[var(--color-violet)] text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">Popular</span>
               </div>
-              <h3 className="text-xl font-bold text-[var(--color-navy)] mb-2">💻 Computer Scientist</h3>
-              <p className="text-gray-600 mb-6">Full CS path: snake + platformer (12 missions)</p>
-              <div className="text-4xl font-bold text-[var(--color-navy)] mb-6">
-                £24.99 <span className="text-base font-normal text-gray-500">/month</span>
+              <div className="mb-5 h-10 flex items-baseline gap-1">
+                <span className="text-3xl font-bold text-[var(--color-navy)]">£24.99</span>
+                <span className="text-gray-400 text-sm">/month</span>
               </div>
-              <ul className="space-y-3 mb-8">
+              <ul className="space-y-2 mb-6 flex-1">
                 {[
                   "Full Snake Tutorial (4 missions)",
                   "Full Platformer Game (8 missions)",
@@ -421,13 +420,13 @@ export default function Home() {
                   "1 child profile",
                   "Cancel anytime",
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-gray-700">
-                    <CheckCircle className="w-5 h-5 text-[var(--color-violet)] shrink-0" />
+                  <li key={item} className="flex items-center gap-2 text-sm text-gray-500">
+                    <CheckCircle className="w-3.5 h-3.5 text-[var(--color-violet)] shrink-0" />
                     {item}
                   </li>
                 ))}
               </ul>
-              <Link href="/signup" className="btn-primary w-full text-center block">
+              <Link href="/signup" className="mt-auto w-full py-3 text-center rounded-full font-semibold text-sm bg-gradient-to-r from-[var(--color-indigo)] to-[var(--color-violet)] text-white hover:opacity-90 transition-opacity block">
                 Get Started
               </Link>
             </motion.div>
@@ -438,18 +437,17 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               viewport={{ once: true }}
-              className="card ring-2 ring-amber-400 relative"
+              className="bg-white rounded-2xl p-6 flex flex-col ring-2 ring-amber-400"
             >
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center gap-1">
-                <Star className="w-3.5 h-3.5" />
-                Dream Studio
+              <div className="flex items-center justify-between mb-3 h-5">
+                <p className="text-xs font-semibold text-amber-600 uppercase tracking-wide">Dream Studio</p>
+                <span className="bg-amber-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">All Access</span>
               </div>
-              <h3 className="text-xl font-bold text-[var(--color-navy)] mb-2">🌟 Dream Studio</h3>
-              <p className="text-gray-600 mb-6">All paths, current + future, unlimited children</p>
-              <div className="text-4xl font-bold text-[var(--color-navy)] mb-6">
-                £39.99 <span className="text-base font-normal text-gray-500">/month</span>
+              <div className="mb-5 h-10 flex items-baseline gap-1">
+                <span className="text-3xl font-bold text-[var(--color-navy)]">£39.99</span>
+                <span className="text-gray-400 text-sm">/month</span>
               </div>
-              <ul className="space-y-3 mb-8">
+              <ul className="space-y-2 mb-6 flex-1">
                 {[
                   "All current career paths",
                   "All future career paths",
@@ -457,13 +455,13 @@ export default function Home() {
                   "Priority support",
                   "Cancel anytime",
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-gray-700">
-                    <CheckCircle className="w-5 h-5 text-amber-500 shrink-0" />
+                  <li key={item} className="flex items-center gap-2 text-sm text-gray-500">
+                    <CheckCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     {item}
                   </li>
                 ))}
               </ul>
-              <Link href="/signup" className="w-full text-center block py-3 px-6 rounded-xl font-semibold bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 transition-all">
+              <Link href="/signup" className="mt-auto w-full py-3 text-center rounded-full font-semibold text-sm bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:opacity-90 transition-opacity block">
                 Get Started
               </Link>
             </motion.div>
