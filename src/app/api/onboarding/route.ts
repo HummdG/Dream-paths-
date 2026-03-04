@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db'
 import { authOptions } from '@/lib/auth'
 import { trackEvent } from '@/lib/analytics'
 import { sendWelcomeEmail } from '@/lib/email'
+import { PLANS, getMaxChildren } from '@/lib/plans'
 
 const onboardingSchema = z.object({
   parentName: z.string().min(1, 'Please enter your name'),
@@ -44,6 +45,21 @@ export async function POST(request: Request) {
       },
     })
 
+    // Enforce child count limit based on subscription plan
+    const subscription = await prisma.subscription.findUnique({
+      where: { parentId: session.user.id },
+      select: { planId: true },
+    })
+    const existingChildCount = await prisma.child.count({
+      where: { parentId: session.user.id },
+    })
+    if (existingChildCount >= getMaxChildren(subscription?.planId)) {
+      return NextResponse.json(
+        { error: 'You have reached the maximum number of child profiles for your plan. Upgrade to add more.' },
+        { status: 403 }
+      )
+    }
+
     // Create child with selected path
     const child = await prisma.child.create({
       data: {
@@ -75,7 +91,7 @@ export async function POST(request: Request) {
       update: {},
       create: {
         parentId: session.user.id,
-        planId: 'free',
+        planId: PLANS.FREE,
         status: 'TRIALING',
       },
     })

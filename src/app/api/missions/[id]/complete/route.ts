@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db'
 import { authOptions } from '@/lib/auth'
 import { trackEvent } from '@/lib/analytics'
 import { sendNewMissionEmail } from '@/lib/email'
+import { getMaxMissions } from '@/lib/plans'
 
 export async function POST(
   request: Request,
@@ -78,7 +79,7 @@ export async function POST(
       where: { parentId: session.user.id },
     })
 
-    const maxMissions = subscription?.planId === 'free' ? 2 : 999
+    const maxMissions = getMaxMissions(subscription?.planId)
     const nextSequence = mission.sequenceNumber + 1
 
     if (nextSequence <= maxMissions) {

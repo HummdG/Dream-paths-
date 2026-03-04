@@ -37,13 +37,14 @@ export default async function DashboardPage() {
   }
 
   const child = parent.children[0];
-  const packsWithProgress = computeAllPackProgress(allMissionPacks, child.projects);
+  const subscriptionPlan = parent.subscription?.planId ?? 'free'
+  const packsWithProgress = computeAllPackProgress(allMissionPacks, child.projects, subscriptionPlan);
 
   return (
     <DashboardClient
       parentName={parent.name || "Parent"}
       childName={child.firstName}
-      subscriptionPlan={parent.subscription?.planId || "free"}
+      subscriptionPlan={subscriptionPlan}
       packsWithProgress={packsWithProgress}
       heroCharacter={
         child.heroCharacter

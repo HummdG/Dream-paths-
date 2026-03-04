@@ -7,6 +7,7 @@
  */
 
 import type { MissionPack } from './schema';
+import { canAccessPack } from '@/lib/plans';
 
 // Minimal shape we need from the Prisma Project + stepProgress includes.
 interface ProjectWithSteps {
@@ -25,9 +26,11 @@ export interface PackProgress {
   completedMissionIds: string[];
   totalStars: number;
   badges: string[];
-  /** true when the previous pack is not yet complete */
+  /** true when the previous pack is not yet complete OR plan doesn't include this pack */
   locked: boolean;
   lockedMessage?: string;
+  /** 'progression' | 'subscription' — lets the UI show the right unlock prompt */
+  lockReason?: 'progression' | 'subscription';
 }
 
 /**
@@ -71,12 +74,16 @@ export function isPackComplete(
 /**
  * Compute PackProgress for every pack in display order.
  *
- * Lock rule: pack[i] is locked when pack[i-1] is not complete. Pack[0] is
- * never locked. Works for any N packs — no hardcoding.
+ * Two lock sources:
+ *  1. Subscription — pack index is outside the plan's allowed range.
+ *  2. Progression — previous pack is not yet complete (only checked if subscription allows).
+ *
+ * Pack[0] is never progression-locked. Works for any N packs — no hardcoding.
  */
 export function computeAllPackProgress(
   packs: MissionPack[],
-  projects: ProjectWithSteps[]
+  projects: ProjectWithSteps[],
+  planId?: string | null
 ): PackProgress[] {
   return packs.map((pack, index) => {
     const project = projects.find(p => p.packId === pack.packId);
@@ -84,13 +91,35 @@ export function computeAllPackProgress(
     const totalStars = project?.totalStars ?? 0;
     const badges = (project?.badgesJson as string[]) ?? [];
 
-    const locked =
+    // Subscription gate: plan doesn't include this pack
+    if (!canAccessPack(index, planId)) {
+      return {
+        pack,
+        completedMissionIds,
+        totalStars,
+        badges,
+        locked: true,
+        lockReason: 'subscription',
+        lockedMessage: 'Upgrade your plan to unlock this game!',
+      };
+    }
+
+    // Progression gate: previous pack must be complete first
+    const progressionLocked =
       index > 0 && !isPackComplete(packs[index - 1], projects.find(p => p.packId === packs[index - 1].packId));
 
-    const lockedMessage = locked
+    const lockedMessage = progressionLocked
       ? `Complete "${packs[index - 1].packTitle}" to unlock this game!`
       : undefined;
 
-    return { pack, completedMissionIds, totalStars, badges, locked, lockedMessage };
+    return {
+      pack,
+      completedMissionIds,
+      totalStars,
+      badges,
+      locked: progressionLocked,
+      lockReason: progressionLocked ? 'progression' : undefined,
+      lockedMessage,
+    };
   });
 }

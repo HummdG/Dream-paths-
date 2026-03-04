@@ -7,6 +7,7 @@ import { LogOut, Crown, Pencil, Settings, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { GamePath } from "@/components/dashboard/game-path";
 import type { PackProgress } from "@/lib/missions";
+import { PLANS, PLAN_FEATURES } from "@/lib/plans";
 
 const PACK_EMOJIS: Record<string, string> = {
   snake_basics_v1: "🐍",
@@ -31,7 +32,9 @@ export function DashboardClient({
   packsWithProgress,
   heroCharacter,
 }: DashboardClientProps) {
-  const isFree = subscriptionPlan === "free";
+  const isFree = subscriptionPlan === PLANS.FREE;
+  const isPaid = !isFree;
+  const planLabel = PLAN_FEATURES[subscriptionPlan]?.label ?? null;
 
   return (
     <div className="min-h-screen bg-[var(--color-cream)]">
@@ -121,11 +124,16 @@ export function DashboardClient({
               <h1 className="text-xl font-bold text-[var(--color-navy)]">
                 {childName}&apos;s Journey
               </h1>
-              {isFree && (
+              {isFree ? (
                 <span className="text-xs text-amber-600 font-medium bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
                   Free Trial
                 </span>
-              )}
+              ) : planLabel ? (
+                <span className="text-xs text-violet-700 font-medium bg-violet-50 border border-violet-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <Crown className="w-3 h-3" />
+                  {planLabel}
+                </span>
+              ) : null}
             </div>
 
             <div className="flex flex-wrap gap-x-5 gap-y-1">
@@ -147,13 +155,20 @@ export function DashboardClient({
 
           {/* Actions */}
           <div className="shrink-0 flex items-center gap-2">
-            {isFree && (
+            {isFree ? (
               <Link
                 href="/upgrade"
                 className="flex items-center gap-1.5 text-sm font-semibold bg-gradient-to-r from-amber-400 to-orange-400 text-white px-4 py-2 rounded-xl hover:from-amber-500 hover:to-orange-500 transition-all"
               >
                 <Crown className="w-3.5 h-3.5" />
                 Upgrade
+              </Link>
+            ) : (
+              <Link
+                href="/upgrade"
+                className="text-sm font-medium text-gray-500 hover:text-[var(--color-navy)] transition-colors"
+              >
+                Manage
               </Link>
             )}
             <Link

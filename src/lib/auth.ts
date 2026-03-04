@@ -54,7 +54,17 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
+      // On initial sign-in, or when session.update() is called
+      if (user || trigger === 'update') {
+        const parentId = user?.id ?? (token.id as string)
+        const subscription = await prisma.subscription.findUnique({
+          where: { parentId },
+          select: { planId: true, status: true },
+        })
+        token.subscriptionPlan = subscription?.planId ?? 'free'
+        token.subscriptionStatus = subscription?.status ?? 'TRIALING'
+      }
       if (user) {
         token.id = user.id
       }
@@ -63,6 +73,8 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string
+        session.user.subscriptionPlan = (token.subscriptionPlan as string) ?? 'free'
+        session.user.subscriptionStatus = (token.subscriptionStatus as string) ?? 'TRIALING'
       }
       return session
     },
@@ -76,6 +88,8 @@ declare module 'next-auth' {
       id: string
       email?: string | null
       name?: string | null
+      subscriptionPlan: string
+      subscriptionStatus: string
     }
   }
 }
@@ -83,11 +97,7 @@ declare module 'next-auth' {
 declare module 'next-auth/jwt' {
   interface JWT {
     id: string
+    subscriptionPlan?: string
+    subscriptionStatus?: string
   }
 }
-
-
-
-
-
-
