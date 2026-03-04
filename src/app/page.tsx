@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { Gamepad2, Star, CheckCircle, ArrowRight, Sparkles } from "lucide-react";
+import { Gamepad2, Star, CheckCircle, ArrowRight, Sparkles, Crown } from "lucide-react";
 
 const features = [
   {
@@ -288,11 +288,11 @@ export default function Home() {
             </p>
           </motion.div>
           
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-3 gap-8">
             {/* Free Plan */}
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="card"
             >
@@ -313,15 +313,17 @@ export default function Home() {
                 Start Free
               </Link>
             </motion.div>
-            
-            {/* Paid Plan */}
+
+            {/* Founding Family */}
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
               viewport={{ once: true }}
               className="card ring-2 ring-[var(--color-violet)] relative"
             >
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[var(--color-indigo)] to-[var(--color-violet)] text-white px-4 py-1 rounded-full text-sm font-medium">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[var(--color-indigo)] to-[var(--color-violet)] text-white px-4 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+                <Crown className="w-3.5 h-3.5" />
                 Most Popular
               </div>
               <h3 className="text-xl font-bold text-[var(--color-navy)] mb-2">Founding Family</h3>
@@ -330,7 +332,7 @@ export default function Home() {
                 £24.99 <span className="text-base font-normal text-gray-500">/month</span>
               </div>
               <ul className="space-y-3 mb-8">
-                {["All 15 missions unlocked", "New games as we add them", "Priority support", "Up to 2 child profiles", "Cancel anytime"].map((item) => (
+                {["All missions unlocked", "Snake + Platformer paths", "Up to 2 child profiles", "Priority support", "Cancel anytime"].map((item) => (
                   <li key={item} className="flex items-center gap-2 text-gray-700">
                     <CheckCircle className="w-5 h-5 text-[var(--color-violet)]" />
                     {item}
@@ -338,6 +340,36 @@ export default function Home() {
                 ))}
               </ul>
               <Link href="/signup" className="btn-primary w-full text-center block">
+                Get Started
+              </Link>
+            </motion.div>
+
+            {/* Dream Studio */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              viewport={{ once: true }}
+              className="card ring-2 ring-amber-400 relative"
+            >
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+                <Star className="w-3.5 h-3.5" />
+                Dream Studio
+              </div>
+              <h3 className="text-xl font-bold text-[var(--color-navy)] mb-2">Dream Studio</h3>
+              <p className="text-gray-600 mb-6">Unlimited creativity, unlimited kids</p>
+              <div className="text-4xl font-bold text-[var(--color-navy)] mb-6">
+                £39.99 <span className="text-base font-normal text-gray-500">/month</span>
+              </div>
+              <ul className="space-y-3 mb-8">
+                {["Everything in Founding Family", "Unlimited child profiles", "All current + future paths", "Dedicated support", "Founding member badge"].map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-gray-700">
+                    <CheckCircle className="w-5 h-5 text-amber-500" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/signup" className="w-full text-center block py-3 px-6 rounded-xl font-semibold bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 transition-all">
                 Get Started
               </Link>
             </motion.div>
