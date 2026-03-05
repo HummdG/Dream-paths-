@@ -178,8 +178,8 @@ export function DashboardClient({
               </Link>
             )}
             <Link
-              href="/settings"
-              title="Account settings"
+              href="/parent-dashboard"
+              title="Parent dashboard"
               className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors"
             >
               <Settings className="w-4 h-4" />

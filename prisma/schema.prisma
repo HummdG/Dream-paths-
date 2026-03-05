@@ -66,6 +66,7 @@ model Parent {
   children          Child[]
   subscription      Subscription?
   pathSubscriptions PathSubscription[]
+  parentAccessPins  ParentAccessPin[]
 
   @@map("parents")
 }
@@ -207,6 +208,20 @@ model PathSubscription {
 
   @@unique([parentId, pathId])
   @@map("path_subscriptions")
+}
+
+model ParentAccessPin {
+  id        String    @id @default(cuid())
+  parentId  String    @map("parent_id")
+  pinHash   String    @map("pin_hash")
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  parent Parent @relation(fields: [parentId], references: [id], onDelete: Cascade)
+
+  @@index([parentId])
+  @@map("parent_access_pins")
 }
 
 // Analytics events tracking

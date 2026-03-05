@@ -1,9 +1,52 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useAnimationFrame, useMotionValue } from "framer-motion";
+import { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { CheckCircle, ArrowRight, Sparkles, Lock } from "lucide-react";
+
+const LOGOS = [
+  { src: "/meta-brand-color.svg", alt: "Meta", width: 120, height: 48 },
+  { src: "/google-brand-color.svg", alt: "Google", width: 120, height: 48 },
+  { src: "/Imperial_logo.svg.png", alt: "Imperial College London", width: 180, height: 48 },
+];
+
+// NUM_COPIES must match the number of [...Array(N)] below
+const NUM_COPIES = 4;
+
+function LogoMarquee({ speed = 80 }: { speed?: number }) {
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const baseX = useMotionValue(0);
+
+  useAnimationFrame((_t, delta) => {
+    if (!scrollerRef.current) return;
+    const oneSetPx = scrollerRef.current.scrollWidth / NUM_COPIES;
+    let next = baseX.get() - speed * (delta / 1000);
+    if (next <= -oneSetPx) next += oneSetPx;
+    baseX.set(next);
+  });
+
+  return (
+    <div className="overflow-hidden">
+      <motion.div ref={scrollerRef} className="flex w-max" style={{ x: baseX }}>
+        {[...Array(NUM_COPIES)].flatMap((_, i) =>
+          LOGOS.map((logo) => (
+            <div key={`${i}-${logo.alt}`} className="shrink-0 flex items-center px-14">
+              <Image
+                src={logo.src}
+                alt={logo.alt}
+                width={logo.width}
+                height={logo.height}
+                className="h-10 w-auto opacity-60 hover:opacity-90 transition-opacity"
+              />
+            </div>
+          ))
+        )}
+      </motion.div>
+    </div>
+  );
+}
 
 const CAREER_PATHS = [
   {
@@ -26,6 +69,14 @@ const CAREER_PATHS = [
     label: 'AI Engineer',
     emoji: '🤖',
     tagline: 'Machine learning & data science',
+    available: false,
+    badge: 'Coming soon',
+    preview: [],
+  },
+  {
+    label: 'Doctor',
+    emoji: '🩺',
+    tagline: 'Biology, anatomy & medical science',
     available: false,
     badge: 'Coming soon',
     preview: [],
@@ -196,6 +247,19 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Trusted By Section */}
+      <section className="py-10 bg-white border-y border-gray-100 overflow-hidden">
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-xs font-semibold uppercase tracking-widest text-gray-400 text-center mb-7"
+        >
+          Trusted by engineers at
+        </motion.p>
+        <LogoMarquee baseVelocity={3} />
+      </section>
+
       {/* "Choose Your Dream Path" section */}
       <section className="py-20 px-6">
         <div className="max-w-6xl mx-auto">
@@ -344,6 +408,80 @@ export default function Home() {
                 </motion.div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Why DreamPaths Section */}
+      <section className="py-20 px-6 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-navy)] mb-4">
+              Why parents choose DreamPaths
+            </h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Card 1 — Learning by doing */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="card text-center"
+            >
+              <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-[var(--color-indigo)] to-[var(--color-violet)] flex items-center justify-center text-2xl">
+                🚀
+              </div>
+              <h3 className="text-lg font-bold text-[var(--color-navy)] mb-2">
+                They build something real
+              </h3>
+              <p className="text-gray-500 text-sm leading-relaxed">
+                Every mission produces something your child made from scratch. Real projects, real skills, and something worth showing off at the end.
+              </p>
+            </motion.div>
+
+            {/* Card 2 — Transparency */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              viewport={{ once: true }}
+              className="card text-center"
+            >
+              <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-2xl">
+                👀
+              </div>
+              <h3 className="text-lg font-bold text-[var(--color-navy)] mb-2">
+                Full visibility for parents
+              </h3>
+              <p className="text-gray-500 text-sm leading-relaxed">
+                A dedicated parent dashboard shows every mission, step, and star earned. Regular email updates keep you in the loop without any screen-time battles.
+              </p>
+            </motion.div>
+
+            {/* Card 3 — Value */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              viewport={{ once: true }}
+              className="card text-center"
+            >
+              <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-2xl">
+                💡
+              </div>
+              <h3 className="text-lg font-bold text-[var(--color-navy)] mb-2">
+                Better value than a tutor
+              </h3>
+              <p className="text-gray-500 text-sm leading-relaxed">
+                A private tutor costs £50 to £80 per hour. DreamPaths is a fraction of that, and your child builds a real project they can be proud of rather than doing worksheet drills.
+              </p>
+            </motion.div>
           </div>
         </div>
       </section>

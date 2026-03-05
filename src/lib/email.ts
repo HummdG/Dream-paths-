@@ -182,6 +182,38 @@ Continue Adventure
   })
 }
 
+export async function sendParentPinEmail(parentName: string, email: string, pin: string) {
+  const digits = pin.split('').join('&nbsp;&nbsp;')
+  return sendEmail({
+    to: email,
+    subject: 'Your DreamPaths parent dashboard PIN',
+    text: `Hi ${parentName}, your one-time PIN is: ${pin} — it expires in 15 minutes.`,
+    html: `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; background-color: #fef7f0; padding: 40px 20px;">
+<div style="max-width: 500px; margin: 0 auto; background: white; border-radius: 24px; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+<div style="text-align: center; margin-bottom: 32px;">
+<h1 style="color: #1a1a2e; font-size: 22px; margin: 0 0 8px;">Parent Dashboard Access</h1>
+<p style="color: #666; font-size: 15px; margin: 0;">Hi ${parentName}, here's your one-time PIN</p>
+</div>
+<div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 20px; padding: 32px; text-align: center; margin-bottom: 28px;">
+<p style="color: rgba(255,255,255,0.8); font-size: 13px; margin: 0 0 12px; letter-spacing: 1px; text-transform: uppercase;">Your PIN</p>
+<p style="color: white; font-size: 42px; font-weight: 800; letter-spacing: 8px; margin: 0; font-variant-numeric: tabular-nums;">${digits}</p>
+</div>
+<p style="color: #888; font-size: 14px; text-align: center; margin: 0;">
+This PIN expires in <strong>15 minutes</strong> and can only be used once.<br>
+If you didn't request this, you can safely ignore this email.
+</p>
+</div>
+</body>
+</html>`,
+  })
+}
+
 export async function sendWelcomeEmail(email: string, parentName: string, childName: string) {
   const dashboardUrl = `${APP_URL}/dashboard`
   

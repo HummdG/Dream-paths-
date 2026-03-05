@@ -11,8 +11,8 @@ const nunito = Nunito({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://dreampaths.co.uk'),
-  title: "DreamPaths – Kids Learn Real Skills Through the Career They Love",
-  description: "DreamPaths helps kids aged 8–14 discover their dream career through hands-on missions. Pick a path, build real projects, and develop genuine skills — one mission a week.",
+  title: "DreamPaths – Help Your Child Discover Their Dream Career",
+  description: "DreamPaths helps kids aged 8-14 explore the career they want through weekly hands-on missions. Each path builds real, applicable skills one project at a time.",
   keywords: ["kids coding", "learn Python for kids", "STEM for kids", "kids career learning", "game development for kids", "educational platform", "coding missions", "ages 8-14"],
   icons: {
     icon: [
@@ -29,8 +29,8 @@ export const metadata: Metadata = {
   },
   manifest: "/site.webmanifest",
   openGraph: {
-    title: "DreamPaths – Kids Learn Real Skills Through the Career They Love",
-    description: "DreamPaths helps kids aged 8–14 discover their dream career through hands-on missions. Pick a path, build real projects, and develop genuine skills — one mission a week.",
+    title: "DreamPaths – Help Your Child Discover Their Dream Career",
+    description: "DreamPaths helps kids aged 8-14 explore the career they want through weekly hands-on missions. Each path builds real, applicable skills one project at a time.",
     url: "https://dreampaths.co.uk",
     siteName: "DreamPaths",
     images: ["/logo.svg"],
@@ -39,8 +39,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "DreamPaths – Kids Learn Real Skills Through the Career They Love",
-    description: "DreamPaths helps kids aged 8–14 discover their dream career through hands-on missions.",
+    title: "DreamPaths – Help Your Child Discover Their Dream Career",
+    description: "DreamPaths helps kids aged 8-14 explore the career they want through weekly hands-on missions. Each path builds real, applicable skills one project at a time.",
     images: ["/logo.svg"],
   },
   alternates: {
