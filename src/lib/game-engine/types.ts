@@ -140,7 +140,18 @@ export type GameEventType =
   // Snake events
   | 'snake_direction_changed'
   | 'snake_food_eaten'
-  | 'snake_game_over';
+  | 'snake_game_over'
+  // Rocket events
+  | 'rocket_launched'
+  | 'orbit_reached'
+  | 'rocket_landed'
+  | 'thrust_set'
+  | 'direction_changed'
+  // Patient monitor events
+  | 'vital_set'
+  | 'alert_triggered'
+  | 'treatment_applied'
+  | 'patient_stable';
 
 export interface GameEvent {
   type: GameEventType;

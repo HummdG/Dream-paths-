@@ -25,6 +25,30 @@ const PACK_THEMES: Record<string, PackTheme> = {
     bar: "from-violet-400 to-indigo-400",
     emoji: "🎮",
   },
+  rocket_basics_v1: {
+    gradient: "from-indigo-500 to-purple-600",
+    dot: "border-indigo-500",
+    bar: "from-indigo-400 to-purple-400",
+    emoji: "🚀",
+  },
+  astronaut_v1: {
+    gradient: "from-blue-600 to-indigo-700",
+    dot: "border-blue-600",
+    bar: "from-blue-400 to-indigo-500",
+    emoji: "👨‍🚀",
+  },
+  patient_monitor_basics_v1: {
+    gradient: "from-cyan-500 to-teal-600",
+    dot: "border-cyan-500",
+    bar: "from-cyan-400 to-teal-400",
+    emoji: "🏥",
+  },
+  doctor_v1: {
+    gradient: "from-rose-500 to-pink-600",
+    dot: "border-rose-500",
+    bar: "from-rose-400 to-pink-400",
+    emoji: "🩺",
+  },
   default: {
     gradient: "from-blue-500 to-cyan-600",
     dot: "border-blue-500",

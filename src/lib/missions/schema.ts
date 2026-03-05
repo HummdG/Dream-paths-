@@ -42,6 +42,23 @@ export type ValidationCheck =
   | { type: 'snake_direction_set' }
   | { type: 'snake_food_eaten_check' }
 
+  // Rocket runtime checks
+  | { type: 'rocket_launched' }
+  | { type: 'orbit_reached' }
+  | { type: 'altitude_gte'; value: number }
+  | { type: 'thrust_set' }
+  | { type: 'direction_set' }
+
+  // Patient monitor runtime checks
+  | { type: 'alert_triggered' }
+  | { type: 'treatment_applied' }
+  | { type: 'vital_set' }
+  | { type: 'heart_rate_in_range'; min: number; max: number }
+
+  // Generic AST checks for new packs
+  | { type: 'ast_uses_multiplication' }
+  | { type: 'ast_has_list' }
+
   // Customization checks
   | { type: 'theme_applied' }
   | { type: 'player_sprite_applied' }
@@ -80,6 +97,12 @@ export interface StepReward {
 // STEP TYPES
 // =============================================================================
 
+export interface ExperimentGuide {
+  materials: string[];
+  steps: string[];
+  safetyNote?: string;
+}
+
 export interface MissionStep {
   stepId: string;
   concepts: string[];
@@ -91,6 +114,7 @@ export interface MissionStep {
   successCriteria: string[];
   validation: ValidationConfig;
   reward: StepReward;
+  experimentGuide?: ExperimentGuide;
   
   // Customization options for this step
   customization?: {
@@ -116,10 +140,10 @@ export interface Mission {
   learningOutcomes: string[];
   
   // Special mission type (default is 'coding')
-  missionType?: 'coding' | 'creative' | 'level_design' | 'sprite_design';
+  missionType?: 'coding' | 'creative' | 'level_design' | 'sprite_design' | 'experiment_guide';
 
   // Which game engine renders this mission (default = 'platformer')
-  engineType?: 'platformer' | 'snake';
+  engineType?: 'platformer' | 'snake' | 'rocket' | 'patient_monitor';
 }
 
 // =============================================================================

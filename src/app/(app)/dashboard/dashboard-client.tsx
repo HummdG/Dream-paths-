@@ -5,21 +5,16 @@ import Image from "next/image";
 import { signOut } from "next-auth/react";
 import { LogOut, Crown, Pencil, Settings, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { GamePath } from "@/components/dashboard/game-path";
-import type { PackProgress } from "@/lib/missions";
+import { CareerPathGrid } from "@/components/dashboard/career-path-grid";
+import type { CareerPathEntry } from "@/components/dashboard/career-path-grid";
 import { PLANS } from "@/lib/plans";
-
-const PACK_EMOJIS: Record<string, string> = {
-  snake_basics_v1: "🐍",
-  platformer_v1: "🎮",
-};
 
 interface DashboardClientProps {
   parentName: string;
   childName: string;
   subscriptionPlan: string;
   purchasedPathIds: string[];
-  packsWithProgress: PackProgress[];
+  careerPathsProgress: CareerPathEntry[];
   heroCharacter?: {
     name: string;
     pixels: string[][];
@@ -31,16 +26,32 @@ export function DashboardClient({
   childName,
   subscriptionPlan,
   purchasedPathIds,
-  packsWithProgress,
+  careerPathsProgress,
   heroCharacter,
 }: DashboardClientProps) {
   const isDreamStudio = subscriptionPlan === PLANS.DREAM_STUDIO;
   const isFree = !isDreamStudio && purchasedPathIds.length === 0;
   const planLabel = isDreamStudio
-    ? 'Dream Studio'
+    ? "Dream Studio"
     : purchasedPathIds.length > 0
-    ? 'Path Subscriber'
-    : null;
+      ? `${purchasedPathIds.length} Path${purchasedPathIds.length > 1 ? "s" : ""}`
+      : null;
+
+  // Aggregate stats across all paths
+  const totalCompleted = careerPathsProgress.reduce(
+    (sum, e) =>
+      sum + e.packsProgress.reduce((s, pp) => s + pp.completedMissionIds.length, 0),
+    0
+  );
+  const totalMissions = careerPathsProgress.reduce(
+    (sum, e) =>
+      sum + e.packsProgress.reduce((s, pp) => s + pp.pack.missions.length, 0),
+    0
+  );
+  const totalStars = careerPathsProgress.reduce(
+    (sum, e) => sum + e.packsProgress.reduce((s, pp) => s + pp.totalStars, 0),
+    0
+  );
 
   return (
     <div className="min-h-screen bg-[var(--color-cream)]">
@@ -71,7 +82,6 @@ export function DashboardClient({
       </header>
 
       <main className="max-w-4xl mx-auto px-6 py-8">
-
         {/* ── Profile bar ─────────────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -124,7 +134,7 @@ export function DashboardClient({
             )}
           </div>
 
-          {/* Name + pack stats */}
+          {/* Name + stats */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
               <h1 className="text-xl font-bold text-[var(--color-navy)]">
@@ -141,21 +151,11 @@ export function DashboardClient({
                 </span>
               ) : null}
             </div>
-
-            <div className="flex flex-wrap gap-x-5 gap-y-1">
-              {packsWithProgress.map(pp => (
-                <div key={pp.pack.packId} className="flex items-center gap-1.5 text-sm">
-                  <span>{PACK_EMOJIS[pp.pack.packId] ?? "⭐"}</span>
-                  <span className="text-gray-600">{pp.pack.packTitle}</span>
-                  {pp.locked ? (
-                    <span className="text-gray-400 text-xs">· 🔒 Locked</span>
-                  ) : (
-                    <span className="text-gray-400">
-                      · {pp.completedMissionIds.length}/{pp.pack.missions.length} &nbsp;⭐ {pp.totalStars}
-                    </span>
-                  )}
-                </div>
-              ))}
+            <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-gray-500">
+              <span>
+                {totalCompleted}/{totalMissions} missions
+              </span>
+              <span>⭐ {totalStars} stars</span>
             </div>
           </div>
 
@@ -204,7 +204,9 @@ export function DashboardClient({
                   <p className="text-white/70 text-xs font-medium mb-0.5 uppercase tracking-wide">
                     Start here
                   </p>
-                  <h3 className="font-bold text-lg leading-tight">Design your hero character!</h3>
+                  <h3 className="font-bold text-lg leading-tight">
+                    Design your hero character!
+                  </h3>
                   <p className="text-white/75 text-sm mt-0.5">
                     Create your pixel art avatar to begin your coding adventure
                   </p>
@@ -215,16 +217,13 @@ export function DashboardClient({
           </motion.div>
         )}
 
-        {/* ── Game path map ────────────────────────────────────────────── */}
+        {/* ── Career path grid ─────────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
         >
-          <GamePath
-            packs={packsWithProgress}
-            heroPixels={heroCharacter?.pixels ?? null}
-          />
+          <CareerPathGrid careerPaths={careerPathsProgress} />
         </motion.div>
       </main>
     </div>

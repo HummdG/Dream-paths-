@@ -7,7 +7,7 @@
 // Schema and types
 export * from './schema';
 
-// Pack progress utilities
+// Pack progress utilities (computeAllPackProgress, computePathPackProgress, etc.)
 export * from './progress';
 
 // Mission packs
@@ -19,13 +19,28 @@ export {
 } from './platformer-pack';
 
 export { snakeMissionPack, getSnakeMissionById } from './snake-pack';
+export { rocketMissionPack, getRocketMissionById } from './rocket-pack';
+export { astronautMissionPack, getAstronautMissionById } from './astronaut-pack';
+export { patientMonitorMissionPack, getPatientMissionById } from './patient-monitor-pack';
+export { doctorMissionPack, getDoctorMissionById } from './doctor-pack';
 
-// All packs in display order: snake first (gateway), platformer second (unlocked after snake)
+// All packs in display order
 import { snakeMissionPack } from './snake-pack';
 import { platformerMissionPack } from './platformer-pack';
+import { rocketMissionPack } from './rocket-pack';
+import { astronautMissionPack } from './astronaut-pack';
+import { patientMonitorMissionPack } from './patient-monitor-pack';
+import { doctorMissionPack } from './doctor-pack';
 import type { MissionPack, Mission } from './schema';
 
-export const allMissionPacks: MissionPack[] = [snakeMissionPack, platformerMissionPack];
+export const allMissionPacks: MissionPack[] = [
+  snakeMissionPack,
+  platformerMissionPack,
+  rocketMissionPack,
+  astronautMissionPack,
+  patientMonitorMissionPack,
+  doctorMissionPack,
+];
 
 /**
  * Find a mission by ID across all packs.

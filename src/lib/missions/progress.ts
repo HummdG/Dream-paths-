@@ -72,6 +72,25 @@ export function isPackComplete(
 }
 
 /**
+ * Compute PackProgress for a single career path's packs.
+ * Progression locking is scoped to this path only (not across paths).
+ *
+ * Pass only the packs belonging to this path — typically obtained by
+ * filtering allMissionPacks with PATH_PACKS[pathId].
+ */
+export function computePathPackProgress(
+  packs: MissionPack[],
+  projects: ProjectWithSteps[],
+  planId?: string | null,
+  purchasedPathIds?: string[]
+): PackProgress[] {
+  // Identical logic to computeAllPackProgress, but since `packs` is
+  // pre-filtered to a single path, progression locking is naturally
+  // confined within that path.
+  return computeAllPackProgress(packs, projects, planId, purchasedPathIds);
+}
+
+/**
  * Compute PackProgress for every pack in display order.
  *
  * Two lock sources:

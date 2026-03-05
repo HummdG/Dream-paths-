@@ -2,18 +2,28 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { DashboardClient } from "./dashboard-client";
 import { allMissionPacks, computePathPackProgress } from "@/lib/missions";
 import { PATH_PACKS } from "@/lib/plans";
+import { PathClient } from "./path-client";
 
-export default async function DashboardPage() {
+interface PathPageProps {
+  params: Promise<{ pathId: string }>;
+}
+
+export default async function PathPage({ params }: PathPageProps) {
+  const { pathId } = await params;
+
   const session = await getServerSession(authOptions);
-
   if (!session?.user?.id) {
     redirect("/login");
   }
 
-  const allPackIds = allMissionPacks.map((p) => p.packId);
+  const packIds = PATH_PACKS[pathId];
+  if (!packIds) {
+    redirect("/dashboard");
+  }
+
+  const pathPacks = allMissionPacks.filter((p) => packIds.includes(p.packId));
 
   const parent = await db.parent.findUnique({
     where: { id: session.user.id },
@@ -22,7 +32,7 @@ export default async function DashboardPage() {
         include: {
           heroCharacter: true,
           projects: {
-            where: { packId: { in: allPackIds } },
+            where: { packId: { in: packIds } },
             include: { stepProgress: true },
           },
         },
@@ -42,33 +52,20 @@ export default async function DashboardPage() {
   const child = parent.children[0];
   const subscriptionPlan = parent.subscription?.planId ?? "free";
   const purchasedPathIds = parent.pathSubscriptions.map((ps) => ps.pathId);
-
-  const careerPathsProgress = Object.entries(PATH_PACKS).map(
-    ([pathId, packIds]) => {
-      const pathPacks = allMissionPacks.filter((p) => packIds.includes(p.packId));
-      const packsProgress = computePathPackProgress(
-        pathPacks,
-        child.projects,
-        subscriptionPlan,
-        purchasedPathIds
-      );
-      return { pathId, packsProgress };
-    }
+  const packsProgress = computePathPackProgress(
+    pathPacks,
+    child.projects,
+    subscriptionPlan,
+    purchasedPathIds
   );
 
   return (
-    <DashboardClient
-      parentName={parent.name || "Parent"}
-      childName={child.firstName}
-      subscriptionPlan={subscriptionPlan}
-      purchasedPathIds={purchasedPathIds}
-      careerPathsProgress={careerPathsProgress}
-      heroCharacter={
+    <PathClient
+      pathId={pathId}
+      packsProgress={packsProgress}
+      heroPixels={
         child.heroCharacter
-          ? {
-              name: child.heroCharacter.name,
-              pixels: child.heroCharacter.pixelData as string[][],
-            }
+          ? (child.heroCharacter.pixelData as string[][])
           : null
       }
     />

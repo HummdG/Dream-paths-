@@ -5,16 +5,70 @@ export const PLANS = {
 
 export type PlanId = (typeof PLANS)[keyof typeof PLANS]
 
-export const FREE_PACK_ID = 'snake_basics_v1'
+/** Pack IDs that are always free regardless of plan or path. */
+export const FREE_PACK_IDS = ['snake_basics_v1', 'rocket_basics_v1', 'patient_monitor_basics_v1'];
+
+/** @deprecated Use FREE_PACK_IDS. Kept for backwards compat. */
+export const FREE_PACK_ID = 'snake_basics_v1';
 
 /**
  * Maps career path IDs → the game pack IDs they include.
- * Add new paths here as they launch.
  */
 export const PATH_PACKS: Record<string, string[]> = {
   computer_scientist: ['snake_basics_v1', 'platformer_v1'],
-  // astronaut: ['astronaut_v1'],    // future
-  // ai_engineer: ['ai_basics_v1'], // future
+  astronaut: ['rocket_basics_v1', 'astronaut_v1'],
+  doctor: ['patient_monitor_basics_v1', 'doctor_v1'],
+}
+
+/** Display metadata for each career path. */
+export interface CareerPathMeta {
+  label: string;
+  emoji: string;
+  /** Tailwind gradient classes e.g. "from-violet-500 to-indigo-600" */
+  gradient: string;
+  tagline: string;
+  description: string;
+  /** Short bullet points shown in marketing/slideshow */
+  preview: string[];
+}
+
+export const CAREER_PATHS: Record<string, CareerPathMeta> = {
+  computer_scientist: {
+    label: 'Computer Scientist',
+    emoji: '💻',
+    gradient: 'from-violet-500 to-indigo-600',
+    tagline: 'Python through real game-building',
+    description: 'Learn Python by building a Snake game and a Platformer from scratch.',
+    preview: [
+      'Snake Tutorial (free · 4 missions)',
+      'Platformer Game (8 missions)',
+      'Pixel art hero creator',
+    ],
+  },
+  astronaut: {
+    label: 'Astronaut',
+    emoji: '🚀',
+    gradient: 'from-indigo-500 to-purple-600',
+    tagline: 'Rocket physics, space science & Python',
+    description: 'Code rockets, explore orbits, and run space experiments with Python.',
+    preview: [
+      'Space Cadet Program (free · 4 missions)',
+      'Space Explorer (8 missions)',
+      'Physics simulations & experiments',
+    ],
+  },
+  doctor: {
+    label: 'Doctor',
+    emoji: '🩺',
+    gradient: 'from-cyan-500 to-teal-600',
+    tagline: 'Biology, anatomy & medical science',
+    description: 'Diagnose patients, monitor vitals, and learn biology through coding.',
+    preview: [
+      'Junior Medic Academy (free · 4 missions)',
+      'Junior Doctor (8 missions)',
+      'Patient monitor simulator',
+    ],
+  },
 }
 
 export function getMaxChildren(planId: PlanId | string | null | undefined): number {
@@ -40,7 +94,7 @@ export function canAccessPack(
   purchasedPathIds: string[] = []
 ): boolean {
   if (planId === PLANS.DREAM_STUDIO) return true
-  if (packId === FREE_PACK_ID) return true
+  if (FREE_PACK_IDS.includes(packId)) return true
   return purchasedPathIds.some(pathId => PATH_PACKS[pathId]?.includes(packId))
 }
 

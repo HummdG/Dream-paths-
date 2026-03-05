@@ -12,12 +12,19 @@ import Link from "next/link";
 import { Confetti } from "@/components/confetti";
 import { GamePreview } from "@/components/coding-journey/game-preview";
 import { SnakePreview } from "@/components/game-preview/snake-preview";
+import { RocketPreview } from "@/components/game-preview/rocket-preview";
+import { PatientPreview } from "@/components/game-preview/patient-preview";
+import { ExperimentGuide } from "@/components/mission/experiment-guide";
 import { StepPanel } from "@/components/mission/step-panel";
 import { Mission } from "@/lib/missions/schema";
 import { PlatformerEngine } from "@/lib/game-engine";
 import { wrapUserCode } from "@/lib/game-engine/python-api";
 import { wrapSnakeUserCode } from "@/lib/game-engine/snake-python-api";
+import { wrapRocketUserCode } from "@/lib/game-engine/rocket-python-api";
+import { wrapPatientUserCode } from "@/lib/game-engine/patient-python-api";
 import { SnakeEngine } from "@/lib/game-engine/snake-engine";
+import { RocketEngine } from "@/lib/game-engine/rocket-engine";
+import { PatientMonitorEngine } from "@/lib/game-engine/patient-monitor-engine";
 import { validateStep, ValidationResult, friendlyError } from "@/lib/validation";
 import { CharacterCreator } from "@/components/character-creator";
 import { LevelDesigner, LevelData } from "@/components/level-designer";
@@ -115,9 +122,14 @@ export function MissionWorkspace({
   const [levelData, setLevelData] = useState<LevelData | undefined>(initialLevelData);
   const [hasRunCode, setHasRunCode] = useState(false);
   const [snakeRunTrigger, setSnakeRunTrigger] = useState(0);
+  const [rocketRunTrigger, setRocketRunTrigger] = useState(0);
+  const [patientRunTrigger, setPatientRunTrigger] = useState(0);
   const gamePreviewRef = useRef<HTMLDivElement>(null);
 
   const isSnakeMission = mission.engineType === 'snake';
+  const isRocketMission = mission.engineType === 'rocket';
+  const isPatientMission = mission.engineType === 'patient_monitor';
+  const isExperimentGuide = mission.missionType === 'experiment_guide';
 
   // Default level data if none provided
   const defaultLevelData: LevelData = {
@@ -148,6 +160,20 @@ export function MissionWorkspace({
           snakeEng.clearCallbacks();
           snakeEng.clearEvents();
           snakeEng.restart();
+        }
+      } else if (isRocketMission) {
+        const rocketEng = (window as unknown as { rocketEngine?: RocketEngine }).rocketEngine;
+        if (rocketEng) {
+          rocketEng.clearCallbacks();
+          rocketEng.clearEvents();
+          rocketEng.restart();
+        }
+      } else if (isPatientMission) {
+        const patientEng = (window as unknown as { patientEngine?: PatientMonitorEngine }).patientEngine;
+        if (patientEng) {
+          patientEng.clearCallbacks();
+          patientEng.clearEvents();
+          patientEng.restart();
         }
       } else {
         const windowEngine = (window as unknown as { gameEngine?: PlatformerEngine }).gameEngine;
@@ -183,6 +209,8 @@ export function MissionWorkspace({
         pyodide?: { runPythonAsync: (code: string) => Promise<string> };
         gameEngine?: PlatformerEngine;
         snakeEngine?: SnakeEngine;
+        rocketEngine?: RocketEngine;
+        patientEngine?: PatientMonitorEngine;
       };
 
       if (typeof win.pyodide === "undefined") {
@@ -193,6 +221,118 @@ export function MissionWorkspace({
       let wrappedCode: string;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let events: any[] = [];
+
+      if (isRocketMission) {
+        // ── Rocket execution path ──────────────────────────────────────────────
+        const rocketEng = (win as unknown as { rocketEngine?: RocketEngine }).rocketEngine;
+        if (rocketEng) {
+          rocketEng.clearCallbacks();
+          rocketEng.clearEvents();
+          rocketEng.restart();
+          rocketEng.start();
+        }
+
+        wrappedCode = wrapRocketUserCode(code);
+
+        const rocketRunner = `
+import sys
+from io import StringIO
+
+__old_stdout__ = sys.stdout
+sys.stdout = StringIO()
+
+try:
+${wrappedCode.split("\n").map(line => "    " + line).join("\n")}
+except Exception as e:
+    print(f"Error: {e}")
+
+__captured_output__ = sys.stdout.getvalue()
+sys.stdout = __old_stdout__
+__captured_output__
+`;
+        const result = await pyodide.runPythonAsync(rocketRunner);
+        const printOutput = result || "";
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        events = rocketEng?.getEvents() ?? [];
+
+        setRocketRunTrigger(t => t + 1);
+
+        if (currentStep) {
+          const validation = validateStep(code, printOutput, events, currentStep.validation);
+          setValidationResult(validation);
+
+          if (validation.passed && !completedSteps.has(currentStep.stepId)) {
+            const newCompleted = new Set(completedSteps);
+            newCompleted.add(currentStep.stepId);
+            setCompletedSteps(newCompleted);
+            onStepComplete?.(currentStep.stepId, currentStep.reward.stars, currentStep.reward.badge);
+
+            if (newCompleted.size === mission.steps.length) {
+              setShowCelebration(true);
+              onMissionComplete?.(mission.missionId);
+            }
+          }
+        }
+
+        return { output: printOutput.trim() };
+      }
+
+      if (isPatientMission) {
+        // ── Patient Monitor execution path ─────────────────────────────────────
+        const patientEng = (win as unknown as { patientEngine?: PatientMonitorEngine }).patientEngine;
+        if (patientEng) {
+          patientEng.clearCallbacks();
+          patientEng.clearEvents();
+          patientEng.restart();
+          patientEng.start();
+        }
+
+        wrappedCode = wrapPatientUserCode(code);
+
+        const patientRunner = `
+import sys
+from io import StringIO
+
+__old_stdout__ = sys.stdout
+sys.stdout = StringIO()
+
+try:
+${wrappedCode.split("\n").map(line => "    " + line).join("\n")}
+except Exception as e:
+    print(f"Error: {e}")
+
+__captured_output__ = sys.stdout.getvalue()
+sys.stdout = __old_stdout__
+__captured_output__
+`;
+        const result = await pyodide.runPythonAsync(patientRunner);
+        const printOutput = result || "";
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        events = patientEng?.getEvents() ?? [];
+
+        setPatientRunTrigger(t => t + 1);
+
+        if (currentStep) {
+          const validation = validateStep(code, printOutput, events, currentStep.validation);
+          setValidationResult(validation);
+
+          if (validation.passed && !completedSteps.has(currentStep.stepId)) {
+            const newCompleted = new Set(completedSteps);
+            newCompleted.add(currentStep.stepId);
+            setCompletedSteps(newCompleted);
+            onStepComplete?.(currentStep.stepId, currentStep.reward.stars, currentStep.reward.badge);
+
+            if (newCompleted.size === mission.steps.length) {
+              setShowCelebration(true);
+              onMissionComplete?.(mission.missionId);
+            }
+          }
+        }
+
+        return { output: printOutput.trim() };
+      }
 
       if (isSnakeMission) {
         // ── Snake execution path ──────────────────────────────────────────────
@@ -473,7 +613,7 @@ __captured_output__
   const isCreativeMission = mission.missionType === 'creative';
   const isLevelDesignMission = mission.missionType === 'level_design';
   const isSpriteDesignMission = mission.missionType === 'sprite_design';
-  // isSnakeMission is declared near top of component
+  // isSnakeMission, isRocketMission, isPatientMission, isExperimentGuide are declared near top of component
 
   const goToPrevStep = () => {
     if (currentStepIndex > 0) {
@@ -625,7 +765,14 @@ __captured_output__
       {/* Main content */}
       <main className="max-w-[1800px] mx-auto p-4">
         {/* Creative Mission - Character Creator */}
-        {isCreativeMission ? (
+        {isExperimentGuide && currentStep?.experimentGuide ? (
+          <ExperimentGuide
+            title={mission.title.replace(/^Mission \d+:\s*/i, '')}
+            experimentGuide={currentStep.experimentGuide}
+            onComplete={markCurrentStepComplete}
+            isCompleted={completedSteps.has(currentStep.stepId)}
+          />
+        ) : isCreativeMission ? (
           <CharacterCreator
             initialPixels={heroPixels}
             initialName="My Hero"
@@ -677,6 +824,16 @@ __captured_output__
               {isSnakeMission ? (
                 <SnakePreview
                   runTrigger={snakeRunTrigger}
+                  onPlayClicked={() => handleRunCode(currentCode)}
+                />
+              ) : isRocketMission ? (
+                <RocketPreview
+                  runTrigger={rocketRunTrigger}
+                  onPlayClicked={() => handleRunCode(currentCode)}
+                />
+              ) : isPatientMission ? (
+                <PatientPreview
+                  runTrigger={patientRunTrigger}
                   onPlayClicked={() => handleRunCode(currentCode)}
                 />
               ) : (

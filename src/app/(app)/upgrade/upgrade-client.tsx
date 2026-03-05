@@ -20,14 +20,24 @@ const CAREER_PATH_CARDS = [
     pathId: 'computer_scientist',
     label: 'Computer Scientist',
     emoji: '💻',
-    price: '£24.99',
-    tagline: 'Python through real game-building',
-    features: [
-      '12 missions across 2 games',
-      'Snake + Platformer paths',
-      '1 child profile',
-    ],
   },
+  {
+    pathId: 'astronaut',
+    label: 'Astronaut',
+    emoji: '🚀',
+  },
+  {
+    pathId: 'doctor',
+    label: 'Doctor',
+    emoji: '🩺',
+  },
+]
+
+const INDIVIDUAL_PATH_FEATURES = [
+  'One full career path',
+  'Free starter tutorial included',
+  '1 child profile',
+  'Cancel anytime',
 ]
 
 export function UpgradeClient({ currentPlanId, hasStripeCustomer, isSuccess, purchasedPathIds }: UpgradeClientProps) {
@@ -94,8 +104,7 @@ export function UpgradeClient({ currentPlanId, hasStripeCustomer, isSuccess, pur
     updateSession().then(() => router.replace('/upgrade'))
   }
 
-  const csCard = CAREER_PATH_CARDS[0]
-  const csActive = purchasedPathIds.includes(csCard.pathId)
+  const anyPathActive = CAREER_PATH_CARDS.some((c) => purchasedPathIds.includes(c.pathId))
 
   return (
     <div className="min-h-screen bg-[var(--color-cream)]">
@@ -195,7 +204,7 @@ export function UpgradeClient({ currentPlanId, hasStripeCustomer, isSuccess, pur
               </div>
             </motion.div>
 
-            {/* Computer Scientist card */}
+            {/* Individual Path card */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -203,36 +212,55 @@ export function UpgradeClient({ currentPlanId, hasStripeCustomer, isSuccess, pur
               className="bg-white rounded-2xl p-6 flex flex-col ring-2 ring-[var(--color-violet)]"
             >
               <div className="flex items-center justify-between mb-3 h-5">
-                <p className="text-xs font-semibold text-[var(--color-violet)] uppercase tracking-wide">{csCard.label}</p>
+                <p className="text-xs font-semibold text-[var(--color-violet)] uppercase tracking-wide">Individual Path</p>
                 <span className="bg-[var(--color-violet)] text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">Popular</span>
               </div>
-              <div className="mb-5 h-10 flex items-baseline gap-1">
-                <span className="text-3xl font-bold text-[var(--color-navy)]">{csCard.price}</span>
+              <div className="mb-4 h-10 flex items-baseline gap-1">
+                <span className="text-3xl font-bold text-[var(--color-navy)]">£24.99</span>
                 <span className="text-gray-400 text-sm">/month</span>
               </div>
-              <ul className="space-y-2 mb-6 flex-1">
-                {csCard.features.map((f) => (
+              <ul className="space-y-2 mb-4">
+                {INDIVIDUAL_PATH_FEATURES.map((f) => (
                   <li key={f} className="flex items-center gap-2 text-sm text-gray-500">
                     <CheckCircle className="w-3.5 h-3.5 text-[var(--color-violet)] shrink-0" />
                     {f}
                   </li>
                 ))}
               </ul>
-              <div className="mt-auto">
-                {csActive ? (
-                  <div className="w-full py-3 text-center rounded-full bg-emerald-50 text-emerald-700 text-sm font-semibold">
-                    ✓ Active
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => handleSubscribePath(csCard.pathId)}
-                    disabled={loading !== null}
-                    className="w-full py-3 rounded-full font-semibold text-sm bg-gradient-to-r from-[var(--color-indigo)] to-[var(--color-violet)] text-white hover:opacity-90 transition-opacity disabled:opacity-50"
-                  >
-                    {loading === csCard.pathId ? 'Redirecting…' : 'Get Started'}
-                  </button>
-                )}
+              <div className="space-y-2 flex-1">
+                {CAREER_PATH_CARDS.map((card) => {
+                  const isActive = purchasedPathIds.includes(card.pathId)
+                  return (
+                    <div
+                      key={card.pathId}
+                      className="flex items-center justify-between p-2.5 rounded-xl bg-gray-50 border border-gray-100"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span>{card.emoji}</span>
+                        <span className="text-sm font-medium text-gray-700">{card.label}</span>
+                      </div>
+                      {isActive ? (
+                        <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                          ✓ Active
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => handleSubscribePath(card.pathId)}
+                          disabled={loading !== null}
+                          className="text-xs font-semibold bg-gradient-to-r from-[var(--color-indigo)] to-[var(--color-violet)] text-white px-3 py-1.5 rounded-full hover:opacity-90 transition-opacity disabled:opacity-50"
+                        >
+                          {loading === card.pathId ? '…' : 'Buy'}
+                        </button>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
+              {anyPathActive && (
+                <div className="mt-3 text-xs text-gray-400 text-center">
+                  Each path is a separate subscription
+                </div>
+              )}
             </motion.div>
 
             {/* Dream Studio card */}

@@ -155,6 +155,30 @@ function performASTCheck(code: string, check: ValidationCheck): CheckResult {
       };
     }
 
+    case 'ast_uses_multiplication': {
+      const pattern = /\*/m;
+      const passed = pattern.test(codeStripped);
+      return {
+        check,
+        passed,
+        message: passed
+          ? `✅ Uses multiplication (*)`
+          : `❌ Use multiplication (*) to calculate the value`
+      };
+    }
+
+    case 'ast_has_list': {
+      const pattern = /\[.*\]/m;
+      const passed = pattern.test(codeStripped);
+      return {
+        check,
+        passed,
+        message: passed
+          ? `✅ Found a list`
+          : `❌ Create a list using square brackets [ ]`
+      };
+    }
+
     default:
       // Non-AST checks are skipped here
       return {
@@ -485,6 +509,111 @@ function performRuntimeCheck(
         message: passed
           ? '✅ Snake ate food'
           : '❌ The snake needs to eat — run the game longer!'
+      };
+    }
+
+    case 'rocket_launched': {
+      const passed = events.some(e => e.type === 'rocket_launched');
+      return {
+        check,
+        passed,
+        message: passed
+          ? '✅ Rocket launched!'
+          : '❌ Call set_thrust() with a value > 0 to launch the rocket'
+      };
+    }
+
+    case 'orbit_reached': {
+      const passed = events.some(e => e.type === 'orbit_reached');
+      return {
+        check,
+        passed,
+        message: passed
+          ? '✅ Orbit reached!'
+          : '❌ Reach 400 km altitude to achieve orbit'
+      };
+    }
+
+    case 'altitude_gte': {
+      const altEvent = events.filter(e => e.type === 'thrust_set' || e.type === 'direction_changed');
+      // Use orbit_reached as proxy for high altitude
+      const passed = events.some(e => e.type === 'orbit_reached') || altEvent.length > 0;
+      return {
+        check,
+        passed,
+        message: passed
+          ? `✅ Altitude condition checked`
+          : `❌ Check the altitude using get_altitude()`
+      };
+    }
+
+    case 'thrust_set': {
+      const passed = events.some(e => e.type === 'thrust_set');
+      return {
+        check,
+        passed,
+        message: passed
+          ? '✅ Thrust set'
+          : '❌ Call set_thrust() to power the rocket'
+      };
+    }
+
+    case 'direction_set': {
+      const passed = events.some(e => e.type === 'direction_changed');
+      return {
+        check,
+        passed,
+        message: passed
+          ? '✅ Direction set'
+          : '❌ Call set_direction() to steer the rocket'
+      };
+    }
+
+    case 'alert_triggered': {
+      const passed = events.some(e => e.type === 'alert_triggered');
+      return {
+        check,
+        passed,
+        message: passed
+          ? '✅ Alert triggered'
+          : '❌ Call show_alert() to trigger the alert banner'
+      };
+    }
+
+    case 'treatment_applied': {
+      const passed = events.some(e => e.type === 'treatment_applied');
+      return {
+        check,
+        passed,
+        message: passed
+          ? '✅ Treatment applied'
+          : '❌ Call add_treatment() to apply a treatment'
+      };
+    }
+
+    case 'vital_set': {
+      const passed = events.some(e => e.type === 'vital_set');
+      return {
+        check,
+        passed,
+        message: passed
+          ? '✅ Vital sign updated'
+          : '❌ Use set_heart_rate(), set_blood_pressure(), or set_oxygen() to set vitals'
+      };
+    }
+
+    case 'heart_rate_in_range': {
+      const vitalEvents = events.filter(e => e.type === 'vital_set' && (e.data as Record<string, unknown>)?.vital === 'heart_rate');
+      const passed = vitalEvents.some(e => {
+        const val = (e.data as Record<string, unknown>)?.value as number;
+        return val >= check.min && val <= check.max;
+      });
+      return {
+        check,
+        passed,
+        message: passed
+          ? `✅ Heart rate in range (${check.min}–${check.max} bpm)`
+          : `❌ Set heart rate between ${check.min} and ${check.max} bpm`
       };
     }
 

@@ -32,14 +32,10 @@ interface SettingsClientProps {
 
 // ─── Subscription section ────────────────────────────────────────────────────
 
-const CAREER_PATH_CARDS = [
-  {
-    pathId: "computer_scientist",
-    label: "Computer Scientist",
-    emoji: "💻",
-    price: "£24.99/mo",
-    features: ["12 missions across 2 games", "Snake + Platformer", "1 child profile"],
-  },
+const ALL_PATH_CARDS = [
+  { pathId: "computer_scientist", label: "Computer Scientist", emoji: "💻" },
+  { pathId: "astronaut", label: "Astronaut", emoji: "🚀" },
+  { pathId: "doctor", label: "Doctor", emoji: "🩺" },
 ];
 
 function SubscriptionSection({ subscription }: { subscription: SubscriptionInfo }) {
@@ -47,8 +43,13 @@ function SubscriptionSection({ subscription }: { subscription: SubscriptionInfo 
   const [error, setError] = useState<string | null>(null);
 
   const isDreamStudio = subscription.planId === PLANS.DREAM_STUDIO;
-  const csActive = subscription.purchasedPathIds.includes("computer_scientist");
-  const isPaid = isDreamStudio || csActive;
+  const activePaths = ALL_PATH_CARDS.filter((c) =>
+    subscription.purchasedPathIds.includes(c.pathId)
+  );
+  const inactivePaths = ALL_PATH_CARDS.filter(
+    (c) => !subscription.purchasedPathIds.includes(c.pathId)
+  );
+  const hasActivePaths = activePaths.length > 0;
 
   async function handleManage() {
     setLoading("portal");
@@ -100,6 +101,19 @@ function SubscriptionSection({ subscription }: { subscription: SubscriptionInfo 
     }
   }
 
+  // Plan badge text
+  const planBadge = isDreamStudio
+    ? "🌟 Dream Studio"
+    : activePaths.length > 0
+      ? `${activePaths.map((c) => c.emoji).join("")} ${activePaths.length} Path${activePaths.length > 1 ? "s" : ""}`
+      : "Free plan";
+
+  const planBadgeClass = isDreamStudio
+    ? "bg-amber-50 text-amber-700 border-amber-200"
+    : hasActivePaths
+      ? "bg-violet-50 text-violet-700 border-violet-200"
+      : "bg-gray-100 text-gray-500 border-transparent";
+
   return (
     <div className="card">
       <div className="flex items-center justify-between mb-5">
@@ -107,21 +121,9 @@ function SubscriptionSection({ subscription }: { subscription: SubscriptionInfo 
           <Crown className="w-5 h-5 text-[var(--color-violet)]" />
           Subscription
         </h2>
-
-        {/* Current plan badge */}
-        {isDreamStudio ? (
-          <span className="text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1 rounded-full">
-            🌟 Dream Studio
-          </span>
-        ) : csActive ? (
-          <span className="text-xs font-semibold bg-violet-50 text-violet-700 border border-violet-200 px-3 py-1 rounded-full">
-            💻 Computer Scientist
-          </span>
-        ) : (
-          <span className="text-xs font-semibold bg-gray-100 text-gray-500 px-3 py-1 rounded-full">
-            Free plan
-          </span>
-        )}
+        <span className={`text-xs font-semibold border px-3 py-1 rounded-full ${planBadgeClass}`}>
+          {planBadge}
+        </span>
       </div>
 
       {error && (
@@ -154,115 +156,89 @@ function SubscriptionSection({ subscription }: { subscription: SubscriptionInfo 
         </div>
       )}
 
-      {/* Computer Scientist active */}
-      {!isDreamStudio && csActive && (
-        <div className="bg-gradient-to-r from-violet-50 to-indigo-50 border border-violet-100 rounded-xl p-4 mb-4">
-          <p className="text-sm font-semibold text-violet-800 mb-1">
-            Computer Scientist path — active
-          </p>
-          <ul className="mt-1 space-y-1">
-            {CAREER_PATH_CARDS[0].features.map((f) => (
-              <li key={f} className="flex items-center gap-1.5 text-sm text-violet-700">
-                <CheckCircle className="w-3.5 h-3.5 text-violet-400 shrink-0" />
-                {f}
-              </li>
-            ))}
-          </ul>
-          {subscription.hasStripeCustomer && (
-            <button
-              onClick={handleManage}
-              disabled={loading !== null}
-              className="mt-3 flex items-center gap-1.5 text-sm font-medium text-violet-700 hover:text-violet-900 transition-colors disabled:opacity-50"
+      {/* Active paths */}
+      {!isDreamStudio && activePaths.length > 0 && (
+        <div className="space-y-3 mb-4">
+          {activePaths.map((card) => (
+            <div
+              key={card.pathId}
+              className="bg-gradient-to-r from-violet-50 to-indigo-50 border border-violet-100 rounded-xl p-4 flex items-center justify-between"
             >
-              {loading === "portal" ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <ExternalLink className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-2">
+                <span className="text-lg">{card.emoji}</span>
+                <div>
+                  <p className="text-sm font-semibold text-violet-800">{card.label} — active</p>
+                  <p className="text-xs text-violet-600">£24.99/month</p>
+                </div>
+              </div>
+              {subscription.hasStripeCustomer && (
+                <button
+                  onClick={handleManage}
+                  disabled={loading !== null}
+                  className="flex items-center gap-1 text-xs font-medium text-violet-700 hover:text-violet-900 transition-colors disabled:opacity-50"
+                >
+                  {loading === "portal" ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <ExternalLink className="w-3 h-3" />
+                  )}
+                  Manage
+                </button>
               )}
-              Manage billing
-            </button>
-          )}
+            </div>
+          ))}
         </div>
       )}
 
-      {/* Free — show upgrade options */}
-      {!isPaid && (
-        <>
-          <p className="text-sm text-gray-500 mb-4">
-            You&apos;re on the free plan. Upgrade to unlock the full coding adventure.
+      {/* Add a Career Path section (shown when not Dream Studio and at least one path exists to buy) */}
+      {!isDreamStudio && inactivePaths.length > 0 && (
+        <div className="mb-4">
+          <p className="text-sm font-semibold text-[var(--color-navy)] mb-3">
+            {hasActivePaths ? "Add another career path" : "Add a career path"}
           </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {/* Computer Scientist card */}
-            <div className="border-2 border-[var(--color-violet)] rounded-xl p-4 flex flex-col">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-lg">💻</span>
-                <div>
-                  <p className="text-sm font-bold text-[var(--color-navy)]">Computer Scientist</p>
-                  <p className="text-xs text-gray-400">£24.99/month</p>
-                </div>
-              </div>
-              <ul className="space-y-1 mb-4 flex-1">
-                {CAREER_PATH_CARDS[0].features.map((f) => (
-                  <li key={f} className="flex items-center gap-1.5 text-xs text-gray-500">
-                    <CheckCircle className="w-3 h-3 text-[var(--color-violet)] shrink-0" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={() => handleSubscribePath("computer_scientist")}
-                disabled={loading !== null}
-                className="w-full py-2 rounded-full text-xs font-semibold bg-gradient-to-r from-[var(--color-indigo)] to-[var(--color-violet)] text-white hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-1.5"
+          {!hasActivePaths && (
+            <p className="text-sm text-gray-500 mb-3">
+              Each path is £24.99/month and unlocks the full curriculum for that career.
+            </p>
+          )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {inactivePaths.map((card) => (
+              <div
+                key={card.pathId}
+                className="border-2 border-[var(--color-violet)] rounded-xl p-3 flex flex-col"
               >
-                {loading === "computer_scientist" ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                ) : null}
-                Get Started
-              </button>
-            </div>
-
-            {/* Dream Studio card */}
-            <div className="border-2 border-amber-400 rounded-xl p-4 flex flex-col">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-lg">🌟</span>
-                <div>
-                  <p className="text-sm font-bold text-[var(--color-navy)]">Dream Studio</p>
-                  <p className="text-xs text-gray-400">£39.99/month</p>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xl">{card.emoji}</span>
+                  <div>
+                    <p className="text-sm font-bold text-[var(--color-navy)]">{card.label}</p>
+                    <p className="text-xs text-gray-400">£24.99/month</p>
+                  </div>
                 </div>
+                <button
+                  onClick={() => handleSubscribePath(card.pathId)}
+                  disabled={loading !== null}
+                  className="w-full py-2 rounded-full text-xs font-semibold bg-gradient-to-r from-[var(--color-indigo)] to-[var(--color-violet)] text-white hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-1.5"
+                >
+                  {loading === card.pathId ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : null}
+                  Get Started
+                </button>
               </div>
-              <ul className="space-y-1 mb-4 flex-1">
-                {["All career paths", "Unlimited child profiles", "Priority support"].map((f) => (
-                  <li key={f} className="flex items-center gap-1.5 text-xs text-gray-500">
-                    <CheckCircle className="w-3 h-3 text-amber-400 shrink-0" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={handleSubscribeDreamStudio}
-                disabled={loading !== null}
-                className="w-full py-2 rounded-full text-xs font-semibold bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-1.5"
-              >
-                {loading === "dream_studio" ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                ) : null}
-                Upgrade
-              </button>
-            </div>
+            ))}
           </div>
-        </>
+        </div>
       )}
 
-      {/* Upgrade to Dream Studio if on path plan */}
-      {!isDreamStudio && csActive && (
-        <div className="mt-4 border border-amber-200 rounded-xl p-4 bg-amber-50">
+      {/* Dream Studio upsell (shown when on path plan but not Dream Studio) */}
+      {!isDreamStudio && (
+        <div className="border border-amber-200 rounded-xl p-4 bg-amber-50">
           <div className="flex items-start gap-3">
             <Zap className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
             <div className="flex-1">
-              <p className="text-sm font-semibold text-amber-800">Upgrade to Dream Studio</p>
+              <p className="text-sm font-semibold text-amber-800">Dream Studio — £39.99/month</p>
               <p className="text-xs text-amber-700 mt-0.5">
-                All career paths, unlimited child profiles — £39.99/month.
+                All career paths, unlimited child profiles, future paths included.
               </p>
             </div>
             <button

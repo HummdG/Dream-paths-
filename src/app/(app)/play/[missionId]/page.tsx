@@ -68,7 +68,7 @@ export default async function PlayPage({ params }: PlayPageProps) {
       data: {
         childId: child.id,
         packId: pack.packId,
-        name: pack.packId === 'snake_basics_v1' ? "My Snake Game" : "My Platformer Game",
+        name: `My ${pack.packTitle} Game`,
         currentMissionId: missionId,
         currentStepId: mission.steps[0].stepId,
         gameConfigJson: pack.gameTemplate.defaultConfig as object,
@@ -125,7 +125,7 @@ export default async function PlayPage({ params }: PlayPageProps) {
 
   // Get the user's most recent level for game preview (platformer missions only)
   let levelData: LevelData | undefined;
-  if (mission.engineType !== 'snake') {
+  if (mission.engineType === 'platformer' || mission.engineType === undefined) {
     const userLevel = await db.userLevel.findFirst({
       where: { childId: child.id },
       orderBy: { updatedAt: "desc" },

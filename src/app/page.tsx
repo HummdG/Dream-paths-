@@ -5,6 +5,7 @@ import { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { CheckCircle, ArrowRight, Sparkles, Lock } from "lucide-react";
+import { PathSlideshow } from "@/components/homepage/path-slideshow";
 
 const LOGOS = [
   { src: "/meta-brand-color.svg", alt: "Meta", width: 120, height: 48 },
@@ -50,6 +51,7 @@ function LogoMarquee({ speed = 80 }: { speed?: number }) {
 
 const CAREER_PATHS = [
   {
+    pathId: 'computer_scientist',
     label: 'Computer Scientist',
     emoji: '💻',
     tagline: 'Learn Python by building real games',
@@ -58,25 +60,28 @@ const CAREER_PATHS = [
     preview: ['Snake Tutorial (free)', 'Platformer Game', 'More coming…'],
   },
   {
+    pathId: 'astronaut',
     label: 'Astronaut',
     emoji: '🚀',
     tagline: 'Maths, physics & space science',
-    available: false,
-    badge: 'Coming soon',
-    preview: [],
+    available: true,
+    badge: 'Available now',
+    preview: ['Space Cadet Program (free)', 'Space Explorer', 'More coming…'],
   },
   {
-    label: 'AI Engineer',
-    emoji: '🤖',
-    tagline: 'Machine learning & data science',
-    available: false,
-    badge: 'Coming soon',
-    preview: [],
-  },
-  {
+    pathId: 'doctor',
     label: 'Doctor',
     emoji: '🩺',
     tagline: 'Biology, anatomy & medical science',
+    available: true,
+    badge: 'Available now',
+    preview: ['Junior Medic Academy (free)', 'Junior Doctor', 'More coming…'],
+  },
+  {
+    pathId: null,
+    label: 'AI Engineer',
+    emoji: '🤖',
+    tagline: 'Machine learning & data science',
     available: false,
     badge: 'Coming soon',
     preview: [],
@@ -102,24 +107,6 @@ const HOW_IT_WORKS = [
     title: 'Build a real portfolio',
     description: 'Every mission produces something real: a working game, a program, a project to be proud of.',
   },
-]
-
-const snakeMissions = [
-  { title: "Hello Python", emoji: "🐍" },
-  { title: "Functions & Movement", emoji: "⚙️" },
-  { title: "Keyboard Controls", emoji: "⌨️" },
-  { title: "Score & Game Over", emoji: "🏆" },
-]
-
-const platformerMissions = [
-  { title: "Design Your Hero", emoji: "🎨" },
-  { title: "Run & Explore", emoji: "🏃" },
-  { title: "Build Your Scene", emoji: "🏗️" },
-  { title: "Gravity & Jumping", emoji: "🦘" },
-  { title: "Collisions", emoji: "💥" },
-  { title: "Collect & Score", emoji: "🪙" },
-  { title: "Enemies", emoji: "👾" },
-  { title: "Win & Polish", emoji: "🏁" },
 ]
 
 export default function Home() {
@@ -257,7 +244,7 @@ export default function Home() {
         >
           Trusted by engineers at
         </motion.p>
-        <LogoMarquee baseVelocity={3} />
+        <LogoMarquee />
       </section>
 
       {/* "Choose Your Dream Path" section */}
@@ -285,7 +272,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className={`card relative overflow-hidden ${!path.available ? 'opacity-70' : 'card-interactive'}`}
+                className={`card relative overflow-hidden flex flex-col ${!path.available ? 'opacity-70' : 'card-interactive'}`}
               >
                 {!path.available && (
                   <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] flex items-center justify-center z-10 rounded-2xl">
@@ -309,7 +296,7 @@ export default function Home() {
                 </div>
                 <p className="text-gray-600 text-sm mb-4">{path.tagline}</p>
                 {path.preview.length > 0 && (
-                  <ul className="space-y-1.5">
+                  <ul className="space-y-1.5 mb-5 flex-1">
                     {path.preview.map(item => (
                       <li key={item} className="flex items-center gap-2 text-sm text-gray-600">
                         <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
@@ -317,6 +304,22 @@ export default function Home() {
                       </li>
                     ))}
                   </ul>
+                )}
+                {path.available && path.pathId && (
+                  <div className="flex gap-2 mt-auto pt-2">
+                    <Link
+                      href={`/paths/${path.pathId}`}
+                      className="flex-1 text-center py-2 rounded-full border-2 border-[var(--color-navy)] text-[var(--color-navy)] text-xs font-semibold hover:bg-[var(--color-navy)] hover:text-white transition-colors"
+                    >
+                      Learn More
+                    </Link>
+                    <Link
+                      href="/signup"
+                      className="flex-1 text-center py-2 rounded-full bg-gradient-to-r from-[var(--color-indigo)] to-[var(--color-violet)] text-white text-xs font-semibold hover:opacity-90 transition-opacity"
+                    >
+                      Get Started
+                    </Link>
+                  </div>
                 )}
               </motion.div>
             ))}
@@ -363,52 +366,7 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Computer Scientist path missions detail */}
-          <div className="mb-10">
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-2xl">🐍</span>
-              <h3 className="text-lg font-bold text-gray-800">Snake Tutorial</h3>
-              <span className="text-xs font-bold bg-emerald-500 text-white px-2.5 py-1 rounded-full">FREE</span>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {snakeMissions.map((mission, index) => (
-                <motion.div
-                  key={mission.title}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.05 }}
-                  className="card p-5 text-center ring-2 ring-emerald-300 ring-offset-2"
-                >
-                  <div className="text-3xl mb-2">{mission.emoji}</div>
-                  <h3 className="text-sm font-bold text-[var(--color-navy)]">{mission.title}</h3>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-2xl">🎮</span>
-              <h3 className="text-lg font-bold text-gray-800">Platformer Game</h3>
-              <span className="text-xs font-semibold text-violet-600 bg-violet-100 px-2.5 py-1 rounded-full">Computer Scientist path</span>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {platformerMissions.map((mission, index) => (
-                <motion.div
-                  key={mission.title}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.05 }}
-                  className="card p-5 text-center"
-                >
-                  <div className="text-3xl mb-2">{mission.emoji}</div>
-                  <h3 className="text-sm font-bold text-[var(--color-navy)]">{mission.title}</h3>
-                </motion.div>
-              ))}
-            </div>
-          </div>
+          <PathSlideshow />
         </div>
       </section>
 

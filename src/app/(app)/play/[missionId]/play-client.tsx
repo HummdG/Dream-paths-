@@ -53,9 +53,10 @@ export function PlayClient({
       ? currentPack.missions[missionIndex + 1].missionId
       : undefined;
 
-  // For creative/level_design missions, we don't need Pyodide
+  // For creative/level_design/experiment_guide missions, we don't need Pyodide
   const isCreativeMission = mission.missionType === 'creative';
   const isLevelDesignMission = mission.missionType === 'level_design';
+  const isExperimentGuide = mission.missionType === 'experiment_guide';
 
   useEffect(() => {
     // Check if Pyodide is already loaded
@@ -126,8 +127,8 @@ export function PlayClient({
     }
   };
 
-  // For creative/level_design missions, render directly without waiting for Pyodide
-  if (isCreativeMission || isLevelDesignMission) {
+  // For creative/level_design/experiment_guide missions, render directly without waiting for Pyodide
+  if (isCreativeMission || isLevelDesignMission || isExperimentGuide) {
     return (
       <MissionWorkspace
         mission={mission}
