@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { allMissionPacks, computeAllPackProgress } from "@/lib/missions";
+import { allMissionPacks, computePathPackProgress } from "@/lib/missions";
+import { PATH_PACKS } from "@/lib/plans";
 import { GameClient } from "./game-client";
 
 interface GamePageProps {
@@ -52,7 +53,15 @@ export default async function GamePage({ params }: GamePageProps) {
   const child = parent.children[0];
   const subscriptionPlan = parent.subscription?.planId ?? 'free'
   const purchasedPathIds = parent.pathSubscriptions.map(ps => ps.pathId)
-  const packsWithProgress = computeAllPackProgress(allMissionPacks, child.projects, subscriptionPlan, purchasedPathIds);
+
+  // Scope progress to this pack's path so progression locking doesn't bleed across paths.
+  // e.g. rocket_basics_v1 must not be locked because platformer_v1 is incomplete.
+  const pathId = Object.entries(PATH_PACKS).find(([, ids]) => ids.includes(packId))?.[0];
+  const scopedPacks = pathId
+    ? allMissionPacks.filter(p => PATH_PACKS[pathId].includes(p.packId))
+    : allMissionPacks;
+
+  const packsWithProgress = computePathPackProgress(scopedPacks, child.projects, subscriptionPlan, purchasedPathIds);
   const thisPackProgress = packsWithProgress.find(pp => pp.pack.packId === packId);
 
   // Redirect locked packs back to the dashboard
