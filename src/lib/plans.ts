@@ -38,11 +38,11 @@ export const CAREER_PATHS: Record<string, CareerPathMeta> = {
     emoji: '💻',
     gradient: 'from-violet-500 to-indigo-600',
     tagline: 'Python through real game-building',
-    description: 'Learn Python by building a Snake game and a Platformer from scratch.',
+    description: 'Learn to code in Python by building real games from scratch. First, program your own Snake game: moving the snake, eating food, and keeping score. Then create a full Platformer game complete with a pixel-art hero you design, gravity, jumping, enemies, and collectibles.',
     preview: [
-      'Snake Tutorial (free · 4 missions)',
-      'Platformer Game (8 missions)',
-      'Pixel art hero creator',
+      'Program your own Snake game in Python',
+      'Build a full Platformer with gravity, enemies & coins',
+      'Design a custom pixel-art hero character',
     ],
   },
   astronaut: {
@@ -50,11 +50,11 @@ export const CAREER_PATHS: Record<string, CareerPathMeta> = {
     emoji: '🚀',
     gradient: 'from-indigo-500 to-purple-600',
     tagline: 'Rocket physics, space science & Python',
-    description: 'Code rockets, explore orbits, and run space experiments with Python.',
+    description: 'Blast off into coding! Program your own rocket, simulate real gravity and orbits, and run space experiments, all using Python. You\'ll start with the basics of rocket control, then build increasingly complex space simulations as you progress through the Astronaut path.',
     preview: [
-      'Space Cadet Program (free · 4 missions)',
-      'Space Explorer (8 missions)',
-      'Physics simulations & experiments',
+      'Program and launch your own rocket in Python',
+      'Simulate real gravity and orbital physics',
+      'Run experiments and explore the solar system',
     ],
   },
   doctor: {
@@ -62,11 +62,11 @@ export const CAREER_PATHS: Record<string, CareerPathMeta> = {
     emoji: '🩺',
     gradient: 'from-cyan-500 to-teal-600',
     tagline: 'Biology, anatomy & medical science',
-    description: 'Diagnose patients, monitor vitals, and learn biology through coding.',
+    description: 'Step into the hospital and learn biology through code. Build a patient monitor that tracks heart rate and vitals, write a diagnosis system, and create medical tools — all in Python. Start as a Junior Medic and work your way up to performing digital surgery!',
     preview: [
-      'Junior Medic Academy (free · 4 missions)',
-      'Junior Doctor (8 missions)',
-      'Patient monitor simulator',
+      'Build a patient monitor that tracks vitals in Python',
+      'Write a diagnosis system and treatment planner',
+      'Explore biology, anatomy, and medical science',
     ],
   },
 }

@@ -131,6 +131,15 @@ export default async function PathMarketingPage({ params }: PathMarketingPagePro
               </div>
             </div>
           ))}
+
+          {/* More coming soon */}
+          <div className="mt-2 mb-4 flex items-center gap-3 px-5 py-4 bg-gradient-to-r from-violet-50 to-indigo-50 border border-violet-100 rounded-2xl">
+            <span className="text-2xl">✨</span>
+            <div>
+              <p className="text-sm font-semibold text-violet-700">More missions on the way</p>
+              <p className="text-xs text-gray-500 mt-0.5">New packs and sections are added regularly. Your child&apos;s path keeps growing.</p>
+            </div>
+          </div>
         </div>
       </section>
 

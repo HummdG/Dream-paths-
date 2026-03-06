@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { LegalModal } from "@/components/legal/legal-modal";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -15,6 +16,9 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -149,9 +153,36 @@ export default function SignUpPage() {
             </div>
           </div>
 
+          <label className="flex items-start gap-3 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={agreedToTerms}
+              onChange={(e) => setAgreedToTerms(e.target.checked)}
+              className="mt-0.5 w-4 h-4 rounded border-gray-300 accent-[var(--color-violet)] shrink-0 cursor-pointer"
+            />
+            <span className="text-sm text-gray-600 leading-snug">
+              I agree to the{" "}
+              <button
+                type="button"
+                onClick={() => setShowTerms(true)}
+                className="text-[var(--color-violet)] hover:underline font-medium"
+              >
+                Terms of Service
+              </button>{" "}
+              and{" "}
+              <button
+                type="button"
+                onClick={() => setShowPrivacy(true)}
+                className="text-[var(--color-violet)] hover:underline font-medium"
+              >
+                Privacy Policy
+              </button>
+            </span>
+          </label>
+
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || !agreedToTerms}
             className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
@@ -172,10 +203,10 @@ export default function SignUpPage() {
           </Link>
         </p>
 
-        <p className="mt-4 text-center text-xs text-gray-500">
-          By signing up, you agree to our Terms of Service and Privacy Policy.
-        </p>
       </motion.div>
+
+      {showPrivacy && <LegalModal type="privacy" onClose={() => setShowPrivacy(false)} />}
+      {showTerms && <LegalModal type="terms" onClose={() => setShowTerms(false)} />}
     </div>
   );
 }

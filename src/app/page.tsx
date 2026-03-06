@@ -1,11 +1,12 @@
 "use client";
 
 import { motion, useAnimationFrame, useMotionValue } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { CheckCircle, ArrowRight, Sparkles, Lock } from "lucide-react";
 import { PathSlideshow } from "@/components/homepage/path-slideshow";
+import { LegalModal } from "@/components/legal/legal-modal";
 
 const LOGOS = [
   { src: "/meta-brand-color.svg", alt: "Meta", width: 120, height: 48 },
@@ -110,6 +111,9 @@ const HOW_IT_WORKS = [
 ]
 
 export default function Home() {
+  const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
+
   return (
     <div className="min-h-screen bg-[var(--color-cream)]">
       {/* Navigation */}
@@ -126,6 +130,12 @@ export default function Home() {
             />
           </Link>
           <div className="flex items-center gap-4">
+            <Link
+              href="/contact"
+              className="hidden sm:block text-[var(--color-navy)] hover:text-[var(--color-violet)] font-medium transition-colors"
+            >
+              Contact
+            </Link>
             <Link
               href="/login"
               className="text-[var(--color-navy)] hover:text-[var(--color-violet)] font-medium transition-colors"
@@ -509,12 +519,15 @@ export default function Home() {
             © 2026 DreamPaths. Made with ❤️ for young creators.
           </p>
           <div className="flex gap-6 text-sm text-gray-500">
-            <Link href="#" className="hover:text-[var(--color-violet)]">Privacy</Link>
-            <Link href="#" className="hover:text-[var(--color-violet)]">Terms</Link>
-            <Link href="#" className="hover:text-[var(--color-violet)]">Contact</Link>
+            <button onClick={() => setShowPrivacy(true)} className="hover:text-[var(--color-violet)] transition-colors">Privacy</button>
+            <button onClick={() => setShowTerms(true)} className="hover:text-[var(--color-violet)] transition-colors">Terms</button>
+            <Link href="/contact" className="hover:text-[var(--color-violet)] transition-colors">Contact</Link>
           </div>
         </div>
       </footer>
+
+      {showPrivacy && <LegalModal type="privacy" onClose={() => setShowPrivacy(false)} />}
+      {showTerms && <LegalModal type="terms" onClose={() => setShowTerms(false)} />}
     </div>
   );
 }

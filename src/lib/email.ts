@@ -214,6 +214,39 @@ If you didn't request this, you can safely ignore this email.
   })
 }
 
+export async function sendContactEmail(name: string, email: string, type: string, message: string) {
+  const typeLabels: Record<string, string> = {
+    question: 'Question',
+    complaint: 'Complaint',
+    feedback: 'Feedback',
+    help: 'Help Request',
+  }
+  const typeLabel = typeLabels[type] ?? type
+
+  return sendEmail({
+    to: process.env.FROM_EMAIL ?? 'support@dreampaths.co.uk',
+    subject: `[Contact] ${typeLabel} from ${name}`,
+    text: `Name: ${name}\nEmail: ${email}\nType: ${typeLabel}\n\n${message}`,
+    html: `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fef7f0; padding: 40px 20px;">
+<div style="max-width: 500px; margin: 0 auto; background: white; border-radius: 24px; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+<h2 style="color: #1a1a2e; margin: 0 0 24px;">New Contact Form Submission</h2>
+<table style="width: 100%; border-collapse: collapse; font-size: 15px;">
+<tr><td style="padding: 8px 0; color: #888; width: 80px;">Name</td><td style="padding: 8px 0; color: #1a1a2e; font-weight: 600;">${name}</td></tr>
+<tr><td style="padding: 8px 0; color: #888;">Email</td><td style="padding: 8px 0;"><a href="mailto:${email}" style="color: #6366f1;">${email}</a></td></tr>
+<tr><td style="padding: 8px 0; color: #888;">Type</td><td style="padding: 8px 0; color: #1a1a2e;">${typeLabel}</td></tr>
+</table>
+<div style="margin-top: 24px; padding: 20px; background: #f8f7ff; border-radius: 12px;">
+<p style="color: #444; font-size: 15px; line-height: 1.7; margin: 0; white-space: pre-wrap;">${message}</p>
+</div>
+</div>
+</body>
+</html>`,
+  })
+}
+
 export async function sendWelcomeEmail(email: string, parentName: string, childName: string) {
   const dashboardUrl = `${APP_URL}/dashboard`
   
