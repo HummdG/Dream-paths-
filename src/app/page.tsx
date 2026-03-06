@@ -12,6 +12,9 @@ const LOGOS = [
   { src: "/meta-brand-color.svg", alt: "Meta", width: 120, height: 48 },
   { src: "/google-brand-color.svg", alt: "Google", width: 120, height: 48 },
   { src: "/Imperial_logo.svg.png", alt: "Imperial College London", width: 180, height: 48 },
+  { src: "/goldmansachs_logo.svg", alt: "Goldman Sachs", width: 160, height: 48 },
+  { src: "/hcltechlogo.svg", alt: "HCLTech", width: 120, height: 48 },
+  { src: "/snpglobal_logo.svg", alt: "S&P Global", width: 140, height: 48 },
 ];
 
 // NUM_COPIES must match the number of [...Array(N)] below
@@ -130,12 +133,6 @@ export default function Home() {
             />
           </Link>
           <div className="flex items-center gap-4">
-            <Link
-              href="/contact"
-              className="hidden sm:block text-[var(--color-navy)] hover:text-[var(--color-violet)] font-medium transition-colors"
-            >
-              Contact
-            </Link>
             <Link
               href="/login"
               className="text-[var(--color-navy)] hover:text-[var(--color-violet)] font-medium transition-colors"
