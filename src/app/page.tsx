@@ -15,6 +15,9 @@ const LOGOS = [
   { src: "/goldmansachs_logo.svg", alt: "Goldman Sachs", width: 160, height: 48 },
   { src: "/hcltechlogo.svg", alt: "HCLTech", width: 120, height: 48 },
   { src: "/snpglobal_logo.svg", alt: "S&P Global", width: 140, height: 48 },
+  { src: "/ibm_logo.svg", alt: "IBM", width: 100, height: 48 },
+  { src: "/pwc_logo.png", alt: "PwC", width: 100, height: 48 },
+  { src: "/uber_logo.svg", alt: "Uber", width: 100, height: 48 },
 ];
 
 // NUM_COPIES must match the number of [...Array(N)] below
@@ -395,7 +398,7 @@ export default function Home() {
       {/* Trusted By Section */}
       <section className="py-10 bg-white border-y border-gray-100 overflow-hidden">
         <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 text-center mb-7">
-          Trusted by engineers at
+          Trusted by professionals at
         </p>
         <LogoMarquee />
       </section>

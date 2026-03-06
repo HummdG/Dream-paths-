@@ -67,6 +67,7 @@ model Parent {
   subscription      Subscription?
   pathSubscriptions PathSubscription[]
   parentAccessPins  ParentAccessPin[]
+  calendarEvents    CalendarEvent[]
 
   @@map("parents")
 }
@@ -89,6 +90,7 @@ model Child {
   userSprites      UserSprite[]
   userLevels       UserLevel[]
   gameProjects     GameProject[]
+  calendarEvents   CalendarEvent[]
 
   @@map("children")
 }
@@ -400,6 +402,31 @@ model UserLevel {
   @@index([childId])
   @@index([theme])
   @@map("user_levels")
+}
+
+// Calendar events for parent scheduling
+model CalendarEvent {
+  id             String    @id @default(cuid())
+  parentId       String    @map("parent_id")
+  childId        String?   @map("child_id")
+  title          String
+  description    String?
+  startAt        DateTime  @map("start_at")
+  endAt          DateTime? @map("end_at")
+  isDreampaths   Boolean   @default(false) @map("is_dreampaths")
+  packId         String?   @map("pack_id")
+  missionId      String?   @map("mission_id")
+  emailReminder  Boolean   @default(true) @map("email_reminder")
+  reminderSentAt DateTime? @map("reminder_sent_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  parent Parent  @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  child  Child?  @relation(fields: [childId], references: [id], onDelete: SetNull)
+
+  @@index([parentId])
+  @@index([startAt])
+  @@map("calendar_events")
 }
 
 // Game project that combines hero, levels, and sprites
