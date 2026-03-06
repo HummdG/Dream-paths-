@@ -113,7 +113,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[var(--color-cream)]">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-6 py-2 flex justify-between items-center">
           <Link href="/" className="flex items-center">
             <Image
@@ -198,11 +198,8 @@ export default function Home() {
 
               <div className="relative z-10 space-y-3">
                 {CAREER_PATHS.map((path, i) => (
-                  <motion.div
+                  <div
                     key={path.label}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 + i * 0.1 }}
                     className={`card p-4 flex items-center gap-4 ${!path.available ? 'opacity-60' : ''}`}
                   >
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0 ${
@@ -226,7 +223,7 @@ export default function Home() {
                       <p className="text-xs text-gray-500">{path.tagline}</p>
                     </div>
                     {!path.available && <Lock className="w-4 h-4 text-gray-300 shrink-0" />}
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </motion.div>
@@ -234,44 +231,22 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Trusted By Section */}
-      <section className="py-10 bg-white border-y border-gray-100 overflow-hidden">
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-xs font-semibold uppercase tracking-widest text-gray-400 text-center mb-7"
-        >
-          Trusted by engineers at
-        </motion.p>
-        <LogoMarquee />
-      </section>
-
       {/* "Choose Your Dream Path" section */}
-      <section className="py-20 px-6">
+      <section className="py-20 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
+          <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-navy)] mb-4">
               Choose Your Dream Path
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Each path takes your child from complete beginner to something they've actually built.
             </p>
-          </motion.div>
+          </div>
 
           <div className="grid md:grid-cols-3 gap-6">
             {CAREER_PATHS.map((path, i) => (
-              <motion.div
+              <div
                 key={path.label}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
                 className={`card relative overflow-hidden flex flex-col ${!path.available ? 'opacity-70' : 'card-interactive'}`}
               >
                 {!path.available && (
@@ -321,7 +296,7 @@ export default function Home() {
                     </Link>
                   </div>
                 )}
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -330,30 +305,18 @@ export default function Home() {
       {/* How it works */}
       <section id="how-it-works" className="py-20 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
+          <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-navy)] mb-4">
               How it works
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Start free. One mission a week, at your own pace.
+              Three steps from zero to something you built yourself.
             </p>
-          </motion.div>
+          </div>
 
           <div className="grid md:grid-cols-3 gap-8 mb-16">
             {HOW_IT_WORKS.map((item, i) => (
-              <motion.div
-                key={item.step}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="text-center"
-              >
+              <div key={item.step} className="text-center">
                 <div className="w-16 h-16 bg-gradient-to-br from-[var(--color-indigo)] to-[var(--color-violet)] rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl">
                   {item.emoji}
                 </div>
@@ -362,7 +325,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-lg font-bold text-[var(--color-navy)] mb-2">{item.title}</h3>
                 <p className="text-gray-600 text-sm leading-relaxed">{item.description}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
 
@@ -373,25 +336,15 @@ export default function Home() {
       {/* Why DreamPaths Section */}
       <section className="py-20 px-6 bg-white">
         <div className="max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
+          <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-navy)] mb-4">
               Why parents choose DreamPaths
             </h2>
-          </motion.div>
+          </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Card 1 — Learning by doing */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="card text-center"
-            >
+            <div className="card text-center">
               <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-[var(--color-indigo)] to-[var(--color-violet)] flex items-center justify-center text-2xl">
                 🚀
               </div>
@@ -401,16 +354,10 @@ export default function Home() {
               <p className="text-gray-500 text-sm leading-relaxed">
                 Every mission produces something your child made from scratch. Real projects, real skills, and something worth showing off at the end.
               </p>
-            </motion.div>
+            </div>
 
             {/* Card 2 — Transparency */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              viewport={{ once: true }}
-              className="card text-center"
-            >
+            <div className="card text-center">
               <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-2xl">
                 👀
               </div>
@@ -420,16 +367,10 @@ export default function Home() {
               <p className="text-gray-500 text-sm leading-relaxed">
                 A dedicated parent dashboard shows every mission, step, and star earned. Regular email updates keep you in the loop without any screen-time battles.
               </p>
-            </motion.div>
+            </div>
 
             {/* Card 3 — Value */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              viewport={{ once: true }}
-              className="card text-center"
-            >
+            <div className="card text-center">
               <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-2xl">
                 💡
               </div>
@@ -439,36 +380,34 @@ export default function Home() {
               <p className="text-gray-500 text-sm leading-relaxed">
                 A private tutor costs £50 to £80 per hour. DreamPaths is a fraction of that, and your child builds a real project they can be proud of rather than doing worksheet drills.
               </p>
-            </motion.div>
+            </div>
           </div>
         </div>
+      </section>
+
+      {/* Trusted By Section */}
+      <section className="py-10 bg-white border-y border-gray-100 overflow-hidden">
+        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 text-center mb-7">
+          Trusted by engineers at
+        </p>
+        <LogoMarquee />
       </section>
 
       {/* Pricing Section */}
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
+          <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-navy)] mb-4">
               Simple, family-friendly pricing
             </h2>
             <p className="text-lg text-gray-600">
               Start free. One mission a week, at your own pace.
             </p>
-          </motion.div>
+          </div>
 
           <div className="grid md:grid-cols-3 gap-6 items-stretch">
             {/* Free Plan */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="bg-white rounded-2xl p-6 flex flex-col border border-gray-100"
-            >
+            <div className="bg-white rounded-2xl p-6 flex flex-col border border-gray-100">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3 h-5">Free</p>
               <div className="mb-5 h-10 flex items-baseline gap-1">
                 <span className="text-3xl font-bold text-[var(--color-navy)]">£0</span>
@@ -490,16 +429,10 @@ export default function Home() {
               <Link href="/signup" className="mt-auto w-full py-3 text-center rounded-full font-semibold text-sm border-2 border-gray-200 text-gray-500 hover:border-gray-300 transition-colors block">
                 Start Free
               </Link>
-            </motion.div>
+            </div>
 
             {/* Computer Scientist Path */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              viewport={{ once: true }}
-              className="bg-white rounded-2xl p-6 flex flex-col ring-2 ring-[var(--color-violet)]"
-            >
+            <div className="bg-white rounded-2xl p-6 flex flex-col ring-2 ring-[var(--color-violet)]">
               <div className="flex items-center justify-between mb-3 h-5">
                 <p className="text-xs font-semibold text-[var(--color-violet)] uppercase tracking-wide">Computer Scientist</p>
                 <span className="bg-[var(--color-violet)] text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">Popular</span>
@@ -525,16 +458,10 @@ export default function Home() {
               <Link href="/signup" className="mt-auto w-full py-3 text-center rounded-full font-semibold text-sm bg-gradient-to-r from-[var(--color-indigo)] to-[var(--color-violet)] text-white hover:opacity-90 transition-opacity block">
                 Get Started
               </Link>
-            </motion.div>
+            </div>
 
             {/* Dream Studio */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              viewport={{ once: true }}
-              className="bg-white rounded-2xl p-6 flex flex-col ring-2 ring-amber-400"
-            >
+            <div className="bg-white rounded-2xl p-6 flex flex-col ring-2 ring-amber-400">
               <div className="flex items-center justify-between mb-3 h-5">
                 <p className="text-xs font-semibold text-amber-600 uppercase tracking-wide">Dream Studio</p>
                 <span className="bg-amber-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">All Access</span>
@@ -560,7 +487,7 @@ export default function Home() {
               <Link href="/signup" className="mt-auto w-full py-3 text-center rounded-full font-semibold text-sm bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:opacity-90 transition-opacity block">
                 Get Started
               </Link>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>

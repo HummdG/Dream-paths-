@@ -21,6 +21,29 @@
   box-sizing: border-box;
 }
 
+/* Prevent text selection cursor globally except in code editors and instruction text */
+body {
+  cursor: default;
+}
+
+h1, h2, h3, h4, h5, h6, p, span, div, label, li, td, th, button, a {
+  cursor: default;
+  user-select: none;
+}
+
+/* Restore pointer for interactive elements */
+a, button, [role="button"], [role="link"] {
+  cursor: pointer;
+}
+
+/* Restore text selection in inputs, textareas, and code editors */
+input, textarea, [contenteditable],
+.code-editor, .highlighted-editor, .prism-editor, pre code,
+.prism-editor * {
+  cursor: text;
+  user-select: text;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -80,6 +103,7 @@ body {
 
 .animate-float {
   animation: float 3s ease-in-out infinite;
+  will-change: transform;
 }
 
 .animate-wiggle {
@@ -110,7 +134,7 @@ body {
   border-radius: 9999px;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
   box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
 }
 
@@ -131,7 +155,7 @@ body {
   border-radius: 9999px;
   border: 2px solid var(--color-indigo);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .btn-secondary:hover {
@@ -145,7 +169,7 @@ body {
   border-radius: 24px;
   padding: 2rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .card:hover {

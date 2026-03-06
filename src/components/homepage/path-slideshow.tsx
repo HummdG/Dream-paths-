@@ -4,135 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-
-interface MissionTile {
-  title: string;
-  emoji: string;
-}
-
-interface PackSection {
-  title: string;
-  emoji: string;
-  freeBadge?: boolean;
-  pathBadge?: string;
-  ringClass: string;
-  missions: MissionTile[];
-}
-
-interface PathSlide {
-  pathId: string;
-  label: string;
-  emoji: string;
-  packs: PackSection[];
-}
-
-const PATH_SLIDES: PathSlide[] = [
-  {
-    pathId: "computer_scientist",
-    label: "Computer Scientist",
-    emoji: "💻",
-    packs: [
-      {
-        title: "Snake Tutorial",
-        emoji: "🐍",
-        freeBadge: true,
-        ringClass: "ring-2 ring-emerald-300 ring-offset-2",
-        missions: [
-          { title: "Hello Python", emoji: "🐍" },
-          { title: "Functions & Movement", emoji: "⚙️" },
-          { title: "Keyboard Controls", emoji: "⌨️" },
-          { title: "Score & Game Over", emoji: "🏆" },
-        ],
-      },
-      {
-        title: "Platformer Game",
-        emoji: "🎮",
-        pathBadge: "Computer Scientist path",
-        ringClass: "",
-        missions: [
-          { title: "Design Your Hero", emoji: "🎨" },
-          { title: "Run & Explore", emoji: "🏃" },
-          { title: "Build Your Scene", emoji: "🏗️" },
-          { title: "Gravity & Jumping", emoji: "🦘" },
-          { title: "Collisions", emoji: "💥" },
-          { title: "Collect & Score", emoji: "🪙" },
-          { title: "Enemies", emoji: "👾" },
-          { title: "Win & Polish", emoji: "🏁" },
-        ],
-      },
-    ],
-  },
-  {
-    pathId: "astronaut",
-    label: "Astronaut",
-    emoji: "🚀",
-    packs: [
-      {
-        title: "Space Cadet Program",
-        emoji: "🛸",
-        freeBadge: true,
-        ringClass: "ring-2 ring-emerald-300 ring-offset-2",
-        missions: [
-          { title: "Mission Briefing", emoji: "📋" },
-          { title: "Rocket Functions", emoji: "🔧" },
-          { title: "Keyboard Controls", emoji: "⌨️" },
-          { title: "Reach Orbit", emoji: "🌍" },
-        ],
-      },
-      {
-        title: "Space Explorer",
-        emoji: "👨‍🚀",
-        pathBadge: "Astronaut path",
-        ringClass: "",
-        missions: [
-          { title: "Design Your Rocket", emoji: "🚀" },
-          { title: "Gravity Simulation", emoji: "🌌" },
-          { title: "Star Map", emoji: "⭐" },
-          { title: "Mission Control", emoji: "🖥️" },
-          { title: "Planet Landing", emoji: "🪐" },
-          { title: "Alien Discovery", emoji: "👽" },
-          { title: "Space Mission Complete", emoji: "🏆" },
-          { title: "Build a Water Rocket", emoji: "💧" },
-        ],
-      },
-    ],
-  },
-  {
-    pathId: "doctor",
-    label: "Doctor",
-    emoji: "🩺",
-    packs: [
-      {
-        title: "Junior Medic Academy",
-        emoji: "🏥",
-        freeBadge: true,
-        ringClass: "ring-2 ring-emerald-300 ring-offset-2",
-        missions: [
-          { title: "First Day at the Hospital", emoji: "🏥" },
-          { title: "Check the Vitals", emoji: "💓" },
-          { title: "Alert System", emoji: "🚨" },
-          { title: "Treatment Plan", emoji: "💊" },
-        ],
-      },
-      {
-        title: "Junior Doctor",
-        emoji: "🩺",
-        pathBadge: "Doctor path",
-        ringClass: "",
-        missions: [
-          { title: "Design Your Doctor", emoji: "👨‍⚕️" },
-          { title: "Body Systems Quiz", emoji: "🫀" },
-          { title: "Dissect a Flower", emoji: "🌸" },
-          { title: "Heartbeat Analyser", emoji: "📈" },
-          { title: "First Aid Guide", emoji: "🩹" },
-          { title: "Diagnosis Detective", emoji: "🔬" },
-          { title: "Hospital Simulator", emoji: "🏨" },
-          { title: "Build a Stethoscope", emoji: "🎧" },
-        ],
-      },
-    ],
-  },
-];
+import { PATH_SLIDES } from "@/lib/path-slides-data";
 
 const slideVariants = {
   enter: (dir: number) => ({ x: dir > 0 ? 40 : -40, opacity: 0 }),
@@ -200,18 +72,15 @@ export function PathSlideshow() {
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {pack.missions.map((mission, index) => (
-                  <motion.div
+                  <div
                     key={mission.title}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.04 }}
-                    className={`card p-5 text-center ${pack.ringClass}`}
+                    className={`card p-5 text-center ${pack.freeBadge ? "ring-2 ring-emerald-300 ring-offset-2" : ""}`}
                   >
                     <div className="text-3xl mb-2">{mission.emoji}</div>
                     <h3 className="text-sm font-bold text-[var(--color-navy)]">
                       {mission.title}
                     </h3>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </div>

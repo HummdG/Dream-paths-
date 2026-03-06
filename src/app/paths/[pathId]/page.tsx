@@ -4,6 +4,7 @@ import Image from "next/image";
 import { CheckCircle, ArrowRight } from "lucide-react";
 import { CAREER_PATHS, PATH_PACKS } from "@/lib/plans";
 import { allMissionPacks } from "@/lib/missions";
+import { PATH_SLIDES } from "@/lib/path-slides-data";
 
 interface PathMarketingPageProps {
   params: Promise<{ pathId: string }>;
@@ -16,6 +17,7 @@ export default async function PathMarketingPage({ params }: PathMarketingPagePro
 
   const packIds = PATH_PACKS[pathId] ?? [];
   const packs = allMissionPacks.filter((p) => packIds.includes(p.packId));
+  const slide = PATH_SLIDES.find((s) => s.pathId === pathId);
 
   return (
     <div className="min-h-screen bg-[var(--color-cream)]">
@@ -81,11 +83,11 @@ export default async function PathMarketingPage({ params }: PathMarketingPagePro
 
       {/* What you'll learn */}
       <section className="py-16 px-6 bg-white">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl font-bold text-[var(--color-navy)] mb-8 text-center">
             What&apos;s included
           </h2>
-          <ul className="grid sm:grid-cols-3 gap-4 mb-10">
+          <ul className="grid sm:grid-cols-3 gap-4 mb-12">
             {meta.preview.map((item) => (
               <li
                 key={item}
@@ -97,41 +99,38 @@ export default async function PathMarketingPage({ params }: PathMarketingPagePro
             ))}
           </ul>
 
-          {/* Pack cards */}
-          <div className="grid sm:grid-cols-2 gap-5">
-            {packs.map((pack) => {
-              const isFree = ["snake_basics_v1", "rocket_basics_v1", "patient_monitor_basics_v1"].includes(
-                pack.packId
-              );
-              return (
-                <div
-                  key={pack.packId}
-                  className="border border-gray-200 rounded-2xl p-5 bg-white"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-bold text-[var(--color-navy)]">
-                      {pack.packTitle}
+          {/* Mission tiles per pack */}
+          {slide?.packs.map((pack) => (
+            <div key={pack.title} className="mb-10">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-2xl">{pack.emoji}</span>
+                <h3 className="text-lg font-bold text-gray-800">{pack.title}</h3>
+                {pack.freeBadge && (
+                  <span className="text-xs font-bold bg-emerald-500 text-white px-2.5 py-1 rounded-full">
+                    FREE
+                  </span>
+                )}
+                {pack.pathBadge && (
+                  <span className="text-xs font-semibold text-violet-600 bg-violet-100 px-2.5 py-1 rounded-full">
+                    {pack.pathBadge}
+                  </span>
+                )}
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {pack.missions.map((mission) => (
+                  <div
+                    key={mission.title}
+                    className={`card p-5 text-center ${pack.freeBadge ? "ring-2 ring-emerald-300 ring-offset-2" : ""}`}
+                  >
+                    <div className="text-3xl mb-2">{mission.emoji}</div>
+                    <h3 className="text-sm font-bold text-[var(--color-navy)]">
+                      {mission.title}
                     </h3>
-                    {isFree ? (
-                      <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
-                        FREE
-                      </span>
-                    ) : (
-                      <span className="text-xs font-medium text-violet-600 bg-violet-50 px-2.5 py-1 rounded-full">
-                        Path
-                      </span>
-                    )}
                   </div>
-                  <p className="text-sm text-gray-500 mb-3">
-                    {pack.description}
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    {pack.missions.length} missions
-                  </p>
-                </div>
-              );
-            })}
-          </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
