@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Lock, ArrowRight, Zap } from "lucide-react";
+import { Lock, ArrowRight } from "lucide-react";
 import type { PackProgress } from "@/lib/missions";
 import { CAREER_PATHS, FREE_PACK_IDS } from "@/lib/plans";
 import type { CareerPathEntry } from "./career-path-grid";
@@ -29,8 +29,6 @@ export function PathCard({ entry }: PathCardProps) {
   const paidPacks = packsProgress.filter(
     (pp) => !FREE_PACK_IDS.includes(pp.pack.packId)
   );
-  const paidLocked = paidPacks.some((pp) => pp.lockReason === "subscription");
-
   const totalCompleted = packsProgress.reduce(
     (sum, pp) => sum + pp.completedMissionIds.length,
     0
@@ -71,15 +69,6 @@ export function PathCard({ entry }: PathCardProps) {
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
 
-          {paidLocked && paidPacks.length > 0 && (
-            <Link
-              href="/upgrade"
-              className="flex items-center justify-center gap-1.5 w-full py-2 rounded-full text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-colors"
-            >
-              <Zap className="w-3 h-3" />
-              Unlock Full Path — £24.99/mo
-            </Link>
-          )}
         </div>
 
         {totalStars > 0 && (

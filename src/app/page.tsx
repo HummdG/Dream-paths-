@@ -16,7 +16,7 @@ const LOGOS = [
   { src: "/hcltechlogo.svg", alt: "HCLTech", width: 120, height: 48 },
   { src: "/snpglobal_logo.svg", alt: "S&P Global", width: 140, height: 48 },
   { src: "/ibm_logo.svg", alt: "IBM", width: 100, height: 48 },
-  { src: "/pwc_logo.png", alt: "PwC", width: 100, height: 48 },
+  { src: "/pwc_logo.svg", alt: "PwC", width: 100, height: 48 },
   { src: "/uber_logo.svg", alt: "Uber", width: 100, height: 48 },
 ];
 

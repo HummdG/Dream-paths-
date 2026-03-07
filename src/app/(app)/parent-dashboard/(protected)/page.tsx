@@ -11,7 +11,11 @@ const PACK_EMOJIS: Record<string, string> = {
   platformer_v1: "🎮",
 };
 
-export default async function ParentDashboardPage() {
+export default async function ParentDashboardPage({
+  searchParams,
+}: {
+  searchParams: { child_added?: string };
+}) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     redirect("/login");
@@ -23,6 +27,9 @@ export default async function ParentDashboardPage() {
     where: { id: parentId },
     select: {
       name: true,
+      subscription: {
+        select: { planId: true },
+      },
       children: {
         select: {
           id: true,
@@ -127,6 +134,8 @@ export default async function ParentDashboardPage() {
     <ParentDashboardClient
       parentName={parent.name ?? "Parent"}
       childrenData={children}
+      subscriptionPlan={parent.subscription?.planId ?? "free"}
+      childJustAdded={searchParams.child_added === "true"}
     />
   );
 }

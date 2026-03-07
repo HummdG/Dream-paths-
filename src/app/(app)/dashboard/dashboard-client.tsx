@@ -161,22 +161,6 @@ export function DashboardClient({
 
           {/* Actions */}
           <div className="shrink-0 flex items-center gap-2">
-            {isFree ? (
-              <Link
-                href="/upgrade"
-                className="flex items-center gap-1.5 text-sm font-semibold bg-gradient-to-r from-amber-400 to-orange-400 text-white px-4 py-2 rounded-xl hover:from-amber-500 hover:to-orange-500 transition-all"
-              >
-                <Crown className="w-3.5 h-3.5" />
-                Upgrade
-              </Link>
-            ) : (
-              <Link
-                href="/upgrade"
-                className="text-sm font-medium text-gray-500 hover:text-[var(--color-navy)] transition-colors"
-              >
-                Manage
-              </Link>
-            )}
             <Link
               href="/parent-dashboard"
               title="Parent dashboard"

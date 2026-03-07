@@ -44,7 +44,21 @@ export async function POST(request: Request) {
           break
         }
 
-        if (type === 'dream_studio') {
+        if (type === 'add_child') {
+          const childFirstName = checkoutSession.metadata?.childFirstName
+          const childAgeStr = checkoutSession.metadata?.childAge
+          if (!childFirstName || !childAgeStr) {
+            console.error('checkout.session.completed: missing child metadata', checkoutSession.metadata)
+            break
+          }
+          await prisma.child.create({
+            data: {
+              parentId,
+              firstName: childFirstName,
+              age: parseInt(childAgeStr, 10),
+            },
+          })
+        } else if (type === 'dream_studio') {
           await prisma.subscription.update({
             where: { parentId },
             data: {

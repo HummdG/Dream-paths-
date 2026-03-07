@@ -3,15 +3,19 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { getStripe } from '@/lib/stripe'
 import { prisma } from '@/lib/db'
-import { PLANS, PATH_PACKS } from '@/lib/plans'
+import { PATH_PACKS } from '@/lib/plans'
 
 type CheckoutBody =
   | { type: 'path'; pathId: string }
   | { type: 'dream_studio' }
+  | { type: 'add_child'; childFirstName: string; childAge: number }
 
 function resolvePriceId(body: CheckoutBody): string | null {
   if (body.type === 'dream_studio') {
     return process.env.STRIPE_DREAM_STUDIO_PRICE_ID ?? null
+  }
+  if (body.type === 'add_child') {
+    return process.env.STRIPE_ADD_CHILD_PRICE_ID ?? null
   }
   // Validate pathId is a known path
   if (!(body.pathId in PATH_PACKS)) return null
@@ -28,7 +32,7 @@ export async function POST(request: Request) {
 
     const body = (await request.json()) as CheckoutBody
 
-    if (body.type !== 'path' && body.type !== 'dream_studio') {
+    if (body.type !== 'path' && body.type !== 'dream_studio' && body.type !== 'add_child') {
       return NextResponse.json({ error: 'Invalid checkout type' }, { status: 400 })
     }
 
@@ -38,6 +42,10 @@ export async function POST(request: Request) {
 
     if (body.type === 'path' && !(body.pathId in PATH_PACKS)) {
       return NextResponse.json({ error: 'Unknown pathId' }, { status: 400 })
+    }
+
+    if (body.type === 'add_child' && (!body.childFirstName || !body.childAge)) {
+      return NextResponse.json({ error: 'childFirstName and childAge are required for add_child checkout' }, { status: 400 })
     }
 
     const priceId = resolvePriceId(body)
@@ -79,12 +87,18 @@ export async function POST(request: Request) {
       payment_method_types: ['card'],
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${baseUrl}/upgrade?success=true`,
-      cancel_url: `${baseUrl}/upgrade`,
+      success_url: body.type === 'add_child'
+        ? `${baseUrl}/parent-dashboard?child_added=true`
+        : `${baseUrl}/upgrade?success=true`,
+      cancel_url: body.type === 'add_child'
+        ? `${baseUrl}/parent-dashboard`
+        : `${baseUrl}/upgrade`,
       metadata: {
         parentId: parent.id,
         type: body.type,
         pathId: body.type === 'path' ? body.pathId : '',
+        childFirstName: body.type === 'add_child' ? body.childFirstName : '',
+        childAge: body.type === 'add_child' ? String(body.childAge) : '',
       },
     })
 
