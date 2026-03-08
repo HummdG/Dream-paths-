@@ -119,7 +119,7 @@ export async function POST(request: Request) {
       await sendWelcomeEmail(parent.email, parentName, childName, signupPlan ?? null)
     }
 
-    revalidateTag(DASHBOARD_CACHE_TAG(session.user.id))
+    revalidateTag(DASHBOARD_CACHE_TAG(session.user.id), 'default')
 
     return NextResponse.json({
       success: true,
