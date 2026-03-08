@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { verifyProjectOwnership } from "@/lib/queries";
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,23 +21,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify the project belongs to this user's child
-    const parent = await db.parent.findUnique({
-      where: { email: session.user.email },
-      include: {
-        children: {
-          include: {
-            projects: {
-              where: { id: projectId },
-            },
-          },
-        },
-      },
-    });
-
-    const project = parent?.children
-      .flatMap((c) => c.projects)
-      .find((p) => p.id === projectId);
+    const project = await verifyProjectOwnership(projectId, session.user.email);
 
     if (!project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
@@ -75,19 +60,15 @@ export async function POST(request: NextRequest) {
     });
 
     // Clean up old snapshots (keep only last 20 per step)
-    const snapshots = await db.codeSnapshot.findMany({
-      where: { projectId, stepId },
-      orderBy: { createdAt: "desc" },
-      skip: 20,
-    });
-
-    if (snapshots.length > 0) {
-      await db.codeSnapshot.deleteMany({
-        where: {
-          id: { in: snapshots.map((s) => s.id) },
-        },
-      });
-    }
+    await db.$executeRaw`
+      DELETE FROM "CodeSnapshot"
+      WHERE id IN (
+        SELECT id FROM "CodeSnapshot"
+        WHERE "projectId" = ${projectId} AND "stepId" = ${stepId}
+        ORDER BY "createdAt" DESC
+        OFFSET 20
+      )
+    `;
 
     return NextResponse.json({ success: true });
   } catch (error) {

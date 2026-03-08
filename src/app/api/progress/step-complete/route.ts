@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { verifyProjectOwnership, DASHBOARD_CACHE_TAG } from "@/lib/queries";
+import { revalidateTag } from "next/cache";
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,23 +22,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify the project belongs to this user's child
-    const parent = await db.parent.findUnique({
-      where: { email: session.user.email },
-      include: {
-        children: {
-          include: {
-            projects: {
-              where: { id: projectId },
-            },
-          },
-        },
-      },
-    });
-
-    const project = parent?.children
-      .flatMap((c) => c.projects)
-      .find((p) => p.id === projectId);
+    const project = await verifyProjectOwnership(projectId, session.user.email);
 
     if (!project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
@@ -68,14 +54,11 @@ export async function POST(request: NextRequest) {
     });
 
     // Update project total stars and badges
-    const allStepProgress = await db.stepProgress.findMany({
+    const starsResult = await db.stepProgress.aggregate({
       where: { projectId },
+      _sum: { starsEarned: true },
     });
-
-    const totalStars = allStepProgress.reduce(
-      (sum, sp) => sum + sp.starsEarned,
-      0
-    );
+    const totalStars = starsResult._sum.starsEarned ?? 0;
 
     // Get current badges and add new one if present
     const currentBadges = (project.badgesJson as string[]) || [];
@@ -91,6 +74,8 @@ export async function POST(request: NextRequest) {
         currentStepId: stepId,
       },
     });
+
+    revalidateTag(DASHBOARD_CACHE_TAG(session.user.id!));
 
     return NextResponse.json({
       success: true,

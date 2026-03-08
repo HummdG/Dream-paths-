@@ -1,9 +1,10 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { hash } from 'bcryptjs'
 import { z } from 'zod'
 import { prisma } from '@/lib/db'
 import { sendVerificationEmail } from '@/lib/email'
 import { trackEvent } from '@/lib/analytics'
+import { checkRateLimit, getClientIp, rateLimitedResponse } from '@/lib/rate-limit'
 import crypto from 'crypto'
 
 const registerSchema = z.object({
@@ -11,7 +12,11 @@ const registerSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters'),
 })
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const ip = getClientIp(request.headers);
+  const rl = checkRateLimit(`register:${ip}`, 5, 60 * 60 * 1000); // 5 per IP per hour
+  if (!rl.allowed) return rateLimitedResponse(rl.resetAt);
+
   try {
     const body = await request.json()
     const { email, password } = registerSchema.parse(body)

@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   keywords: ["kids coding", "learn Python for kids", "STEM for kids", "kids career learning", "game development for kids", "educational platform", "coding missions", "ages 8-14"],
   icons: {
     icon: [
+      { url: "/favicon.ico", sizes: "any" },
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
       { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
     ],

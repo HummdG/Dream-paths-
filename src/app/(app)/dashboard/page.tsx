@@ -1,12 +1,12 @@
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { db } from "@/lib/db";
 import { DashboardClient } from "./dashboard-client";
 import { ChildSelector } from "./child-selector";
 import { allMissionPacks, computePathPackProgress } from "@/lib/missions";
 import { PATH_PACKS } from "@/lib/plans";
 import { DEV_EMAIL } from "@/lib/auth";
+import { getCachedDashboard } from "@/lib/queries";
 
 export default async function DashboardPage({
   searchParams,
@@ -19,27 +19,7 @@ export default async function DashboardPage({
     redirect("/login");
   }
 
-  const allPackIds = allMissionPacks.map((p) => p.packId);
-
-  const parent = await db.parent.findUnique({
-    where: { id: session.user.id },
-    include: {
-      children: {
-        include: {
-          heroCharacter: true,
-          projects: {
-            where: { packId: { in: allPackIds } },
-            include: { stepProgress: true },
-          },
-        },
-      },
-      subscription: true,
-      pathSubscriptions: {
-        where: { status: "ACTIVE" },
-        select: { pathId: true },
-      },
-    },
-  });
+  const parent = await getCachedDashboard(session.user.id);
 
   if (!parent?.children?.length) {
     redirect("/onboarding");

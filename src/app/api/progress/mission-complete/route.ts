@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getMissionById, platformerMissionPack } from "@/lib/missions";
+import { verifyProjectOwnership, DASHBOARD_CACHE_TAG } from "@/lib/queries";
+import { revalidateTag } from "next/cache";
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,23 +23,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify the project belongs to this user's child
-    const parent = await db.parent.findUnique({
-      where: { email: session.user.email },
-      include: {
-        children: {
-          include: {
-            projects: {
-              where: { id: projectId },
-            },
-          },
-        },
-      },
-    });
-
-    const project = parent?.children
-      .flatMap((c) => c.projects)
-      .find((p) => p.id === projectId);
+    const project = await verifyProjectOwnership(projectId, session.user.email);
 
     if (!project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
@@ -65,39 +51,34 @@ export async function POST(request: NextRequest) {
     });
 
     // Also update the legacy MissionProgress if it exists
-    const child = parent?.children.find((c) =>
-      c.projects.some((p) => p.id === projectId)
-    );
+    const dbMission = await db.mission.findFirst({
+      where: {
+        title: { contains: mission.title.split(":")[1]?.trim() || mission.title },
+      },
+    });
 
-    if (child) {
-      // Find the mission in the old system and mark it complete
-      const dbMission = await db.mission.findFirst({
+    if (dbMission) {
+      await db.missionProgress.upsert({
         where: {
-          title: { contains: mission.title.split(":")[1]?.trim() || mission.title },
+          childId_missionId: {
+            childId: project.childId,
+            missionId: dbMission.id,
+          },
+        },
+        create: {
+          childId: project.childId,
+          missionId: dbMission.id,
+          status: "COMPLETED",
+          completedAt: new Date(),
+        },
+        update: {
+          status: "COMPLETED",
+          completedAt: new Date(),
         },
       });
-
-      if (dbMission) {
-        await db.missionProgress.upsert({
-          where: {
-            childId_missionId: {
-              childId: child.id,
-              missionId: dbMission.id,
-            },
-          },
-          create: {
-            childId: child.id,
-            missionId: dbMission.id,
-            status: "COMPLETED",
-            completedAt: new Date(),
-          },
-          update: {
-            status: "COMPLETED",
-            completedAt: new Date(),
-          },
-        });
-      }
     }
+
+    revalidateTag(DASHBOARD_CACHE_TAG(session.user.id!));
 
     return NextResponse.json({
       success: true,
