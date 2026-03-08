@@ -219,6 +219,7 @@ export default function OnboardingPage() {
           childName,
           childAge,
           pathId: selectedPath,
+          signupPlan,
         }),
       });
 

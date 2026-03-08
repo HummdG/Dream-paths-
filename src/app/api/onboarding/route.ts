@@ -1,17 +1,20 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
+import { revalidateTag } from 'next/cache'
 import { z } from 'zod'
 import { prisma } from '@/lib/db'
 import { authOptions } from '@/lib/auth'
 import { trackEvent } from '@/lib/analytics'
 import { sendWelcomeEmail } from '@/lib/email'
 import { PLANS, getMaxChildren } from '@/lib/plans'
+import { DASHBOARD_CACHE_TAG } from '@/lib/queries'
 
 const onboardingSchema = z.object({
   parentName: z.string().min(1, 'Please enter your name'),
   childName: z.string().min(1, 'Please enter your child\'s name'),
   childAge: z.number().min(6).max(18, 'Age must be between 6 and 18'),
   pathId: z.string().min(1, 'Please select a path'),
+  signupPlan: z.string().nullable().optional(),
 })
 
 export async function POST(request: Request) {
@@ -23,7 +26,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { parentName, childName, childAge, pathId: pathSlug } = onboardingSchema.parse(body)
+    const { parentName, childName, childAge, pathId: pathSlug, signupPlan } = onboardingSchema.parse(body)
 
     // Look up the path by slug to get the actual ID
     const path = await prisma.path.findUnique({
@@ -113,8 +116,10 @@ export async function POST(request: Request) {
 
     // Send welcome email
     if (parent.email) {
-      await sendWelcomeEmail(parent.email, parentName, childName)
+      await sendWelcomeEmail(parent.email, parentName, childName, signupPlan ?? null)
     }
+
+    revalidateTag(DASHBOARD_CACHE_TAG(session.user.id))
 
     return NextResponse.json({
       success: true,

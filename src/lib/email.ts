@@ -247,13 +247,70 @@ export async function sendContactEmail(name: string, email: string, type: string
   })
 }
 
-export async function sendWelcomeEmail(email: string, parentName: string, childName: string) {
+type WelcomePathContent = {
+  emoji: string
+  pathLabel: string
+  description: string
+  highlights: string[]
+}
+
+function getWelcomePathContent(signupPlan: string | null): WelcomePathContent {
+  switch (signupPlan) {
+    case 'astronaut':
+      return {
+        emoji: '🚀',
+        pathLabel: 'Space Explorer',
+        description: 'Over the next few weeks, they\'ll learn maths and physics through real space science missions.',
+        highlights: [
+          'Mission 1 is ready: "Space Cadet Launch"',
+          'Takes about 30 minutes',
+          'Perfect for after school or weekends',
+        ],
+      }
+    case 'doctor':
+      return {
+        emoji: '🩺',
+        pathLabel: 'Junior Doctor',
+        description: 'Over the next few weeks, they\'ll explore biology, anatomy, and medical science through hands-on experiments.',
+        highlights: [
+          'Mission 1 is ready: "Junior Medic Induction"',
+          'Takes about 30 minutes',
+          'Perfect for after school or weekends',
+        ],
+      }
+    case 'dream_studio':
+      return {
+        emoji: '✨',
+        pathLabel: 'Dream Studio',
+        description: 'They have access to all three career paths: Computer Scientist, Astronaut, and Doctor. They can start any path right away.',
+        highlights: [
+          'All 3 career paths unlocked',
+          'Start with any path they choose',
+          'New paths added as DreamPaths grows',
+        ],
+      }
+    default:
+      return {
+        emoji: '💻',
+        pathLabel: 'Junior Game Developer',
+        description: 'Over the next few weeks, they\'ll write real Python code and build their very own playable game from scratch.',
+        highlights: [
+          'Mission 1 is ready: "Snake Tutorial"',
+          'Takes about 30 minutes',
+          'Perfect for after school or weekends',
+        ],
+      }
+  }
+}
+
+export async function sendWelcomeEmail(email: string, parentName: string, childName: string, signupPlan: string | null) {
   const dashboardUrl = `${APP_URL}/dashboard`
-  
+  const { emoji, pathLabel, description, highlights } = getWelcomePathContent(signupPlan)
+
   return sendEmail({
     to: email,
-    subject: 'Welcome to DreamPaths!',
-    text: `Hi ${parentName}, ${childName} is enrolled in the Junior Game Developer path! Visit ${dashboardUrl} to get started.`,
+    subject: `Welcome to DreamPaths! ${childName}'s journey starts now`,
+    text: `Hi ${parentName}, ${childName} is enrolled in the ${pathLabel} path! Visit ${dashboardUrl} to get started.`,
     html: `<!DOCTYPE html>
 <html>
 <head>
@@ -263,19 +320,18 @@ export async function sendWelcomeEmail(email: string, parentName: string, childN
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; background-color: #fef7f0; padding: 40px 20px;">
 <div style="max-width: 500px; margin: 0 auto; background: white; border-radius: 24px; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
 <div style="text-align: center; margin-bottom: 32px;">
-<h1 style="color: #1a1a2e; font-size: 24px; margin: 16px 0 8px;">You're all set!</h1>
+<div style="font-size: 48px; margin-bottom: 12px;">${emoji}</div>
+<h1 style="color: #1a1a2e; font-size: 24px; margin: 0 0 8px;">You're all set!</h1>
 <p style="color: #666; font-size: 16px; margin: 0;">${childName}'s journey begins now</p>
 </div>
 <p style="color: #444; font-size: 16px; line-height: 1.6;">Hi ${parentName},</p>
 <p style="color: #444; font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
-${childName} is enrolled in the <strong>Junior Game Developer</strong> path! Over the next few weeks, they'll design characters, build game scenes, and create their very own playable game.
+${childName} is enrolled in the <strong>${pathLabel}</strong> path! ${description}
 </p>
 <div style="background: linear-gradient(135deg, #ede9fe, #ddd6fe); border-radius: 16px; padding: 24px; margin-bottom: 32px;">
 <h3 style="color: #5b21b6; margin: 0 0 12px; font-size: 16px;">What's Next?</h3>
 <ul style="color: #6d28d9; margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8;">
-<li>Mission 1 is ready: "Design Your Hero"</li>
-<li>Takes about 30 minutes</li>
-<li>Perfect for after school or weekends</li>
+${highlights.map((h) => `<li>${h}</li>`).join('\n')}
 </ul>
 </div>
 <div style="text-align: center; margin-bottom: 32px;">
