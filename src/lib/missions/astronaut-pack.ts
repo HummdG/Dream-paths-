@@ -18,7 +18,7 @@ const missions: Mission[] = [
     purpose: 'Design a pixel art rocket that will appear in your missions.',
     storyIntro:
       "Every astronaut has their own rocket! Draw your rocket in the pixel art editor — it will be your personal spacecraft for the rest of the path.",
-    estimatedMinutes: 20,
+    estimatedMinutes: 35,
     engineType: 'rocket',
     missionType: 'creative',
     learningOutcomes: ['creativity', 'design thinking'],

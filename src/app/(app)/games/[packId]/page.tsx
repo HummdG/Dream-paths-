@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { allMissionPacks, computePathPackProgress } from "@/lib/missions";
 import { PATH_PACKS } from "@/lib/plans";
+import { DEV_EMAIL } from "@/lib/auth";
 import { GameClient } from "./game-client";
 
 interface GamePageProps {
@@ -61,7 +62,8 @@ export default async function GamePage({ params }: GamePageProps) {
     ? allMissionPacks.filter(p => PATH_PACKS[pathId].includes(p.packId))
     : allMissionPacks;
 
-  const packsWithProgress = computePathPackProgress(scopedPacks, child.projects, subscriptionPlan, purchasedPathIds);
+  const isDev = session.user.email === DEV_EMAIL;
+  const packsWithProgress = computePathPackProgress(scopedPacks, child.projects, subscriptionPlan, purchasedPathIds, { bypassProgressionLock: isDev });
   const thisPackProgress = packsWithProgress.find(pp => pp.pack.packId === packId);
 
   // Redirect locked packs back to the dashboard

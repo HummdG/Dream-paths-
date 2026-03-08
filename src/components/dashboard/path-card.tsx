@@ -101,7 +101,7 @@ function PackRow({
           {isSubLocked ? (
             <Lock className="w-3 h-3 text-gray-400" />
           ) : (
-            <span className="text-gray-500">{isFree ? "🆓" : "🎮"}</span>
+            <span className="text-gray-500">🎮</span>
           )}
           <span
             className={`font-medium truncate max-w-[120px] ${isSubLocked ? "text-gray-400" : "text-gray-700"}`}

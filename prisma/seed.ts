@@ -70,10 +70,175 @@ async function main() {
   console.log(`✅ ${missionStubs.length} mission stubs`)
 
 
+  // ── Dev account ─────────────────────────────────────────────────────────────
+  const devPasswordHash = await bcrypt.hash('password123', 10)
+
+  const devParent = await prisma.parent.upsert({
+    where: { email: 'dev@dreampaths.com' },
+    update: { emailVerified: new Date(), passwordHash: devPasswordHash, name: 'Dev' },
+    create: {
+      email: 'dev@dreampaths.com',
+      emailVerified: new Date(),
+      passwordHash: devPasswordHash,
+      name: 'Dev',
+    },
+  })
+
+  await prisma.subscription.upsert({
+    where: { parentId: devParent.id },
+    update: { planId: 'dream_studio', status: 'ACTIVE' },
+    create: {
+      parentId: devParent.id,
+      planId: 'dream_studio',
+      status: 'ACTIVE',
+    },
+  })
+
+  for (const pathId of ['computer_scientist', 'astronaut', 'doctor']) {
+    await prisma.pathSubscription.upsert({
+      where: { parentId_pathId: { parentId: devParent.id, pathId } },
+      update: { status: 'ACTIVE' },
+      create: { parentId: devParent.id, pathId, status: 'ACTIVE' },
+    })
+  }
+
+  const existingChild = await prisma.child.findFirst({
+    where: { parentId: devParent.id },
+  })
+  if (!existingChild) {
+    await prisma.child.create({
+      data: {
+        parentId: devParent.id,
+        firstName: 'Alex',
+        age: 10,
+        pathId: path.id,
+      },
+    })
+  }
+
+  // ── Calendar events (March 2026 dummy data) ─────────────────────────────────
+  const devChild = await prisma.child.findFirst({ where: { parentId: devParent.id } })
+
+  const marchEvents = [
+    {
+      title: 'Snake Tutorial - Mission 1',
+      description: 'Hello Python and the Snake World',
+      startAt: new Date('2026-03-03T16:00:00Z'),
+      endAt:   new Date('2026-03-03T16:45:00Z'),
+      isDreampaths: true,
+      packId: 'snake_basics_v1',
+    },
+    {
+      title: 'Snake Tutorial - Mission 2',
+      description: 'Functions and Snake Movement',
+      startAt: new Date('2026-03-05T16:00:00Z'),
+      endAt:   new Date('2026-03-05T16:45:00Z'),
+      isDreampaths: true,
+      packId: 'snake_basics_v1',
+    },
+    {
+      title: 'Football practice',
+      description: null,
+      startAt: new Date('2026-03-06T17:30:00Z'),
+      endAt:   new Date('2026-03-06T18:30:00Z'),
+      isDreampaths: false,
+      packId: null,
+    },
+    {
+      title: 'Snake Tutorial - Mission 3',
+      description: 'Keyboard Controls',
+      startAt: new Date('2026-03-10T16:00:00Z'),
+      endAt:   new Date('2026-03-10T16:45:00Z'),
+      isDreampaths: true,
+      packId: 'snake_basics_v1',
+    },
+    {
+      title: 'Snake Tutorial - Mission 4',
+      description: 'Score and Game Over',
+      startAt: new Date('2026-03-12T16:00:00Z'),
+      endAt:   new Date('2026-03-12T16:45:00Z'),
+      isDreampaths: true,
+      packId: 'snake_basics_v1',
+    },
+    {
+      title: 'Doctor appointment',
+      description: null,
+      startAt: new Date('2026-03-14T10:00:00Z'),
+      endAt:   new Date('2026-03-14T10:30:00Z'),
+      isDreampaths: false,
+      packId: null,
+    },
+    {
+      title: 'Platformer - Design Your Hero',
+      description: 'Draw your 16x16 pixel art character',
+      startAt: new Date('2026-03-17T16:00:00Z'),
+      endAt:   new Date('2026-03-17T16:45:00Z'),
+      isDreampaths: true,
+      packId: 'platformer_v1',
+    },
+    {
+      title: 'Platformer - Build Your Scene',
+      description: 'Level design mission',
+      startAt: new Date('2026-03-19T16:00:00Z'),
+      endAt:   new Date('2026-03-19T16:45:00Z'),
+      isDreampaths: true,
+      packId: 'platformer_v1',
+    },
+    {
+      title: 'Family day out',
+      description: null,
+      startAt: new Date('2026-03-22T10:00:00Z'),
+      endAt:   new Date('2026-03-22T17:00:00Z'),
+      isDreampaths: false,
+      packId: null,
+    },
+    {
+      title: 'Platformer - Movement with Functions',
+      description: 'Mission 3 coding session',
+      startAt: new Date('2026-03-24T16:00:00Z'),
+      endAt:   new Date('2026-03-24T16:45:00Z'),
+      isDreampaths: true,
+      packId: 'platformer_v1',
+    },
+    {
+      title: 'Platformer - Input and Conditionals',
+      description: 'Mission 4 coding session',
+      startAt: new Date('2026-03-26T16:00:00Z'),
+      endAt:   new Date('2026-03-26T16:45:00Z'),
+      isDreampaths: true,
+      packId: 'platformer_v1',
+    },
+    {
+      title: 'Easter coding catch-up',
+      description: 'Extra session during school holidays',
+      startAt: new Date('2026-03-31T11:00:00Z'),
+      endAt:   new Date('2026-03-31T12:00:00Z'),
+      isDreampaths: true,
+      packId: 'platformer_v1',
+    },
+  ]
+
+  for (const ev of marchEvents) {
+    await prisma.calendarEvent.create({
+      data: {
+        parentId: devParent.id,
+        childId: devChild?.id ?? null,
+        title: ev.title,
+        description: ev.description,
+        startAt: ev.startAt,
+        endAt: ev.endAt,
+        isDreampaths: ev.isDreampaths,
+        packId: ev.packId,
+        emailReminder: false,
+      },
+    })
+  }
+
+  console.log(`✅ ${marchEvents.length} March calendar events`)
+
+  console.log('✅ Dev account: dev@dreampaths.com / password123')
   console.log('')
   console.log('🎉 Done!')
-  console.log('')
-  console.log('Dev login → dev@dreampaths.com / password123')
 }
 
 main()

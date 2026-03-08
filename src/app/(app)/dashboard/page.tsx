@@ -6,6 +6,7 @@ import { DashboardClient } from "./dashboard-client";
 import { ChildSelector } from "./child-selector";
 import { allMissionPacks, computePathPackProgress } from "@/lib/missions";
 import { PATH_PACKS } from "@/lib/plans";
+import { DEV_EMAIL } from "@/lib/auth";
 
 export default async function DashboardPage({
   searchParams,
@@ -86,6 +87,8 @@ export default async function DashboardPage({
       parent.children[0])
     : parent.children[0];
 
+  const isDev = session.user.email === DEV_EMAIL;
+
   const careerPathsProgress = Object.entries(PATH_PACKS).map(
     ([pathId, packIds]) => {
       const pathPacks = allMissionPacks.filter((p) => packIds.includes(p.packId));
@@ -93,7 +96,8 @@ export default async function DashboardPage({
         pathPacks,
         child.projects,
         subscriptionPlan,
-        purchasedPathIds
+        purchasedPathIds,
+        { bypassProgressionLock: isDev }
       );
       return { pathId, packsProgress };
     }

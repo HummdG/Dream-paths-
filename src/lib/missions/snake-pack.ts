@@ -30,7 +30,7 @@ const missions: Mission[] = [
     purpose: 'Learn how to write comments, print messages, and use variables.',
     storyIntro:
       "Your snake is hungry and waiting! Before it can move, you need to learn the basics of Python. Let's start by making the snake say hello!",
-    estimatedMinutes: 15,
+    estimatedMinutes: 30,
     engineType: 'snake',
     learningOutcomes: ['comments', 'print()', 'variables', 'f-strings'],
     steps: [
@@ -173,7 +173,7 @@ print(f"My snake is {snake_name} and has {get_snake_length()} segments!")
     purpose: 'Learn to define and call your own functions using def.',
     storyIntro:
       "Your snake needs a team of helpers! Functions are like mini-programs you write once and use many times. Let's build some!",
-    estimatedMinutes: 20,
+    estimatedMinutes: 35,
     engineType: 'snake',
     learningOutcomes: ['def', 'indentation', 'calling functions'],
     steps: [
@@ -340,7 +340,7 @@ print("Snake customised!")
     purpose: 'Make the snake respond to arrow key presses using on_key_down.',
     storyIntro:
       "The snake can move on its own, but it needs YOU to steer it! Let's connect the arrow keys to the snake's direction.",
-    estimatedMinutes: 20,
+    estimatedMinutes: 35,
     engineType: 'snake',
     learningOutcomes: ['on_key_down', 'lambda', 'if statement', 'game loop'],
     steps: [
@@ -515,7 +515,7 @@ on_key_down('RIGHT', lambda: set_direction('RIGHT') if get_direction() != 'LEFT'
     purpose: 'Track the score and react to game events using callbacks.',
     storyIntro:
       "Your snake can move! Now let's add scoring so you can track how well you're doing — and make the game react when it ends.",
-    estimatedMinutes: 20,
+    estimatedMinutes: 35,
     engineType: 'snake',
     learningOutcomes: ['global variables', 'on_food_eaten', 'on_game_over', 'conditional speed'],
     steps: [

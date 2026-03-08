@@ -163,10 +163,10 @@ export function DashboardClient({
           <div className="shrink-0 flex items-center gap-2">
             <Link
               href="/parent-dashboard"
-              title="Parent dashboard"
-              className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors text-xs font-medium"
             >
-              <Settings className="w-4 h-4" />
+              <Settings className="w-3.5 h-3.5" />
+              <span>Parent Area</span>
             </Link>
           </div>
         </motion.div>

@@ -262,6 +262,9 @@ function SubscriptionSection({ subscription }: { subscription: SubscriptionInfo 
 
 export function SettingsClient({ email, name, subscription }: SettingsClientProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   return (
     <div className="min-h-screen bg-[var(--color-cream)]">
@@ -340,19 +343,62 @@ export function SettingsClient({ email, name, subscription }: SettingsClientProp
                   <p className="text-red-700 text-sm mb-4">
                     Are you sure? This will permanently delete your account and all associated data.
                   </p>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-red-700 mb-1">
+                      Enter your password to confirm
+                    </label>
+                    <input
+                      type="password"
+                      value={deletePassword}
+                      onChange={(e) => {
+                        setDeletePassword(e.target.value);
+                        setDeleteError(null);
+                      }}
+                      placeholder="Your password"
+                      className="w-full px-3 py-2 border border-red-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-300 bg-white"
+                    />
+                    {deleteError && (
+                      <p className="mt-1 text-xs text-red-600">{deleteError}</p>
+                    )}
+                  </div>
                   <div className="flex gap-3">
                     <button
-                      onClick={() => setShowDeleteConfirm(false)}
+                      onClick={() => {
+                        setShowDeleteConfirm(false);
+                        setDeletePassword("");
+                        setDeleteError(null);
+                      }}
+                      disabled={deleteLoading}
                       className="btn-secondary py-2 px-4 text-sm"
                     >
                       Cancel
                     </button>
                     <button
-                      onClick={() => {
-                        alert("Account deletion will be available soon. Please contact support.");
+                      onClick={async () => {
+                        setDeleteLoading(true);
+                        setDeleteError(null);
+                        try {
+                          const res = await fetch("/api/account/delete", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ password: deletePassword }),
+                          });
+                          const data = await res.json();
+                          if (!res.ok) {
+                            setDeleteError(data.error ?? "Something went wrong");
+                            setDeleteLoading(false);
+                            return;
+                          }
+                          await signOut({ callbackUrl: "/" });
+                        } catch {
+                          setDeleteError("Something went wrong. Please try again.");
+                          setDeleteLoading(false);
+                        }
                       }}
-                      className="bg-red-600 text-white py-2 px-4 rounded-full text-sm font-medium hover:bg-red-700 transition-colors"
+                      disabled={deleteLoading || !deletePassword}
+                      className="bg-red-600 text-white py-2 px-4 rounded-full text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-2"
                     >
+                      {deleteLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                       Yes, delete my account
                     </button>
                   </div>

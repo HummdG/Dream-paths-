@@ -233,7 +233,7 @@ const missions: Mission[] = [
     missionType: 'creative',
     purpose: 'Create a personal connection to the game by designing a custom character.',
     storyIntro: "Welcome, future game developer! 🎨 Before we start coding, let's create YOUR hero! This pixel art character will be the star of all your games. Make them look however you want - they're uniquely yours!",
-    estimatedMinutes: 10,
+    estimatedMinutes: 30,
     learningOutcomes: ['creativity', 'pixel art basics', 'personalization'],
     steps: [
       {
@@ -264,7 +264,7 @@ const missions: Mission[] = [
     title: 'Mission 1: Make Something Happen',
     purpose: 'Teach the loop of: edit Python → run → see result.',
     storyIntro: "Welcome, young coder! 🎮 Today you'll write your very first lines of Python code and see them come to life in a game. Are you ready to become a game developer?",
-    estimatedMinutes: 10,
+    estimatedMinutes: 30,
     learningOutcomes: ['print() function', 'strings', 'running code'],
     steps: [
       {
@@ -345,7 +345,7 @@ show_message('Welcome to my game!')`,
     title: 'Mission 3: Move with Functions',
     purpose: 'Teach functions, def, and calling move() with parameters.',
     storyIntro: "Your player is in the game! 🏃 Let's write a function that makes them run. A function is like a named recipe — write it once, call it whenever you want!",
-    estimatedMinutes: 15,
+    estimatedMinutes: 30,
     learningOutcomes: ['functions', 'def keyword', 'parameters'],
     steps: [
       {
@@ -395,7 +395,7 @@ print('Player moved!')`,
     title: 'Mission 4: Keyboard Controls',
     purpose: 'Introduce events + if statements, then smooth held-key movement.',
     storyIntro: "Functions are awesome! 🚀 Now let's connect them to the keyboard so YOU can control the player. We'll learn about `if` - teaching the computer to make decisions!",
-    estimatedMinutes: 25,
+    estimatedMinutes: 35,
     learningOutcomes: ['events', 'if/elif statements', 'keyboard input', 'on_update', 'is_key_pressed'],
     steps: [
       {
@@ -507,7 +507,7 @@ on_update(update)`,
     title: 'Mission 5: Build Platforms with Loops',
     purpose: 'Teach loops and lists through placing platforms.',
     storyIntro: "Your player can move! 🎉 But they need somewhere to walk. Let's build platforms! We'll use lists (collections of things) and loops (doing something many times).",
-    estimatedMinutes: 20,
+    estimatedMinutes: 35,
     learningOutcomes: ['lists', 'for loops', 'tuples'],
     steps: [
       {
@@ -628,7 +628,7 @@ print(f'Loaded {LEVEL_PRESET} preset with YOUR changes!')`,
     title: 'Mission 6: Make Your Player Jump!',
     purpose: 'Teach set_player_vy, is_on_ground, and keyboard events.',
     storyIntro: "Your player can walk left and right — now let's make them jump! 🦘 Jumping is how your hero reaches higher platforms and avoids enemies. Let's code it!",
-    estimatedMinutes: 20,
+    estimatedMinutes: 35,
     learningOutcomes: ['set_player_vy', 'is_on_ground', 'on_key_down', 'if statements'],
     steps: [
       {
@@ -823,7 +823,7 @@ print(f'Jump strength is {JUMP_STRENGTH} — try changing it!')`,
     title: 'Mission 7: Add Coins and a Goal!',
     purpose: 'Teach add_coin() and add_goal() — placing interactive objects in the level.',
     storyIntro: "Your level has platforms to jump on — but it needs THINGS to collect and a FINISH LINE! 🪙🏁 Let's add coins and a goal flag. Watch them appear live in the game as you write the code!",
-    estimatedMinutes: 15,
+    estimatedMinutes: 30,
     learningOutcomes: ['add_coin', 'add_goal', 'coordinates', 'level design'],
     steps: [
       {
@@ -997,7 +997,7 @@ print('Level set! Can you reach the goal? 🏁')
     title: 'Mission 8: Collect Coins and Score!',
     purpose: 'Teach collides_with(), score tracking, and win conditions.',
     storyIntro: "Your coins and goal are in the level — but touching them does NOTHING yet! 🪙 Let's write code to collect coins, keep score, and win the game!",
-    estimatedMinutes: 25,
+    estimatedMinutes: 35,
     learningOutcomes: ['variables', 'increment', 'conditionals', 'score tracking'],
     steps: [
       {
@@ -1727,7 +1727,7 @@ print(f'Speed={enemy_speed} | Zone: {left_bound}–{right_bound} | Lives={lives}
     title: 'Mission 10: Win the Level',
     purpose: 'Teach goal states and finishing a project.',
     storyIntro: "This is it! 🏁 The final mission! Your platformer has everything - movement, platforms, coins, enemies. Now let's add the GOAL so players can WIN!",
-    estimatedMinutes: 20,
+    estimatedMinutes: 35,
     learningOutcomes: ['conditionals', 'state', 'win conditions', 'polish'],
     steps: [
       {

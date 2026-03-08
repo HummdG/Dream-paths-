@@ -1,3 +1,5 @@
+export const DEV_EMAIL = 'dev@dreampaths.com'
+
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { PrismaAdapter } from '@auth/prisma-adapter'

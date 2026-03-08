@@ -7,7 +7,7 @@ import { PLANS } from '@/lib/plans'
 
 const addChildSchema = z.object({
   firstName: z.string().min(1, 'Please enter a name'),
-  age: z.number().int().min(6).max(14, 'Age must be between 6 and 14'),
+  age: z.number().int().min(6).max(18, 'Age must be between 6 and 18'),
 })
 
 export async function POST(request: Request) {

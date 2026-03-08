@@ -25,7 +25,7 @@ const missions: Mission[] = [
     purpose: 'Learn variables and print() by creating a patient card.',
     storyIntro:
       "Welcome to DreamPaths Hospital! As a junior medic, your first job is to fill out a patient card. Let's use Python to record the patient's information!",
-    estimatedMinutes: 15,
+    estimatedMinutes: 30,
     engineType: 'patient_monitor',
     learningOutcomes: ['variables', 'print()', 'string and number types'],
     steps: [
@@ -183,7 +183,7 @@ print(f"Monitoring {patient_name} — HR: {heart_rate} bpm")
     purpose: 'Learn functions with parameters and return values.',
     storyIntro:
       "A good doctor checks all the vitals! Let's write functions to read and process patient data systematically.",
-    estimatedMinutes: 20,
+    estimatedMinutes: 35,
     engineType: 'patient_monitor',
     learningOutcomes: ['def', 'parameters', 'return values'],
     steps: [
@@ -341,7 +341,7 @@ print(f"Current heart rate: {hr} bpm")
     purpose: 'Use if/elif/else to trigger medical alerts based on heart rate.',
     storyIntro:
       "Doctors need to act fast when vitals go out of range. Build an alert system that watches the heart rate and sounds the alarm when needed!",
-    estimatedMinutes: 20,
+    estimatedMinutes: 35,
     engineType: 'patient_monitor',
     learningOutcomes: ['if', 'elif', 'else', 'show_alert()'],
     steps: [
@@ -514,7 +514,7 @@ else:
     purpose: 'Use lists and for loops to apply a series of treatments.',
     storyIntro:
       "The patient needs several treatments! Instead of writing each one separately, a smart doctor uses a list and a loop to apply them all automatically.",
-    estimatedMinutes: 25,
+    estimatedMinutes: 40,
     engineType: 'patient_monitor',
     learningOutcomes: ['lists', 'for loops', 'add_treatment()'],
     steps: [

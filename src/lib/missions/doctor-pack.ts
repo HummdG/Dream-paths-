@@ -18,7 +18,7 @@ const missions: Mission[] = [
     purpose: 'Create a pixel art doctor character.',
     storyIntro:
       "Every great doctor needs a white coat! Design your doctor character in the pixel art editor — it will represent you throughout the path.",
-    estimatedMinutes: 20,
+    estimatedMinutes: 35,
     engineType: 'patient_monitor',
     missionType: 'creative',
     learningOutcomes: ['creativity', 'design'],
@@ -694,7 +694,7 @@ else:
     purpose: 'Build a Python decision tree that gives first aid advice based on symptoms.',
     storyIntro:
       "First aid saves lives! Build a decision-making program that asks about a symptom and gives the correct first aid step.",
-    estimatedMinutes: 25,
+    estimatedMinutes: 40,
     engineType: 'patient_monitor',
     learningOutcomes: ['if/elif/else', 'decision trees', 'user simulation'],
     steps: [

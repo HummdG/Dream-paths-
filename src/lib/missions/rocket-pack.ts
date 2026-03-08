@@ -25,7 +25,7 @@ const missions: Mission[] = [
     purpose: 'Learn variables, print(), and f-strings to prepare for launch.',
     storyIntro:
       "Welcome to the Space Cadet Program! Before we blast off, every astronaut must complete their mission briefing. Let's write it in Python!",
-    estimatedMinutes: 15,
+    estimatedMinutes: 30,
     engineType: 'rocket',
     learningOutcomes: ['variables', 'print()', 'f-strings'],
     steps: [
@@ -183,7 +183,7 @@ print(f"Pilot {pilot_name}, fuel is {fuel}%, altitude {altitude} km")
     purpose: 'Learn to write and call functions with parameters.',
     storyIntro:
       "A rocket needs reusable systems. Real engineers write functions so they can run the same code multiple times without repeating themselves!",
-    estimatedMinutes: 20,
+    estimatedMinutes: 35,
     engineType: 'rocket',
     learningOutcomes: ['def', 'parameters', 'calling functions'],
     steps: [
@@ -331,7 +331,7 @@ status_report(100)
     purpose: 'Use on_update and the rocket API to control thrust and direction.',
     storyIntro:
       "Time to fly! Astronauts control their rockets with precision. Let's connect your code to the rocket and watch it move!",
-    estimatedMinutes: 20,
+    estimatedMinutes: 35,
     engineType: 'rocket',
     learningOutcomes: ['on_update', 'set_direction()', 'set_thrust()'],
     steps: [
@@ -496,7 +496,7 @@ launch()
     purpose: 'Use if/elif conditions to respond to altitude and reach orbit.',
     storyIntro:
       "The final mission: reach orbit at 400 km! Use if/elif to check your altitude and react. You've learned everything you need — now fly!",
-    estimatedMinutes: 25,
+    estimatedMinutes: 40,
     engineType: 'rocket',
     learningOutcomes: ['if/elif', 'get_altitude()', 'orbit_reached event'],
     steps: [

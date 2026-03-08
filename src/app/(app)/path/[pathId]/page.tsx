@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { allMissionPacks, computePathPackProgress } from "@/lib/missions";
 import { PATH_PACKS } from "@/lib/plans";
+import { DEV_EMAIL } from "@/lib/auth";
 import { PathClient } from "./path-client";
 
 interface PathPageProps {
@@ -52,11 +53,13 @@ export default async function PathPage({ params }: PathPageProps) {
   const child = parent.children[0];
   const subscriptionPlan = parent.subscription?.planId ?? "free";
   const purchasedPathIds = parent.pathSubscriptions.map((ps) => ps.pathId);
+  const isDev = session.user.email === DEV_EMAIL;
   const packsProgress = computePathPackProgress(
     pathPacks,
     child.projects,
     subscriptionPlan,
-    purchasedPathIds
+    purchasedPathIds,
+    { bypassProgressionLock: isDev }
   );
 
   return (

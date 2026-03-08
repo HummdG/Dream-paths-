@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { CheckCircle, ArrowRight, Sparkles, Lock } from "lucide-react";
 import { PathSlideshow } from "@/components/homepage/path-slideshow";
+import { AppScreensSlideshow } from "@/components/homepage/app-screens-slideshow";
 import { LegalModal } from "@/components/legal/legal-modal";
 
 const LOGOS = [
@@ -106,7 +107,7 @@ const HOW_IT_WORKS = [
     step: '2',
     emoji: '🚀',
     title: 'Complete one mission a week',
-    description: 'Each mission takes around 30 to 45 minutes. Short enough to fit around school, long enough to feel like real progress.',
+    description: 'Each mission fits around school life. Write real code, see it run instantly, and unlock the next mission when you\'re done.',
   },
   {
     step: '3',
@@ -162,8 +163,7 @@ export default function Home() {
               transition={{ duration: 0.6 }}
             >
               <div className="inline-flex items-center gap-2 bg-[var(--color-peach)] text-amber-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
-                <Sparkles className="w-4 h-4" />
-                For kids aged 8–14
+                Kids of all ages
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[var(--color-navy)] leading-tight mb-6">
@@ -299,7 +299,7 @@ export default function Home() {
                       Learn More
                     </Link>
                     <Link
-                      href="/signup"
+                      href={`/signup?plan=${path.pathId}`}
                       className="flex-1 text-center py-2 rounded-full bg-gradient-to-r from-[var(--color-indigo)] to-[var(--color-violet)] text-white text-xs font-semibold hover:opacity-90 transition-opacity"
                     >
                       Get Started
@@ -339,7 +339,11 @@ export default function Home() {
             ))}
           </div>
 
-          <PathSlideshow />
+          <AppScreensSlideshow />
+
+          <div className="mt-20">
+            <PathSlideshow />
+          </div>
         </div>
       </section>
 
@@ -418,16 +422,16 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-6 items-stretch">
             {/* Free Plan */}
             <div className="bg-white rounded-2xl p-6 flex flex-col border border-gray-100">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3 h-5">Free</p>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3 h-5">Free forever</p>
               <div className="mb-5 h-10 flex items-baseline gap-1">
                 <span className="text-3xl font-bold text-[var(--color-navy)]">£0</span>
-                <span className="text-gray-400 text-sm">forever</span>
+                <span className="text-gray-400 text-sm">/ month</span>
               </div>
               <ul className="space-y-2 mb-6 flex-1">
                 {[
-                  "Full Snake Tutorial (4 missions)",
+                  "Starter missions on all 3 paths",
                   "Pixel art hero creator",
-                  "Parent dashboard",
+                  "Parent progress dashboard",
                   "1 child profile",
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-2 text-sm text-gray-500">
@@ -441,21 +445,20 @@ export default function Home() {
               </Link>
             </div>
 
-            {/* Computer Scientist Path */}
+            {/* Individual Path */}
             <div className="bg-white rounded-2xl p-6 flex flex-col ring-2 ring-[var(--color-violet)]">
               <div className="flex items-center justify-between mb-3 h-5">
-                <p className="text-xs font-semibold text-[var(--color-violet)] uppercase tracking-wide">Computer Scientist</p>
+                <p className="text-xs font-semibold text-[var(--color-violet)] uppercase tracking-wide">Individual Path</p>
                 <span className="bg-[var(--color-violet)] text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">Popular</span>
               </div>
               <div className="mb-5 h-10 flex items-baseline gap-1">
                 <span className="text-3xl font-bold text-[var(--color-navy)]">£24.99</span>
-                <span className="text-gray-400 text-sm">/month</span>
+                <span className="text-gray-400 text-sm">/ month</span>
               </div>
-              <ul className="space-y-2 mb-6 flex-1">
+              <ul className="space-y-2 mb-4">
                 {[
-                  "Full Snake Tutorial (4 missions)",
-                  "Full Platformer Game (8 missions)",
-                  "12 missions total",
+                  "Everything in Free",
+                  "12 missions per path (3 months of content)",
                   "1 child profile",
                   "Cancel anytime",
                 ].map((item) => (
@@ -465,9 +468,24 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-              <Link href="/signup" className="mt-auto w-full py-3 text-center rounded-full font-semibold text-sm bg-gradient-to-r from-[var(--color-indigo)] to-[var(--color-violet)] text-white hover:opacity-90 transition-opacity block">
-                Get Started
-              </Link>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2 mt-3">Choose your path</p>
+              <div className="space-y-2 flex-1">
+                {[
+                  { emoji: "💻", label: "Computer Scientist", pathId: "computer_scientist" },
+                  { emoji: "🚀", label: "Astronaut", pathId: "astronaut" },
+                  { emoji: "🩺", label: "Doctor", pathId: "doctor" },
+                ].map((path) => (
+                  <Link
+                    key={path.pathId}
+                    href={`/signup?plan=${path.pathId}`}
+                    className="flex items-center gap-3 w-full px-3 py-2 rounded-xl border border-gray-100 hover:border-[var(--color-violet)] hover:bg-violet-50 transition-all group"
+                  >
+                    <span className="text-base">{path.emoji}</span>
+                    <span className="text-sm font-medium text-[var(--color-navy)] flex-1">{path.label}</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-[var(--color-violet)] transition-colors" />
+                  </Link>
+                ))}
+              </div>
             </div>
 
             {/* Dream Studio */}
@@ -478,7 +496,7 @@ export default function Home() {
               </div>
               <div className="mb-5 h-10 flex items-baseline gap-1">
                 <span className="text-3xl font-bold text-[var(--color-navy)]">£39.99</span>
-                <span className="text-gray-400 text-sm">/month</span>
+                <span className="text-gray-400 text-sm">/ month</span>
               </div>
               <ul className="space-y-2 mb-6 flex-1">
                 {[
@@ -494,7 +512,7 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-              <Link href="/signup" className="mt-auto w-full py-3 text-center rounded-full font-semibold text-sm bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:opacity-90 transition-opacity block">
+              <Link href="/signup?plan=dream_studio" className="mt-auto w-full py-3 text-center rounded-full font-semibold text-sm bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:opacity-90 transition-opacity block">
                 Get Started
               </Link>
             </div>

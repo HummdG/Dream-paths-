@@ -1,16 +1,180 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { ArrowRight, ArrowLeft, Loader2, User, Baby, Gamepad2 } from "lucide-react";
+import { ArrowRight, ArrowLeft, Loader2, CheckCircle } from "lucide-react";
 
 const steps = [
-  { id: 1, title: "Your Name", icon: User },
-  { id: 2, title: "Your Child", icon: Baby },
-  { id: 3, title: "Choose Path", icon: Gamepad2 },
+  { id: 1, title: "Your name" },
+  { id: 2, title: "Your child" },
+  { id: 3, title: "Choose path" },
 ];
+
+function Step3Content({ signupPlan, childName }: { signupPlan: string | null; childName: string }) {
+  if (signupPlan === "computer_scientist") {
+    return (
+      <div className="space-y-6">
+        <div className="text-center mb-8">
+          <div className="text-5xl mb-4">💻</div>
+          <h1 className="text-2xl font-bold text-[var(--color-navy)] mb-2">
+            {childName}&apos;s Computer Scientist path
+          </h1>
+          <p className="text-gray-600">Ready to begin the adventure!</p>
+        </div>
+
+        <div className="card ring-2 ring-[var(--color-violet)] ring-offset-2">
+          <h3 className="text-lg font-bold text-[var(--color-navy)] mb-1">Junior Game Developer</h3>
+          <p className="text-sm text-gray-500 mb-4">
+            Learn Python by building real games from scratch. No experience needed.
+          </p>
+          <div className="flex items-center gap-3 text-sm text-gray-500 flex-wrap">
+            <span>🎮 12 missions</span>
+            <span>⏱️ 30–45 min each</span>
+            <span className="text-xs font-semibold bg-emerald-500 text-white px-2 py-0.5 rounded-full">
+              Snake tutorial is free
+            </span>
+          </div>
+        </div>
+
+        <p className="text-center text-xs text-gray-400">You can add other career paths later</p>
+      </div>
+    );
+  }
+
+  if (signupPlan === "astronaut") {
+    return (
+      <div className="space-y-6">
+        <div className="text-center mb-8">
+          <div className="text-5xl mb-4">🚀</div>
+          <h1 className="text-2xl font-bold text-[var(--color-navy)] mb-2">
+            {childName}&apos;s Astronaut path
+          </h1>
+          <p className="text-gray-600">Ready to begin the adventure!</p>
+        </div>
+
+        <div className="card ring-2 ring-[var(--color-violet)] ring-offset-2">
+          <h3 className="text-lg font-bold text-[var(--color-navy)] mb-1">Space Explorer</h3>
+          <p className="text-sm text-gray-500 mb-4">
+            Maths, physics and space science through hands-on missions.
+          </p>
+          <div className="flex items-center gap-3 text-sm text-gray-500 flex-wrap">
+            <span>🌌 12 missions</span>
+            <span>⏱️ 30–45 min each</span>
+            <span className="text-xs font-semibold bg-emerald-500 text-white px-2 py-0.5 rounded-full">
+              Space Cadet Program is free
+            </span>
+          </div>
+        </div>
+
+        <p className="text-center text-xs text-gray-400">You can add other career paths later</p>
+      </div>
+    );
+  }
+
+  if (signupPlan === "doctor") {
+    return (
+      <div className="space-y-6">
+        <div className="text-center mb-8">
+          <div className="text-5xl mb-4">🩺</div>
+          <h1 className="text-2xl font-bold text-[var(--color-navy)] mb-2">
+            {childName}&apos;s Doctor path
+          </h1>
+          <p className="text-gray-600">Ready to begin the adventure!</p>
+        </div>
+
+        <div className="card ring-2 ring-[var(--color-violet)] ring-offset-2">
+          <h3 className="text-lg font-bold text-[var(--color-navy)] mb-1">Junior Doctor</h3>
+          <p className="text-sm text-gray-500 mb-4">
+            Biology, anatomy and medical science through real experiments.
+          </p>
+          <div className="flex items-center gap-3 text-sm text-gray-500 flex-wrap">
+            <span>🔬 12 missions</span>
+            <span>⏱️ 30–45 min each</span>
+            <span className="text-xs font-semibold bg-emerald-500 text-white px-2 py-0.5 rounded-full">
+              Junior Medic Academy is free
+            </span>
+          </div>
+        </div>
+
+        <p className="text-center text-xs text-gray-400">You can add other career paths later</p>
+      </div>
+    );
+  }
+
+  if (signupPlan === "dream_studio") {
+    return (
+      <div className="space-y-6">
+        <div className="text-center mb-8">
+          <div className="text-5xl mb-4">✨</div>
+          <h1 className="text-2xl font-bold text-[var(--color-navy)] mb-2">
+            {childName} gets access to everything
+          </h1>
+          <p className="text-gray-600">Dream Studio unlocks all career paths</p>
+        </div>
+
+        <div className="card space-y-3">
+          {[
+            { emoji: "💻", label: "Computer Scientist" },
+            { emoji: "🚀", label: "Astronaut" },
+            { emoji: "🩺", label: "Doctor" },
+          ].map((path) => (
+            <div key={path.label} className="flex items-center gap-3">
+              <span className="text-xl">{path.emoji}</span>
+              <span className="text-sm font-medium text-[var(--color-navy)] flex-1">{path.label}</span>
+              <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
+            </div>
+          ))}
+          <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
+            <span className="text-xl">🔮</span>
+            <span className="text-sm text-gray-500 flex-1">All future paths included</span>
+            <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
+          </div>
+        </div>
+
+        <p className="text-center text-xs text-gray-400">
+          Dream Studio includes all current and future career paths
+        </p>
+      </div>
+    );
+  }
+
+  // Generic / no plan
+  return (
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <div className="text-5xl mb-4">🎉</div>
+        <h1 className="text-2xl font-bold text-[var(--color-navy)] mb-2">
+          Everything starts free
+        </h1>
+        <p className="text-gray-600">
+          {childName} gets free access to the starter missions on all 3 career paths
+        </p>
+      </div>
+
+      <div className="card space-y-3">
+        {[
+          { emoji: "💻", label: "Computer Scientist" },
+          { emoji: "🚀", label: "Astronaut" },
+          { emoji: "🩺", label: "Doctor" },
+        ].map((path) => (
+          <div key={path.label} className="flex items-center gap-3">
+            <span className="text-xl">{path.emoji}</span>
+            <span className="text-sm font-medium text-[var(--color-navy)] flex-1">{path.label}</span>
+            <span className="text-xs font-semibold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">
+              Free
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <p className="text-center text-xs text-gray-400">
+        Upgrade to unlock a full career path whenever you&apos;re ready
+      </p>
+    </div>
+  );
+}
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -23,6 +187,12 @@ export default function OnboardingPage() {
   const [childName, setChildName] = useState("");
   const [childAge, setChildAge] = useState(10);
   const [selectedPath] = useState("junior_game_dev");
+  const [signupPlan, setSignupPlan] = useState<string | null>(null);
+
+  useEffect(() => {
+    const plan = localStorage.getItem("dreampaths_signup_plan");
+    setSignupPlan(plan);
+  }, []);
 
   const handleNext = () => {
     if (currentStep < 3) {
@@ -58,6 +228,7 @@ export default function OnboardingPage() {
         throw new Error(data.error || "Something went wrong");
       }
 
+      localStorage.removeItem("dreampaths_signup_plan");
       router.push("/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -80,24 +251,42 @@ export default function OnboardingPage() {
         className="card max-w-lg w-full"
       >
         {/* Progress indicator */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center mb-10">
           {steps.map((step, index) => (
-            <div key={step.id} className="flex items-center">
-              <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-                  currentStep >= step.id
-                    ? "bg-gradient-to-br from-[var(--color-indigo)] to-[var(--color-violet)] text-white"
-                    : "bg-gray-200 text-gray-400"
-                }`}
-              >
-                <step.icon className="w-5 h-5" />
+            <div key={step.id} className="flex items-center flex-1 last:flex-none">
+              <div className="flex flex-col items-center gap-1.5">
+                <div
+                  className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
+                    currentStep > step.id
+                      ? "bg-gradient-to-br from-[var(--color-indigo)] to-[var(--color-violet)] text-white"
+                      : currentStep === step.id
+                      ? "bg-gradient-to-br from-[var(--color-indigo)] to-[var(--color-violet)] text-white ring-4 ring-violet-100"
+                      : "bg-gray-100 text-gray-400"
+                  }`}
+                >
+                  {currentStep > step.id ? (
+                    <CheckCircle className="w-3.5 h-3.5" />
+                  ) : (
+                    step.id
+                  )}
+                </div>
+                <span
+                  className={`text-[11px] font-medium whitespace-nowrap transition-colors duration-300 ${
+                    currentStep >= step.id ? "text-[var(--color-navy)]" : "text-gray-400"
+                  }`}
+                >
+                  {step.title}
+                </span>
               </div>
               {index < steps.length - 1 && (
-                <div
-                  className={`w-16 h-1 mx-2 rounded transition-all ${
-                    currentStep > step.id ? "bg-[var(--color-violet)]" : "bg-gray-200"
-                  }`}
-                />
+                <div className="flex-1 mx-3 mb-5">
+                  <div className="h-px bg-gray-200 relative overflow-hidden rounded-full">
+                    <div
+                      className="absolute inset-y-0 left-0 bg-gradient-to-r from-[var(--color-indigo)] to-[var(--color-violet)] transition-all duration-500"
+                      style={{ width: currentStep > step.id ? "100%" : "0%" }}
+                    />
+                  </div>
+                </div>
               )}
             </div>
           ))}
@@ -125,7 +314,7 @@ export default function OnboardingPage() {
               <div className="text-center mb-8">
                 <div className="text-5xl mb-4">👋</div>
                 <h1 className="text-2xl font-bold text-[var(--color-navy)] mb-2">
-                  Welcome! Let's get started
+                  Welcome! Let&apos;s get started
                 </h1>
                 <p className="text-gray-600">
                   First, tell us what to call you
@@ -163,13 +352,13 @@ export default function OnboardingPage() {
                   Tell us about your child
                 </h1>
                 <p className="text-gray-600">
-                  We'll personalize their learning journey
+                  We&apos;ll personalize their learning journey
                 </p>
               </div>
 
               <div>
                 <label htmlFor="childName" className="block text-sm font-medium text-gray-700 mb-2">
-                  Child's first name
+                  Child&apos;s first name
                 </label>
                 <input
                   type="text"
@@ -189,14 +378,14 @@ export default function OnboardingPage() {
                 <input
                   type="range"
                   min="6"
-                  max="14"
+                  max="18"
                   value={childAge}
                   onChange={(e) => setChildAge(parseInt(e.target.value))}
                   className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[var(--color-violet)]"
                 />
                 <div className="flex justify-between text-xs text-gray-500 mt-1">
                   <span>6</span>
-                  <span>14</span>
+                  <span>18</span>
                 </div>
               </div>
             </motion.div>
@@ -208,34 +397,8 @@ export default function OnboardingPage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="space-y-6"
             >
-              <div className="text-center mb-8">
-                <div className="text-5xl mb-4">🎮</div>
-                <h1 className="text-2xl font-bold text-[var(--color-navy)] mb-2">
-                  {childName}'s Dream Path
-                </h1>
-                <p className="text-gray-600">
-                  Ready to begin the adventure!
-                </p>
-              </div>
-
-              {/* Path card */}
-              <div className="card ring-2 ring-[var(--color-violet)] ring-offset-2">
-                <h3 className="text-lg font-bold text-[var(--color-navy)] mb-1">
-                  Junior Game Developer
-                </h3>
-                <p className="text-sm text-gray-500 mb-4">
-                  {childName} will learn real Python by building games from scratch — no experience needed.
-                </p>
-
-                <div className="flex items-center gap-4 text-sm text-gray-500 flex-wrap">
-                  <span>🎯 15 missions</span>
-                  <span>⏱️ 30–45 min each</span>
-                  <span>🐍 Real Python</span>
-                  <span className="text-xs font-semibold bg-emerald-500 text-white px-2 py-0.5 rounded-full">Snake tutorial is free</span>
-                </div>
-              </div>
+              <Step3Content signupPlan={signupPlan} childName={childName} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -276,7 +439,7 @@ export default function OnboardingPage() {
                 </>
               ) : (
                 <>
-                  Start {childName}'s Journey
+                  Start {childName}&apos;s Journey
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -287,9 +450,3 @@ export default function OnboardingPage() {
     </div>
   );
 }
-
-
-
-
-
-

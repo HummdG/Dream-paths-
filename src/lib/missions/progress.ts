@@ -82,12 +82,10 @@ export function computePathPackProgress(
   packs: MissionPack[],
   projects: ProjectWithSteps[],
   planId?: string | null,
-  purchasedPathIds?: string[]
+  purchasedPathIds?: string[],
+  options?: { bypassProgressionLock?: boolean }
 ): PackProgress[] {
-  // Identical logic to computeAllPackProgress, but since `packs` is
-  // pre-filtered to a single path, progression locking is naturally
-  // confined within that path.
-  return computeAllPackProgress(packs, projects, planId, purchasedPathIds);
+  return computeAllPackProgress(packs, projects, planId, purchasedPathIds, options);
 }
 
 /**
@@ -103,9 +101,11 @@ export function computeAllPackProgress(
   packs: MissionPack[],
   projects: ProjectWithSteps[],
   planId?: string | null,
-  purchasedPathIds?: string[]
+  purchasedPathIds?: string[],
+  options?: { bypassProgressionLock?: boolean }
 ): PackProgress[] {
   const purchased = purchasedPathIds ?? [];
+  const bypassProgression = options?.bypassProgressionLock ?? false;
 
   return packs.map((pack, index) => {
     const project = projects.find(p => p.packId === pack.packId);
@@ -126,9 +126,11 @@ export function computeAllPackProgress(
       };
     }
 
-    // Progression gate: previous pack must be complete first
+    // Progression gate: previous pack must be complete first (skipped for dev)
     const progressionLocked =
-      index > 0 && !isPackComplete(packs[index - 1], projects.find(p => p.packId === packs[index - 1].packId));
+      !bypassProgression &&
+      index > 0 &&
+      !isPackComplete(packs[index - 1], projects.find(p => p.packId === packs[index - 1].packId));
 
     const lockedMessage = progressionLocked
       ? `Complete "${packs[index - 1].packTitle}" to unlock this game!`

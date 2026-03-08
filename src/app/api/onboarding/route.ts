@@ -10,7 +10,7 @@ import { PLANS, getMaxChildren } from '@/lib/plans'
 const onboardingSchema = z.object({
   parentName: z.string().min(1, 'Please enter your name'),
   childName: z.string().min(1, 'Please enter your child\'s name'),
-  childAge: z.number().min(6).max(14, 'Age must be between 6 and 14'),
+  childAge: z.number().min(6).max(18, 'Age must be between 6 and 18'),
   pathId: z.string().min(1, 'Please select a path'),
 })
 
