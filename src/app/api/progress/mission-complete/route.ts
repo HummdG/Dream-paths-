@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    revalidateTag(DASHBOARD_CACHE_TAG(session.user.id!));
+    revalidateTag(DASHBOARD_CACHE_TAG(session.user.id!), 'default');
 
     return NextResponse.json({
       success: true,
