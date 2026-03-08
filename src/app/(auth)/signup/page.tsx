@@ -1,23 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { LegalModal } from "@/components/legal/legal-modal";
 
-export default function SignUpPage() {
-  const router = useRouter();
+function PlanCapture() {
   const searchParams = useSearchParams();
-
   useEffect(() => {
     const plan = searchParams.get("plan");
     if (plan) {
       localStorage.setItem("dreampaths_signup_plan", plan);
     }
   }, [searchParams]);
+  return null;
+}
+
+function SignUpPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -86,6 +88,9 @@ export default function SignUpPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-cream)] bg-dots flex items-center justify-center p-6">
+      <Suspense fallback={null}>
+        <PlanCapture />
+      </Suspense>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -216,6 +221,14 @@ export default function SignUpPage() {
       {showPrivacy && <LegalModal type="privacy" onClose={() => setShowPrivacy(false)} />}
       {showTerms && <LegalModal type="terms" onClose={() => setShowTerms(false)} />}
     </div>
+  );
+}
+
+export default function SignUpPageWrapper() {
+  return (
+    <Suspense fallback={null}>
+      <SignUpPage />
+    </Suspense>
   );
 }
 
