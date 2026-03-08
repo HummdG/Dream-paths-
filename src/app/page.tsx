@@ -192,7 +192,7 @@ export default function Home() {
               </div>
 
               <p className="mt-4 text-sm text-gray-500">
-                ✓ No credit card required &nbsp; ✓ Full Snake tutorial free forever
+                ✓ No credit card required &nbsp; ✓ Starter missions free forever
               </p>
             </motion.div>
 
