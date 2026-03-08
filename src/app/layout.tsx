@@ -9,11 +9,26 @@ const nunito = Nunito({
   variable: "--font-nunito",
 });
 
+const siteTitle = "DreamPaths – Career Adventures for Kids";
+const siteDescription =
+  "DreamPaths gives kids aged 8-14 a taste of real careers through hands-on missions. Build games as a Computer Scientist, launch rockets as an Astronaut, or save lives as a Doctor. Every path teaches real skills, one project at a time.";
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://dreampaths.co.uk'),
-  title: "DreamPaths – Help Your Child Discover Their Dream Career",
-  description: "DreamPaths helps kids aged 8-14 explore the career they want through weekly hands-on missions. Each path builds real, applicable skills one project at a time.",
-  keywords: ["kids coding", "learn Python for kids", "STEM for kids", "kids career learning", "game development for kids", "educational platform", "coding missions", "ages 8-14"],
+  title: siteTitle,
+  description: siteDescription,
+  keywords: [
+    "career learning for kids",
+    "STEM for kids",
+    "kids educational platform",
+    "learn to code for kids",
+    "space exploration for kids",
+    "doctor simulator for kids",
+    "game development for kids",
+    "hands-on learning ages 8-14",
+    "career paths for children",
+    "kids mission-based learning",
+  ],
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -30,8 +45,8 @@ export const metadata: Metadata = {
   },
   manifest: "/site.webmanifest",
   openGraph: {
-    title: "DreamPaths – Help Your Child Discover Their Dream Career",
-    description: "DreamPaths helps kids aged 8-14 explore the career they want through weekly hands-on missions. Each path builds real, applicable skills one project at a time.",
+    title: siteTitle,
+    description: siteDescription,
     url: "https://dreampaths.co.uk",
     siteName: "DreamPaths",
     images: ["/logo.svg"],
@@ -40,8 +55,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "DreamPaths – Help Your Child Discover Their Dream Career",
-    description: "DreamPaths helps kids aged 8-14 explore the career they want through weekly hands-on missions. Each path builds real, applicable skills one project at a time.",
+    title: siteTitle,
+    description: siteDescription,
     images: ["/logo.svg"],
   },
   alternates: {
