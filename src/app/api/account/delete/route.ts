@@ -42,6 +42,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Account not found" }, { status: 404 });
   }
 
+  if (!parent.passwordHash) {
+    return NextResponse.json({ error: "Account has no password set" }, { status: 400 });
+  }
+
   const passwordValid = await bcrypt.compare(body.password, parent.passwordHash);
   if (!passwordValid) {
     return NextResponse.json({ error: "Incorrect password" }, { status: 403 });
