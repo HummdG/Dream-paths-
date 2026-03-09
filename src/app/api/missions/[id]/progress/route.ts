@@ -16,24 +16,28 @@ export async function POST(request: NextRequest, { params }: Props) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Get the child for this parent
-    const child = await prisma.child.findFirst({
-      where: { parentId: session.user.id },
-    });
-
-    if (!child) {
-      return NextResponse.json({ error: "No child found" }, { status: 404 });
-    }
-
     // Get the request body
     const body = await request.json();
     const { currentStep, codeProgress } = body;
+
+    // Scope the lookup to missionId + parent's children to prevent IDOR:
+    // a parent with multiple children cannot manipulate the wrong child's progress.
+    const progress = await prisma.missionProgress.findFirst({
+      where: {
+        missionId,
+        child: { parentId: session.user.id },
+      },
+    });
+
+    if (!progress) {
+      return NextResponse.json({ error: "Mission not found" }, { status: 404 });
+    }
 
     // Update the progress
     await prisma.missionProgress.update({
       where: {
         childId_missionId: {
-          childId: child.id,
+          childId: progress.childId,
           missionId,
         },
       },

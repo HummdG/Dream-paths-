@@ -46,7 +46,7 @@ export const authOptions: NextAuthOptions = {
         })
 
         if (!parent || !parent.passwordHash) {
-          throw new Error('No account found with this email')
+          throw new Error('Invalid email or password')
         }
 
         if (!parent.emailVerified) {
@@ -56,7 +56,7 @@ export const authOptions: NextAuthOptions = {
         const isPasswordValid = await compare(credentials.password, parent.passwordHash)
 
         if (!isPasswordValid) {
-          throw new Error('Invalid password')
+          throw new Error('Invalid email or password')
         }
 
         return {

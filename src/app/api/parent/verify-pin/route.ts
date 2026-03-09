@@ -1,18 +1,23 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { verifyPin, signParentCookie, PARENT_PIN_COOKIE, cookieOptions } from '@/lib/parent-pin'
+import { checkRateLimit, rateLimitedResponse } from '@/lib/rate-limit'
 
 const PIN_REGEX = /^\d{6}$/
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   const parentId = session.user.id
+
+  // 5 attempts per 15 minutes per parent — prevents brute forcing the 6-digit PIN
+  const rl = checkRateLimit(`verify-pin:${parentId}`, 5, 15 * 60 * 1000)
+  if (!rl.allowed) return rateLimitedResponse(rl.resetAt)
 
   let pin: string
   try {

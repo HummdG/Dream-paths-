@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendContactEmail } from '@/lib/email'
+import { checkRateLimit, getClientIp, rateLimitedResponse } from '@/lib/rate-limit'
 
 export async function POST(req: NextRequest) {
+  // 5 submissions per IP per hour — prevents inbox flooding and Resend quota drain
+  const ip = getClientIp(req.headers)
+  const rl = checkRateLimit(`contact:${ip}`, 5, 60 * 60 * 1000)
+  if (!rl.allowed) return rateLimitedResponse(rl.resetAt)
+
   const body = await req.json()
   const { name, email, type, message } = body
 

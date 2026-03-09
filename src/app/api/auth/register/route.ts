@@ -27,10 +27,11 @@ export async function POST(request: NextRequest) {
     })
 
     if (existingUser) {
-      return NextResponse.json(
-        { error: 'An account with this email already exists' },
-        { status: 400 }
-      )
+      // Return generic response — don't confirm whether the email is registered
+      return NextResponse.json({
+        success: true,
+        message: 'Please check your email to verify your account',
+      })
     }
 
     // Hash password
