@@ -4,9 +4,18 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { X, ChevronRight, ChevronLeft } from "lucide-react";
 
-const TOUR_KEY = "snake-tour-v1-seen";
-// The tour auto-opens on the first snake mission regardless of which step the user is on
-const TOUR_MISSION_ID = "sn1_hello_python";
+// First mission ID of each free starter pack
+const FREE_PACK_FIRST_MISSIONS = [
+  "sn1_hello_python",
+  "rc1_mission_briefing",
+  "pm1_first_day",
+] as const;
+
+type FreeMissionId = typeof FREE_PACK_FIRST_MISSIONS[number];
+
+function tourKey(childId: string) {
+  return `pack-tour-v1-seen-${childId}`;
+}
 
 const PADDING = 10;    // px of breathing room around each spotlight target
 const TOOLTIP_W = 340; // card width in px
@@ -20,13 +29,28 @@ interface TourStep {
   description: string;
 }
 
-const TOUR_STEPS: TourStep[] = [
-  {
+const INTRO_BY_MISSION: Record<FreeMissionId, { emoji: string; title: string; description: string }> = {
+  sn1_hello_python: {
     emoji: "🐍",
     title: "Welcome to DreamPaths!",
     description:
       "I'm Slimy the snake! You're going to learn Python by writing code that controls ME. Let me quickly show you around so you know where everything is!",
   },
+  rc1_mission_briefing: {
+    emoji: "🚀",
+    title: "Welcome to DreamPaths!",
+    description:
+      "Strap in, Space Cadet! You're going to learn Python by writing code that launches and steers a real rocket. Let me quickly show you around so you know where everything is!",
+  },
+  pm1_first_day: {
+    emoji: "🩺",
+    title: "Welcome to DreamPaths!",
+    description:
+      "Welcome to the Junior Medic Academy! You're going to learn Python by writing code that monitors patients and keeps them healthy. Let me quickly show you around!",
+  },
+};
+
+const SHARED_STEPS: TourStep[] = [
   {
     target: "step-panel",
     emoji: "📋",
@@ -45,49 +69,49 @@ const TOUR_STEPS: TourStep[] = [
     target: "game-preview",
     scrollIntoView: true,
     emoji: "🎮",
-    title: "The Snake Game",
+    title: "Your Game",
     description:
-      "Your code makes ME move! When you click Run Code, watch what happens here. You can also steer me with your arrow keys once the game is running. Can you find the red food?",
+      "Your code comes to life here! When you click Run Code, watch what happens. Don't forget — you can always use the hints if you get stuck.",
   },
   {
-    emoji: "🚀",
+    emoji: "🌟",
     title: "You're all set!",
     description:
-      "That's everything! Start by reading the mission instructions, write your code in the editor, and hit Run Code. Don't forget — you can always use the hints if you get stuck. Have fun! 🎉",
+      "That's everything! Start by reading the mission instructions, write your code in the editor, and hit Run Code. Have fun!",
   },
 ];
 
 const SPRING = { type: "spring" as const, stiffness: 320, damping: 28 };
 
-interface SnakeTourProps {
+interface PackTourProps {
   missionId: string;
+  childId: string;
 }
 
-export function SnakeTour({ missionId }: SnakeTourProps) {
+export function PackTour({ missionId, childId }: PackTourProps) {
   const [tourStep, setTourStep] = useState(0);
   const [visible, setVisible] = useState(false);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
-  // While true the card is hidden — we're scrolling/measuring before revealing it
   const [isMeasuring, setIsMeasuring] = useState(false);
 
-  // Show the tour the first time the user visits the first snake mission.
-  // Runs once on mount — the parent only renders this component for snake missions.
+  const isTourMission = (FREE_PACK_FIRST_MISSIONS as readonly string[]).includes(missionId);
+  const intro = isTourMission ? INTRO_BY_MISSION[missionId as FreeMissionId] : null;
+  const tourSteps: TourStep[] = intro
+    ? [{ emoji: intro.emoji, title: intro.title, description: intro.description }, ...SHARED_STEPS]
+    : [];
+
   useEffect(() => {
-    if (missionId !== TOUR_MISSION_ID) return;
+    if (!isTourMission) return;
     try {
-      if (!localStorage.getItem(TOUR_KEY)) setVisible(true);
-    } catch { /* localStorage unavailable — skip tour silently */ }
+      if (!localStorage.getItem(tourKey(childId))) setVisible(true);
+    } catch { /* localStorage unavailable */ }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Measure the target element whenever the tour step changes
   useEffect(() => {
-    if (!visible) return;
+    if (!visible || tourSteps.length === 0) return;
 
-    const step = TOUR_STEPS[tourStep];
-
-    // Clear rect. For steps that need to scroll+measure, also hide the card
-    // so it doesn't briefly flash in the center before snapping to its final position.
+    const step = tourSteps[tourStep];
     setTargetRect(null);
 
     if (!step.target) {
@@ -95,7 +119,7 @@ export function SnakeTour({ missionId }: SnakeTourProps) {
       return;
     }
 
-    setIsMeasuring(true); // hide card until we've scrolled and measured
+    setIsMeasuring(true);
 
     const run = async () => {
       const el = document.querySelector(`[data-tour="${step.target}"]`);
@@ -103,42 +127,38 @@ export function SnakeTour({ missionId }: SnakeTourProps) {
 
       if (step.scrollIntoView) {
         el.scrollIntoView({ behavior: "smooth", block: "center" });
-        // Wait for the smooth scroll to settle before measuring
         await new Promise<void>(r => setTimeout(r, 650));
       }
 
       setTargetRect(el.getBoundingClientRect());
-      setIsMeasuring(false); // reveal card in its correct position
+      setIsMeasuring(false);
     };
 
     const t = setTimeout(run, 80);
     return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tourStep, visible]);
 
   const handleNext = () =>
-    tourStep < TOUR_STEPS.length - 1 ? setTourStep(s => s + 1) : finish();
+    tourStep < tourSteps.length - 1 ? setTourStep(s => s + 1) : finish();
 
   const handlePrev = () =>
     tourStep > 0 && setTourStep(s => s - 1);
 
   const finish = () => {
-    try { localStorage.setItem(TOUR_KEY, "1"); } catch { /* ignore */ }
+    try { localStorage.setItem(tourKey(childId), "1"); } catch { /* ignore */ }
     setVisible(false);
   };
 
-  if (!visible) return null;
+  if (!visible || tourSteps.length === 0) return null;
 
-  const step = TOUR_STEPS[tourStep];
-  const isLast = tourStep === TOUR_STEPS.length - 1;
-
-  // Only show spotlight when the CURRENT tour step declares a target AND we've measured it.
-  // This prevents a stale rect from a previous step bleeding into a targetless step.
+  const step = tourSteps[tourStep];
+  const isLast = tourStep === tourSteps.length - 1;
   const showSpotlight = !!step.target && !!targetRect && !isMeasuring;
 
-  // ── Card inner content (shared between centered and positioned variants) ──────
   const cardContent = (
     <>
-      <div className="relative bg-gradient-to-r from-emerald-500 to-teal-500 px-5 pt-5 pb-4">
+      <div className="relative bg-gradient-to-r from-violet-500 to-indigo-500 px-5 pt-5 pb-4">
         <button
           onClick={finish}
           className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/20 text-white/80 hover:bg-white/40 hover:text-white flex items-center justify-center transition-all"
@@ -159,11 +179,11 @@ export function SnakeTour({ missionId }: SnakeTourProps) {
 
         {/* Progress dots */}
         <div className="flex items-center gap-1.5 mb-4">
-          {TOUR_STEPS.map((_, i) => (
+          {tourSteps.map((_, i) => (
             <div
               key={i}
               className={`h-2 rounded-full transition-all duration-300 ${
-                i === tourStep ? "w-6 bg-emerald-500" : i < tourStep ? "w-2 bg-emerald-300" : "w-2 bg-gray-200"
+                i === tourStep ? "w-6 bg-violet-500" : i < tourStep ? "w-2 bg-violet-300" : "w-2 bg-gray-200"
               }`}
             />
           ))}
@@ -184,9 +204,9 @@ export function SnakeTour({ missionId }: SnakeTourProps) {
           )}
           <button
             onClick={handleNext}
-            className="flex items-center gap-1.5 px-5 py-2.5 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 active:scale-95 transition-all text-sm shadow-sm"
+            className="flex items-center gap-1.5 px-5 py-2.5 bg-violet-500 text-white rounded-xl font-bold hover:bg-violet-600 active:scale-95 transition-all text-sm shadow-sm"
           >
-            {isLast ? "Let's go! 🚀" : "Next"}
+            {isLast ? "Let's go!" : "Next"}
             {!isLast && <ChevronRight className="w-4 h-4" />}
           </button>
         </div>
@@ -194,7 +214,6 @@ export function SnakeTour({ missionId }: SnakeTourProps) {
     </>
   );
 
-  // ── Spotlight tooltip position ────────────────────────────────────────────────
   let spotlightStyle: React.CSSProperties = {};
   if (showSpotlight && targetRect) {
     const centerX = targetRect.left + targetRect.width / 2;
@@ -209,12 +228,9 @@ export function SnakeTour({ missionId }: SnakeTourProps) {
 
   return (
     <>
-      {/* ── Dark overlay ───────────────────────────────────────────────────── */}
       {showSpotlight && targetRect ? (
         <>
-          {/* Click-blocker (transparent, covers viewport) */}
           <div style={{ position: "fixed", inset: 0, zIndex: 9000 }} onClick={e => e.stopPropagation()} />
-          {/* Spotlight ring — giant box-shadow darkens everything outside it */}
           <div
             style={{
               position: "fixed",
@@ -237,12 +253,7 @@ export function SnakeTour({ missionId }: SnakeTourProps) {
         />
       )}
 
-      {/* ── Card (hidden while scrolling/measuring to avoid flash-of-center) ── */}
       {!isMeasuring && showSpotlight ? (
-        /*
-         * SPOTLIGHT MODE — card sits beside the highlighted element.
-         * Position is set via left/right/top; no CSS transform needed.
-         */
         <motion.div
           key={`card-spot-${tourStep}`}
           initial={{ opacity: 0, scale: 0.9, y: 8 }}
@@ -254,10 +265,6 @@ export function SnakeTour({ missionId }: SnakeTourProps) {
           {cardContent}
         </motion.div>
       ) : !isMeasuring ? (
-        /*
-         * CENTERED MODE — a flexbox wrapper centers the card on any screen.
-         * The motion.div animates with `y` freely; no CSS transform conflict.
-         */
         <div
           style={{
             position: "fixed",

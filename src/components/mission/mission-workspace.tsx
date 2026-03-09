@@ -30,7 +30,7 @@ import { CharacterCreator } from "@/components/character-creator";
 import { LevelDesigner, LevelData } from "@/components/level-designer";
 import { SpriteDesigner } from "@/components/sprite-designer";
 import { SimpleEditor } from "@/components/code-editor/simple-editor";
-import { SnakeTour } from "@/components/mission/snake-tour";
+import { PackTour } from "@/components/mission/pack-tour";
 
 // Grid size must match game-preview.tsx's gridSize constant.
 const GRID_SIZE = 20;
@@ -795,8 +795,10 @@ __captured_output__
           />
         ) : (
         <div className="grid lg:grid-cols-[1fr_400px] gap-4">
-          {/* Snake-only UI tour — shown once, on first visit to sn1_hello_python */}
-          {isSnakeMission && <SnakeTour missionId={mission.missionId} />}
+          {/* UI tour — shown once per child on their first visit to each free starter pack */}
+          {(isSnakeMission || isRocketMission || isPatientMission) && (
+            <PackTour missionId={mission.missionId} childId={childId} />
+          )}
 
           {/* Left side: Code editor + Game preview — natural height, scrollable on small screens */}
           <div className="flex flex-col gap-4">
