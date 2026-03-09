@@ -49,7 +49,14 @@ export const metadata: Metadata = {
     description: siteDescription,
     url: "https://dreampaths.co.uk",
     siteName: "DreamPaths",
-    images: ["/logo.svg"],
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: siteTitle,
+      },
+    ],
     locale: "en_GB",
     type: "website",
   },
@@ -57,7 +64,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteTitle,
     description: siteDescription,
-    images: ["/logo.svg"],
+    images: ["/og-image.png"],
   },
   alternates: {
     canonical: "https://dreampaths.co.uk",
