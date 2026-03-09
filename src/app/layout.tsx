@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     siteName: "DreamPaths",
     images: [
       {
-        url: "/og-image.jpeg",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: siteTitle,
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteTitle,
     description: siteDescription,
-    images: ["/og-image.png"],
+    images: ["/og-image.jpg"],
   },
   alternates: {
     canonical: "https://dreampaths.co.uk",
