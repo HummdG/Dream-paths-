@@ -11,7 +11,7 @@ const nunito = Nunito({
 
 const siteTitle = "DreamPaths – Career Adventures for Kids";
 const siteDescription =
-  "DreamPaths gives kids aged 8-14 a taste of real careers through hands-on missions. Build games as a Computer Scientist, launch rockets as an Astronaut, or save lives as a Doctor. Every path teaches real skills, one project at a time.";
+  "DreamPaths gives kids of all ages a taste of real careers through hands-on missions. Build games as a Computer Scientist, launch rockets as an Astronaut, or save lives as a Doctor. Every path teaches real skills, one project at a time.";
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://dreampaths.co.uk'),
@@ -31,9 +31,9 @@ export const metadata: Metadata = {
   ],
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon2.ico", sizes: "any" },
+      { url: "/favicon2-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon2-32x32.png", sizes: "32x32", type: "image/png" },
     ],
     apple: [
       { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
