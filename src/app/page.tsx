@@ -96,7 +96,7 @@ const CAREER_PATHS = [
     pathId: null,
     label: 'AI Engineer',
     emoji: '🤖',
-    image: null,
+    image: '/ai_engineer.png',
     gradient: 'from-gray-400 to-gray-500',
     tagline: 'Machine learning & data science',
     available: false,
@@ -291,6 +291,14 @@ export default function Home() {
                   <p className="text-center text-[10px] font-bold text-[var(--color-navy)] mt-1">Doctor</p>
                 </button>
               </motion.div>
+
+              {/* AI Engineer — Coming Soon */}
+              <div className="flex flex-col items-center">
+                <div className="relative" style={{ filter: 'grayscale(1) drop-shadow(3px 6px 3px rgba(0,0,0,0.3))' }}>
+                  <Image src="/ai_engineer.png" width={110} height={110} alt="AI Engineer" className="opacity-60" />
+                </div>
+                <p className="text-center text-[10px] font-bold text-gray-400 mt-1">Coming Soon</p>
+              </div>
             </motion.div>
 
             {/* Right: character cardboard cutouts — hidden on mobile */}
@@ -299,7 +307,7 @@ export default function Home() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              style={{ minHeight: '480px' }}
+              style={{ minHeight: '520px' }}
             >
               {/* Circle background — FIRST in DOM so it is naturally behind all characters */}
               <div
@@ -321,44 +329,10 @@ export default function Home() {
                 />
               </div>
 
-              {/* Kid 1: Programmer — Computer Scientist */}
+              {/* Astronaut — 12 o'clock (top center) */}
               <motion.div
                 className="absolute group cursor-pointer"
-                style={{ bottom: '0px', left: '2%', transformOrigin: '50% 100%' }}
-                animate={{ rotate: [-3, 3, -3] }}
-                whileHover={{ rotate: 0, transition: { duration: 0.15 } }}
-                transition={{ repeat: Infinity, duration: 2.4, ease: "easeInOut", repeatType: "loop" }}
-              >
-                <button onClick={() => handlePathClick('computer_scientist', '/paths/computer_scientist')} className="block bg-transparent border-0 p-0 text-left">
-                  <div
-                    className="relative transition-transform duration-200 group-hover:scale-[1.06]"
-                    style={{ filter: 'drop-shadow(5px 10px 4px rgba(0,0,0,0.45))' }}
-                  >
-                    <Image
-                      src="/programmer.png"
-                      width={220}
-                      height={220}
-                      alt="Computer Scientist"
-                      className="group-hover:opacity-0 transition-opacity duration-150"
-                    />
-                    <Image
-                      src="/programmer_with_outline.png"
-                      width={220}
-                      height={220}
-                      alt="Computer Scientist"
-                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150"
-                    />
-                  </div>
-                  <div className="text-center mt-2 font-bold text-xs text-white bg-[var(--color-indigo)] px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-150 shadow-lg">
-                    Computer Scientist
-                  </div>
-                </button>
-              </motion.div>
-
-              {/* Kid 2: Rocket — Astronaut (faster, more energetic) */}
-              <motion.div
-                className="absolute group cursor-pointer"
-                style={{ top: '-30px', left: '38%', transformOrigin: '50% 100%' }}
+                style={{ top: '-30px', left: 'calc(50% - 105px)', transformOrigin: '50% 100%' }}
                 animate={{ rotate: [-5, 5, -5] }}
                 whileHover={{ rotate: 0, transition: { duration: 0.15 } }}
                 transition={{ repeat: Infinity, duration: 1.9, ease: "easeInOut", repeatType: "loop" }}
@@ -368,20 +342,8 @@ export default function Home() {
                     className="relative transition-transform duration-200 group-hover:scale-[1.06]"
                     style={{ filter: 'drop-shadow(5px 10px 4px rgba(0,0,0,0.45))' }}
                   >
-                    <Image
-                      src="/rocket.png"
-                      width={210}
-                      height={210}
-                      alt="Astronaut"
-                      className="group-hover:opacity-0 transition-opacity duration-150"
-                    />
-                    <Image
-                      src="/rocket_outline.png"
-                      width={210}
-                      height={210}
-                      alt="Astronaut"
-                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150"
-                    />
+                    <Image src="/rocket.png" width={210} height={210} alt="Astronaut" className="group-hover:opacity-0 transition-opacity duration-150" />
+                    <Image src="/rocket_outline.png" width={210} height={210} alt="Astronaut" className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
                   </div>
                   <div className="text-center mt-2 font-bold text-xs text-white bg-[var(--color-indigo)] px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-150 shadow-lg">
                     Astronaut
@@ -389,10 +351,10 @@ export default function Home() {
                 </button>
               </motion.div>
 
-              {/* Kid 3: Scientist — Doctor */}
+              {/* Scientist — 3 o'clock (right center) */}
               <motion.div
                 className="absolute group cursor-pointer"
-                style={{ bottom: '0px', right: '0%', transformOrigin: '50% 100%' }}
+                style={{ top: 'calc(50% - 108px)', right: '-10px', transformOrigin: '50% 100%' }}
                 animate={{ rotate: [-3, 3, -3] }}
                 whileHover={{ rotate: 0, transition: { duration: 0.15 } }}
                 transition={{ repeat: Infinity, duration: 2.7, ease: "easeInOut", repeatType: "loop", delay: 0.8 }}
@@ -402,23 +364,49 @@ export default function Home() {
                     className="relative transition-transform duration-200 group-hover:scale-[1.06]"
                     style={{ filter: 'drop-shadow(5px 10px 4px rgba(0,0,0,0.45))' }}
                   >
-                    <Image
-                      src="/scientist.png"
-                      width={215}
-                      height={215}
-                      alt="Doctor"
-                      className="group-hover:opacity-0 transition-opacity duration-150"
-                    />
-                    <Image
-                      src="/sceintist_outline.png"
-                      width={215}
-                      height={215}
-                      alt="Doctor"
-                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150"
-                    />
+                    <Image src="/scientist.png" width={215} height={215} alt="Doctor" className="group-hover:opacity-0 transition-opacity duration-150" />
+                    <Image src="/sceintist_outline.png" width={215} height={215} alt="Doctor" className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
                   </div>
                   <div className="text-center mt-2 font-bold text-xs text-white bg-[var(--color-indigo)] px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-150 shadow-lg">
                     Doctor
+                  </div>
+                </button>
+              </motion.div>
+
+              {/* AI Engineer — 6 o'clock (bottom center) — Coming Soon */}
+              <div
+                className="absolute flex flex-col items-center"
+                style={{ bottom: '0px', left: 'calc(50% - 107px)' }}
+              >
+                <div
+                  className="relative"
+                  style={{ filter: 'grayscale(1) drop-shadow(5px 10px 4px rgba(0,0,0,0.3))' }}
+                >
+                  <Image src="/ai_engineer.png" width={215} height={215} alt="AI Engineer" className="opacity-60" />
+                </div>
+                <div className="text-center mt-2 font-bold text-xs text-white bg-gray-400 px-3 py-1 rounded-full shadow-lg">
+                  Coming Soon
+                </div>
+              </div>
+
+              {/* Programmer — 9 o'clock (left center) */}
+              <motion.div
+                className="absolute group cursor-pointer"
+                style={{ top: 'calc(50% - 110px)', left: '-10px', transformOrigin: '50% 100%' }}
+                animate={{ rotate: [-3, 3, -3] }}
+                whileHover={{ rotate: 0, transition: { duration: 0.15 } }}
+                transition={{ repeat: Infinity, duration: 2.4, ease: "easeInOut", repeatType: "loop" }}
+              >
+                <button onClick={() => handlePathClick('computer_scientist', '/paths/computer_scientist')} className="block bg-transparent border-0 p-0 text-left">
+                  <div
+                    className="relative transition-transform duration-200 group-hover:scale-[1.06]"
+                    style={{ filter: 'drop-shadow(5px 10px 4px rgba(0,0,0,0.45))' }}
+                  >
+                    <Image src="/programmer.png" width={220} height={220} alt="Computer Scientist" className="group-hover:opacity-0 transition-opacity duration-150" />
+                    <Image src="/programmer_with_outline.png" width={220} height={220} alt="Computer Scientist" className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
+                  </div>
+                  <div className="text-center mt-2 font-bold text-xs text-white bg-[var(--color-indigo)] px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-150 shadow-lg">
+                    Computer Scientist
                   </div>
                 </button>
               </motion.div>
@@ -578,8 +566,8 @@ export default function Home() {
         <img
           src="/parents_choice1.png"
           alt=""
-          className="absolute inset-0 w-full h-full object-cover object-top opacity-10 scale-[1.0]"
-          style={{ objectFit: 'cover', objectPosition: 'center 20%' }}
+          className="absolute left-0 w-full h-auto opacity-10"
+          style={{ top: '50%', transform: 'translateY(-50%)' }}
         />
 
         {/* Why DreamPaths Section */}
