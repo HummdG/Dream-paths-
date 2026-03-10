@@ -212,7 +212,7 @@ export default function Home() {
               </h1>
 
               <p className="text-lg text-gray-600 mb-4 leading-relaxed">
-                Think Minecraft, but your child writes every line of code. Kids pick a dream career and learn real Python by actually building it. One mission a week.
+                Think Minecraft, but your child writes every line of code. Kids pick a career they love and learn towards it through hands-on missions that build real skills along the way.
               </p>
 
               <div className="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-full text-sm mb-8">
