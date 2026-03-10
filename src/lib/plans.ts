@@ -30,6 +30,12 @@ export interface CareerPathMeta {
   description: string;
   /** Short bullet points shown in marketing/slideshow */
   preview: string[];
+  /** Hero section background image path */
+  heroBackground?: string;
+  /** Front-on character image path (detail card / banner) */
+  frontOnImage?: string;
+  /** Homepage-style character image used in path marketing hero */
+  heroCharacterImage?: string;
 }
 
 export const CAREER_PATHS: Record<string, CareerPathMeta> = {
@@ -44,6 +50,9 @@ export const CAREER_PATHS: Record<string, CareerPathMeta> = {
       'Build a full Platformer with gravity, enemies & coins',
       'Design a custom pixel-art hero character',
     ],
+    heroBackground: '/computer_scientist_hero_background.png',
+    frontOnImage: '/computer_scientist_front_on_image.png',
+    heroCharacterImage: '/programmer.png',
   },
   astronaut: {
     label: 'Astronaut',
@@ -56,18 +65,24 @@ export const CAREER_PATHS: Record<string, CareerPathMeta> = {
       'Simulate real gravity and orbital physics',
       'Run experiments and explore the solar system',
     ],
+    heroBackground: '/astronaut_hero_background.png',
+    frontOnImage: '/astronaut_front_on_image.png',
+    heroCharacterImage: '/rocket.png',
   },
   doctor: {
     label: 'Doctor',
     emoji: '🩺',
     gradient: 'from-cyan-500 to-teal-600',
     tagline: 'Biology, anatomy & medical science',
-    description: 'Step into the hospital and learn biology through code. Build a patient monitor that tracks heart rate and vitals, write a diagnosis system, and create medical tools — all in Python. Start as a Junior Medic and work your way up to performing digital surgery!',
+    description: 'Step into the hospital and learn biology through code. Build a patient monitor that tracks heart rate and vitals, write a diagnosis system, and create medical tools -- all in Python. Start as a Junior Medic and work your way up to performing digital surgery!',
     preview: [
       'Build a patient monitor that tracks vitals in Python',
       'Write a diagnosis system and treatment planner',
       'Explore biology, anatomy, and medical science',
     ],
+    heroBackground: '/doctor_hero_background.png',
+    frontOnImage: '/doctor_front_on_image.png',
+    heroCharacterImage: '/scientist.png',
   },
 }
 

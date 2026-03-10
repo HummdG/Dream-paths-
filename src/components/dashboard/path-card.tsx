@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Lock, ArrowRight } from "lucide-react";
 import type { PackProgress } from "@/lib/missions";
 import { CAREER_PATHS, FREE_PACK_IDS } from "@/lib/plans";
@@ -39,12 +40,34 @@ export function PathCard({ entry }: PathCardProps) {
   return (
     <div className="rounded-2xl overflow-hidden shadow-md border border-gray-100 flex flex-col h-full hover:shadow-lg transition-shadow duration-200">
       {/* Header */}
-      <div className={`bg-gradient-to-br ${meta.gradient} p-5`}>
-        <div className="text-3xl mb-2">{meta.emoji}</div>
-        <h3 className="text-white font-bold text-lg leading-tight">
-          {meta.label}
-        </h3>
-        <p className="text-white/75 text-xs mt-0.5">{meta.tagline}</p>
+      <div className={`relative overflow-hidden bg-gradient-to-br ${meta.gradient} p-5`}>
+        {meta.heroBackground && (
+          <Image
+            src={meta.heroBackground}
+            fill
+            alt=""
+            className="object-cover object-center opacity-20"
+          />
+        )}
+        <div className="relative z-10 flex items-end justify-between">
+          <div>
+            <div className="text-3xl mb-2">{meta.emoji}</div>
+            <h3 className="text-white font-bold text-lg leading-tight">
+              {meta.label}
+            </h3>
+            <p className="text-white/75 text-xs mt-0.5">{meta.tagline}</p>
+          </div>
+          {meta.frontOnImage && (
+            <Image
+              src={meta.frontOnImage}
+              width={64}
+              height={80}
+              alt={meta.label}
+              className="shrink-0"
+              style={{ filter: 'drop-shadow(0 3px 8px rgba(0,0,0,0.3))' }}
+            />
+          )}
+        </div>
       </div>
 
       {/* Body */}

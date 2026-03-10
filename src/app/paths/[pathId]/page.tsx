@@ -49,35 +49,65 @@ export default async function PathMarketingPage({ params }: PathMarketingPagePro
       </nav>
 
       {/* Hero */}
-      <section
-        className={`pt-32 pb-16 px-6 bg-gradient-to-br ${meta.gradient}`}
-      >
-        <div className="max-w-4xl mx-auto text-center text-white">
-          <div className="text-6xl mb-5">{meta.emoji}</div>
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">
-            {meta.label}
-          </h1>
-          <p className="text-lg text-white/80 max-w-xl mx-auto mb-8">
-            {meta.description}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/signup"
-              className="flex items-center justify-center gap-2 bg-white text-[var(--color-navy)] font-bold px-8 py-3 rounded-full hover:bg-white/90 transition-colors"
-            >
-              Start Free
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link
-              href="#pricing"
-              className="flex items-center justify-center px-8 py-3 rounded-full border-2 border-white/50 text-white font-semibold hover:bg-white/10 transition-colors"
-            >
-              See Pricing
-            </Link>
+      <section className="relative overflow-hidden pt-32 pb-16 px-6" style={{ minHeight: '400px' }}>
+        {/* Background image — full opacity, path scene */}
+        {meta.heroBackground ? (
+          <Image
+            src={meta.heroBackground}
+            fill
+            alt=""
+            className="object-cover object-center"
+            priority
+          />
+        ) : (
+          <div className={`absolute inset-0 bg-gradient-to-br ${meta.gradient}`} />
+        )}
+        {/* Colour tint overlay using path gradient */}
+        <div className={`absolute inset-0 bg-gradient-to-br ${meta.gradient} opacity-70`} />
+        {/* Dark overlay on left to ensure text is readable */}
+        <div
+          className="absolute inset-0"
+          style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 45%, transparent 70%)' }}
+        />
+
+        <div className="relative z-10 max-w-5xl mx-auto flex flex-col md:flex-row items-end gap-8">
+          <div className="text-left text-white flex-1 pb-4">
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">
+              {meta.label}
+            </h1>
+            <p className="text-lg text-white/85 max-w-xl mb-8">
+              {meta.description}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link
+                href="/signup"
+                className="flex items-center justify-center gap-2 bg-white text-[var(--color-navy)] font-bold px-8 py-3 rounded-full hover:bg-white/90 transition-colors"
+              >
+                Start Free
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+              <Link
+                href="#pricing"
+                className="flex items-center justify-center px-8 py-3 rounded-full border-2 border-white/50 text-white font-semibold hover:bg-white/10 transition-colors"
+              >
+                See Pricing
+              </Link>
+            </div>
+            <p className="mt-4 text-sm text-white/60">
+              ✓ No credit card required &nbsp;·&nbsp; Free starter included
+            </p>
           </div>
-          <p className="mt-4 text-sm text-white/60">
-            ✓ No credit card required &nbsp;·&nbsp; Free starter included
-          </p>
+          {meta.heroCharacterImage && (
+            <div className="hidden md:block shrink-0 self-end">
+              <Image
+                src={meta.heroCharacterImage}
+                width={240}
+                height={240}
+                alt={meta.label}
+                style={{ filter: 'drop-shadow(5px 10px 6px rgba(0,0,0,0.45))' }}
+              />
+            </div>
+          )}
         </div>
       </section>
 

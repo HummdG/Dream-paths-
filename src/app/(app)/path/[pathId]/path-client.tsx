@@ -73,16 +73,39 @@ export function PathClient({ pathId, packsProgress, heroPixels }: PathClientProp
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`bg-gradient-to-r ${meta.gradient} rounded-2xl p-6 text-white mb-8`}
+            className={`relative overflow-hidden bg-gradient-to-r ${meta.gradient} rounded-2xl p-6 text-white mb-8`}
           >
-            <div className="text-4xl mb-3">{meta.emoji}</div>
-            <h1 className="text-2xl font-bold mb-1">{meta.label}</h1>
-            <p className="text-white/80 text-sm mb-4">{meta.tagline}</p>
-            <div className="flex gap-6 text-sm text-white/80">
-              <span>
-                {completedCount}/{totalCount} missions
-              </span>
-              <span>⭐ {totalStars} stars</span>
+            {meta.heroBackground && (
+              <Image
+                src={meta.heroBackground}
+                fill
+                alt=""
+                className="object-cover object-center opacity-20"
+              />
+            )}
+            <div className="relative z-10 flex items-center justify-between">
+              <div>
+                <div className="text-4xl mb-3">{meta.emoji}</div>
+                <h1 className="text-2xl font-bold mb-1">{meta.label}</h1>
+                <p className="text-white/80 text-sm mb-4">{meta.tagline}</p>
+                <div className="flex gap-6 text-sm text-white/80">
+                  <span>
+                    {completedCount}/{totalCount} missions
+                  </span>
+                  <span>⭐ {totalStars} stars</span>
+                </div>
+              </div>
+              {meta.frontOnImage && (
+                <div className="hidden sm:block shrink-0 self-end">
+                  <Image
+                    src={meta.frontOnImage}
+                    width={120}
+                    height={150}
+                    alt={meta.label}
+                    style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))' }}
+                  />
+                </div>
+              )}
             </div>
           </motion.div>
         )}
