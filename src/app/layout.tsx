@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Nunito } from "next/font/google";
+import { Baloo_2 } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 
-const nunito = Nunito({ 
+const baloo = Baloo_2({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-nunito",
+  variable: "--font-baloo",
 });
 
 const siteTitle = "DreamPaths – Career Adventures for Kids";
@@ -78,7 +78,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${nunito.variable} font-sans antialiased`}>
+      <body className={`${baloo.variable} font-sans antialiased`}>
         <Providers>
           {children}
         </Providers>

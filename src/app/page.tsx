@@ -198,7 +198,7 @@ export default function Home() {
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[var(--color-navy)] leading-tight mb-6">
                 Real Python skills,{" "}
                 <span className="bg-gradient-to-r from-[var(--color-indigo)] to-[var(--color-violet)] bg-clip-text text-transparent">
-                  disguised as their favourite game.
+                  disguised as their dream career.
                 </span>
               </h1>
 
