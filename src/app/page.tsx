@@ -8,6 +8,7 @@ import { CheckCircle, ArrowRight, Sparkles, Lock } from "lucide-react";
 import { PathSlideshow } from "@/components/homepage/path-slideshow";
 import { AppScreensSlideshow } from "@/components/homepage/app-screens-slideshow";
 import { LegalModal } from "@/components/legal/legal-modal";
+import { PathTransitionOverlay, type TransitionPathId } from "@/components/homepage/path-transition-overlay";
 
 const LOGOS = [
   { src: "/meta-brand-color.svg", alt: "Meta", width: 120, height: 48 },
@@ -62,7 +63,7 @@ const CAREER_PATHS = [
     pathId: 'computer_scientist',
     label: 'Computer Scientist',
     emoji: '💻',
-    image: '/computer_scientist_front_on_image.png',
+    image: '/programmer.png',
     gradient: 'from-indigo-500 to-violet-600',
     tagline: 'Learn Python by building real games',
     available: true,
@@ -73,7 +74,7 @@ const CAREER_PATHS = [
     pathId: 'astronaut',
     label: 'Astronaut',
     emoji: '🚀',
-    image: '/astronaut_front_on_image.png',
+    image: '/rocket.png',
     gradient: 'from-blue-500 to-cyan-400',
     tagline: 'Maths, physics & space science',
     available: true,
@@ -84,7 +85,7 @@ const CAREER_PATHS = [
     pathId: 'doctor',
     label: 'Doctor',
     emoji: '🩺',
-    image: '/doctor_front_on_image.png',
+    image: '/scientist.png',
     gradient: 'from-teal-500 to-emerald-400',
     tagline: 'Biology, anatomy & medical science',
     available: true,
@@ -128,6 +129,14 @@ const HOW_IT_WORKS = [
 export default function Home() {
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
+  const [activeTransition, setActiveTransition] = useState<{
+    pathId: TransitionPathId;
+    destination: string;
+  } | null>(null);
+
+  function handlePathClick(pathId: TransitionPathId, destination: string) {
+    setActiveTransition({ pathId, destination });
+  }
 
   return (
     <div className="min-h-screen bg-[var(--color-cream)]">
@@ -240,13 +249,13 @@ export default function Home() {
                 whileHover={{ rotate: 0, transition: { duration: 0.15 } }}
                 transition={{ repeat: Infinity, duration: 2.4, ease: "easeInOut", repeatType: "loop" }}
               >
-                <Link href="/paths/computer_scientist" className="block">
+                <button onClick={() => handlePathClick('computer_scientist', '/paths/computer_scientist')} className="block bg-transparent border-0 p-0">
                   <div className="relative" style={{ filter: 'drop-shadow(3px 6px 3px rgba(0,0,0,0.4))' }}>
                     <Image src="/programmer.png" width={110} height={110} alt="Computer Scientist" className="group-hover:opacity-0 transition-opacity duration-150" />
                     <Image src="/programmer_with_outline.png" width={110} height={110} alt="Computer Scientist" className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
                   </div>
                   <p className="text-center text-[10px] font-bold text-[var(--color-navy)] mt-1">Computer Scientist</p>
-                </Link>
+                </button>
               </motion.div>
 
               {/* Rocket */}
@@ -257,13 +266,13 @@ export default function Home() {
                 whileHover={{ rotate: 0, transition: { duration: 0.15 } }}
                 transition={{ repeat: Infinity, duration: 1.9, ease: "easeInOut", repeatType: "loop" }}
               >
-                <Link href="/paths/astronaut" className="block">
+                <button onClick={() => handlePathClick('astronaut', '/paths/astronaut')} className="block bg-transparent border-0 p-0">
                   <div className="relative" style={{ filter: 'drop-shadow(3px 6px 3px rgba(0,0,0,0.4))' }}>
                     <Image src="/rocket.png" width={110} height={110} alt="Astronaut" className="group-hover:opacity-0 transition-opacity duration-150" />
                     <Image src="/rocket_outline.png" width={110} height={110} alt="Astronaut" className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
                   </div>
                   <p className="text-center text-[10px] font-bold text-[var(--color-navy)] mt-1">Astronaut</p>
-                </Link>
+                </button>
               </motion.div>
 
               {/* Scientist */}
@@ -274,13 +283,13 @@ export default function Home() {
                 whileHover={{ rotate: 0, transition: { duration: 0.15 } }}
                 transition={{ repeat: Infinity, duration: 2.7, ease: "easeInOut", repeatType: "loop", delay: 0.8 }}
               >
-                <Link href="/paths/doctor" className="block">
+                <button onClick={() => handlePathClick('doctor', '/paths/doctor')} className="block bg-transparent border-0 p-0">
                   <div className="relative" style={{ filter: 'drop-shadow(3px 6px 3px rgba(0,0,0,0.4))' }}>
                     <Image src="/scientist.png" width={110} height={110} alt="Doctor" className="group-hover:opacity-0 transition-opacity duration-150" />
                     <Image src="/sceintist_outline.png" width={110} height={110} alt="Doctor" className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
                   </div>
                   <p className="text-center text-[10px] font-bold text-[var(--color-navy)] mt-1">Doctor</p>
-                </Link>
+                </button>
               </motion.div>
             </motion.div>
 
@@ -320,7 +329,7 @@ export default function Home() {
                 whileHover={{ rotate: 0, transition: { duration: 0.15 } }}
                 transition={{ repeat: Infinity, duration: 2.4, ease: "easeInOut", repeatType: "loop" }}
               >
-                <Link href="/paths/computer_scientist" className="block">
+                <button onClick={() => handlePathClick('computer_scientist', '/paths/computer_scientist')} className="block bg-transparent border-0 p-0 text-left">
                   <div
                     className="relative transition-transform duration-200 group-hover:scale-[1.06]"
                     style={{ filter: 'drop-shadow(5px 10px 4px rgba(0,0,0,0.45))' }}
@@ -343,7 +352,7 @@ export default function Home() {
                   <div className="text-center mt-2 font-bold text-xs text-white bg-[var(--color-indigo)] px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-150 shadow-lg">
                     Computer Scientist
                   </div>
-                </Link>
+                </button>
               </motion.div>
 
               {/* Kid 2: Rocket — Astronaut (faster, more energetic) */}
@@ -354,7 +363,7 @@ export default function Home() {
                 whileHover={{ rotate: 0, transition: { duration: 0.15 } }}
                 transition={{ repeat: Infinity, duration: 1.9, ease: "easeInOut", repeatType: "loop" }}
               >
-                <Link href="/paths/astronaut" className="block">
+                <button onClick={() => handlePathClick('astronaut', '/paths/astronaut')} className="block bg-transparent border-0 p-0 text-left">
                   <div
                     className="relative transition-transform duration-200 group-hover:scale-[1.06]"
                     style={{ filter: 'drop-shadow(5px 10px 4px rgba(0,0,0,0.45))' }}
@@ -377,7 +386,7 @@ export default function Home() {
                   <div className="text-center mt-2 font-bold text-xs text-white bg-[var(--color-indigo)] px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-150 shadow-lg">
                     Astronaut
                   </div>
-                </Link>
+                </button>
               </motion.div>
 
               {/* Kid 3: Scientist — Doctor */}
@@ -388,7 +397,7 @@ export default function Home() {
                 whileHover={{ rotate: 0, transition: { duration: 0.15 } }}
                 transition={{ repeat: Infinity, duration: 2.7, ease: "easeInOut", repeatType: "loop", delay: 0.8 }}
               >
-                <Link href="/paths/doctor" className="block">
+                <button onClick={() => handlePathClick('doctor', '/paths/doctor')} className="block bg-transparent border-0 p-0 text-left">
                   <div
                     className="relative transition-transform duration-200 group-hover:scale-[1.06]"
                     style={{ filter: 'drop-shadow(5px 10px 4px rgba(0,0,0,0.45))' }}
@@ -411,7 +420,7 @@ export default function Home() {
                   <div className="text-center mt-2 font-bold text-xs text-white bg-[var(--color-indigo)] px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-150 shadow-lg">
                     Doctor
                   </div>
-                </Link>
+                </button>
               </motion.div>
             </motion.div>
 
@@ -420,8 +429,15 @@ export default function Home() {
       </section>
 
       {/* "Choose Your Dream Path" section */}
-      <section className="py-20 px-6 bg-white">
-        <div className="max-w-6xl mx-auto">
+      <section className="relative py-20 px-6 bg-white overflow-hidden">
+        {/* Faded background image */}
+        <Image
+          src="/choose_your_path_bg.png"
+          fill
+          alt=""
+          className="object-cover object-center opacity-10"
+        />
+        <div className="relative z-10 max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-navy)] mb-4">
               Choose Your Dream Path
@@ -516,8 +532,14 @@ export default function Home() {
       </section>
 
       {/* How it works */}
-      <section id="how-it-works" className="py-20 px-6 bg-white">
-        <div className="max-w-6xl mx-auto">
+      <section id="how-it-works" className="relative py-20 px-6 bg-white overflow-hidden">
+        <Image
+          src="/how_it_works_bg1.png"
+          fill
+          alt=""
+          className="object-cover object-center opacity-5"
+        />
+        <div className="relative z-10 max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-navy)] mb-4">
               How it works
@@ -550,65 +572,76 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Why DreamPaths Section */}
-      <section className="py-20 px-6 bg-white">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-navy)] mb-4">
-              Why parents choose DreamPaths
-            </h2>
+      {/* Why DreamPaths + Trusted By — shared background */}
+      <div className="relative overflow-hidden bg-white">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/parents_choice1.png"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover object-top opacity-10 scale-[1.0]"
+          style={{ objectFit: 'cover', objectPosition: 'center 20%' }}
+        />
+
+        {/* Why DreamPaths Section */}
+        <section className="relative z-10 py-20 px-6">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-navy)] mb-4">
+                Why parents choose DreamPaths
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {/* Card 1 — Learning by doing */}
+              <div className="card text-center">
+                <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-[var(--color-indigo)] to-[var(--color-violet)] flex items-center justify-center text-2xl">
+                  🚀
+                </div>
+                <h3 className="text-lg font-bold text-[var(--color-navy)] mb-2">
+                  They build something real
+                </h3>
+                <p className="text-gray-500 text-sm leading-relaxed">
+                  Every mission produces something your child made from scratch. Real projects, real skills, and something worth showing off at the end.
+                </p>
+              </div>
+
+              {/* Card 2 — Transparency */}
+              <div className="card text-center">
+                <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-2xl">
+                  👀
+                </div>
+                <h3 className="text-lg font-bold text-[var(--color-navy)] mb-2">
+                  Full visibility for parents
+                </h3>
+                <p className="text-gray-500 text-sm leading-relaxed">
+                  A dedicated parent dashboard shows every mission, step, and star earned. Regular email updates keep you in the loop without any screen-time battles.
+                </p>
+              </div>
+
+              {/* Card 3 — Value */}
+              <div className="card text-center">
+                <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-2xl">
+                  💡
+                </div>
+                <h3 className="text-lg font-bold text-[var(--color-navy)] mb-2">
+                  Better value than a tutor
+                </h3>
+                <p className="text-gray-500 text-sm leading-relaxed">
+                  A private tutor costs £50 to £80 per hour. DreamPaths is a fraction of that, and your child builds a real project they can be proud of rather than doing worksheet drills.
+                </p>
+              </div>
+            </div>
           </div>
+        </section>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Card 1 — Learning by doing */}
-            <div className="card text-center">
-              <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-[var(--color-indigo)] to-[var(--color-violet)] flex items-center justify-center text-2xl">
-                🚀
-              </div>
-              <h3 className="text-lg font-bold text-[var(--color-navy)] mb-2">
-                They build something real
-              </h3>
-              <p className="text-gray-500 text-sm leading-relaxed">
-                Every mission produces something your child made from scratch. Real projects, real skills, and something worth showing off at the end.
-              </p>
-            </div>
-
-            {/* Card 2 — Transparency */}
-            <div className="card text-center">
-              <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-2xl">
-                👀
-              </div>
-              <h3 className="text-lg font-bold text-[var(--color-navy)] mb-2">
-                Full visibility for parents
-              </h3>
-              <p className="text-gray-500 text-sm leading-relaxed">
-                A dedicated parent dashboard shows every mission, step, and star earned. Regular email updates keep you in the loop without any screen-time battles.
-              </p>
-            </div>
-
-            {/* Card 3 — Value */}
-            <div className="card text-center">
-              <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-2xl">
-                💡
-              </div>
-              <h3 className="text-lg font-bold text-[var(--color-navy)] mb-2">
-                Better value than a tutor
-              </h3>
-              <p className="text-gray-500 text-sm leading-relaxed">
-                A private tutor costs £50 to £80 per hour. DreamPaths is a fraction of that, and your child builds a real project they can be proud of rather than doing worksheet drills.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Trusted By Section */}
-      <section className="py-10 bg-white border-y border-gray-100 overflow-hidden">
-        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 text-center mb-7">
-          Trusted by professionals at
-        </p>
-        <LogoMarquee />
-      </section>
+        {/* Trusted By Section */}
+        <section className="relative z-10 py-10 border-t border-gray-100 overflow-hidden">
+          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 text-center mb-7">
+            Trusted by professionals at
+          </p>
+          <LogoMarquee />
+        </section>
+      </div>
 
       {/* Pricing Section */}
       <section className="py-20 px-6">
@@ -749,6 +782,14 @@ export default function Home() {
 
       {showPrivacy && <LegalModal type="privacy" onClose={() => setShowPrivacy(false)} />}
       {showTerms && <LegalModal type="terms" onClose={() => setShowTerms(false)} />}
+
+      {activeTransition && (
+        <PathTransitionOverlay
+          pathId={activeTransition.pathId}
+          destination={activeTransition.destination}
+          onDone={() => setActiveTransition(null)}
+        />
+      )}
     </div>
   );
 }

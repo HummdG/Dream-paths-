@@ -51,7 +51,6 @@ export function PathCard({ entry }: PathCardProps) {
         )}
         <div className="relative z-10 flex items-end justify-between">
           <div>
-            <div className="text-3xl mb-2">{meta.emoji}</div>
             <h3 className="text-white font-bold text-lg leading-tight">
               {meta.label}
             </h3>
@@ -121,10 +120,8 @@ function PackRow({
     <div>
       <div className="flex items-center justify-between text-xs mb-1">
         <div className="flex items-center gap-1.5">
-          {isSubLocked ? (
+          {isSubLocked && (
             <Lock className="w-3 h-3 text-gray-400" />
-          ) : (
-            <span className="text-gray-500">🎮</span>
           )}
           <span
             className={`font-medium truncate max-w-[120px] ${isSubLocked ? "text-gray-400" : "text-gray-700"}`}

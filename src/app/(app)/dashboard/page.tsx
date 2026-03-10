@@ -11,8 +11,9 @@ import { getCachedDashboard } from "@/lib/queries";
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: { childId?: string };
+  searchParams: Promise<{ childId?: string }>;
 }) {
+  const resolvedParams = await searchParams;
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
@@ -26,7 +27,7 @@ export default async function DashboardPage({
   }
 
   // If there are multiple children and no childId selected, show the selector
-  if (parent.children.length > 1 && !searchParams.childId) {
+  if (parent.children.length > 1 && !resolvedParams.childId) {
     const childCards = parent.children.map((c) => {
       const totalCompleted = c.projects.reduce(
         (sum, p) =>
@@ -62,8 +63,8 @@ export default async function DashboardPage({
   const purchasedPathIds = parent.pathSubscriptions.map((ps) => ps.pathId);
 
   // Select child by ID if provided, otherwise use first child
-  const child = searchParams.childId
-    ? (parent.children.find((c) => c.id === searchParams.childId) ??
+  const child = resolvedParams.childId
+    ? (parent.children.find((c) => c.id === resolvedParams.childId) ??
       parent.children[0])
     : parent.children[0];
 

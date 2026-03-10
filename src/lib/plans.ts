@@ -51,7 +51,7 @@ export const CAREER_PATHS: Record<string, CareerPathMeta> = {
       'Design a custom pixel-art hero character',
     ],
     heroBackground: '/computer_scientist_hero_background.png',
-    frontOnImage: '/computer_scientist_front_on_image.png',
+    frontOnImage: '/programmer.png',
     heroCharacterImage: '/programmer.png',
   },
   astronaut: {
@@ -66,7 +66,7 @@ export const CAREER_PATHS: Record<string, CareerPathMeta> = {
       'Run experiments and explore the solar system',
     ],
     heroBackground: '/astronaut_hero_background.png',
-    frontOnImage: '/astronaut_front_on_image.png',
+    frontOnImage: '/rocket.png',
     heroCharacterImage: '/rocket.png',
   },
   doctor: {
@@ -81,7 +81,7 @@ export const CAREER_PATHS: Record<string, CareerPathMeta> = {
       'Explore biology, anatomy, and medical science',
     ],
     heroBackground: '/doctor_hero_background.png',
-    frontOnImage: '/doctor_front_on_image.png',
+    frontOnImage: '/scientist.png',
     heroCharacterImage: '/scientist.png',
   },
 }
