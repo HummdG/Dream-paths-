@@ -448,3 +448,30 @@ model GameProject {
   @@index([childId])
   @@map("game_projects")
 }
+
+// Admin accounts — completely separate from parent auth
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  name         String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("admins")
+}
+
+// Contact form submissions stored for admin review
+model ContactSubmission {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  type      String   // 'question' | 'feedback' | 'help' | 'complaint'
+  message   String   @db.Text
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([isRead])
+  @@index([createdAt])
+  @@map("contact_submissions")
+}

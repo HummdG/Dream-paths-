@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendContactEmail } from '@/lib/email'
 import { checkRateLimit, getClientIp, rateLimitedResponse } from '@/lib/rate-limit'
+import { prisma } from '@/lib/db'
 
 export async function POST(req: NextRequest) {
   // 5 submissions per IP per hour — prevents inbox flooding and Resend quota drain
@@ -19,6 +20,9 @@ export async function POST(req: NextRequest) {
   if (!validTypes.includes(type)) {
     return NextResponse.json({ error: 'Invalid type.' }, { status: 400 })
   }
+
+  // Persist to DB for admin review — fire and forget, don't block on failure
+  prisma.contactSubmission.create({ data: { name, email, type, message } }).catch(() => {})
 
   const result = await sendContactEmail(name, email, type, message)
 
