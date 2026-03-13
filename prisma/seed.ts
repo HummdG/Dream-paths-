@@ -237,6 +237,20 @@ async function main() {
   console.log(`✅ ${marchEvents.length} March calendar events`)
 
   console.log('✅ Dev account: dev@dreampaths.com / password123')
+
+  // ── Admin account ────────────────────────────────────────────────────────────
+  const adminPasswordHash = await bcrypt.hash('@HafsaIsBeautiful110302!', 12)
+  await prisma.admin.upsert({
+    where: { email: 'admin@dreampaths.co.uk' },
+    update: { passwordHash: adminPasswordHash, name: 'Admin' },
+    create: {
+      email: 'admin@dreampaths.co.uk',
+      passwordHash: adminPasswordHash,
+      name: 'Admin',
+    },
+  })
+
+  console.log('✅ Admin account: admin@dreampaths.co.uk')
   console.log('')
   console.log('🎉 Done!')
 }
