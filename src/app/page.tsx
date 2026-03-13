@@ -145,7 +145,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 py-2 flex justify-between items-center">
           <Link href="/" className="flex items-center">
             <Image
-              src="/logo.svg"
+              src="/logo1.png"
               alt="DreamPaths"
               width={550}
               height={180}
@@ -749,7 +749,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center">
             <Image
-              src="/logo.svg"
+              src="/logo1.png"
               alt="DreamPaths"
               width={320}
               height={105}

@@ -40,7 +40,7 @@ export function PathClient({ pathId, packsProgress, heroPixels }: PathClientProp
           </Link>
           <Link href="/dashboard">
             <Image
-              src="/logo.svg"
+              src="/logo1.png"
               alt="DreamPaths"
               width={550}
               height={180}

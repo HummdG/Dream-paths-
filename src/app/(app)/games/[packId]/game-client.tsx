@@ -22,7 +22,7 @@ export function GameClient({ pack, completedMissionIds, totalStars, badges }: Ga
         <div className="max-w-4xl mx-auto px-6 py-2 flex justify-between items-center">
           <Link href="/dashboard" className="flex items-center">
             <Image
-              src="/logo.svg"
+              src="/logo1.png"
               alt="DreamPaths"
               width={550}
               height={180}

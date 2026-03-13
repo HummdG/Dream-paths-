@@ -68,7 +68,7 @@ function LoginForm() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center mb-6">
             <Image 
-              src="/logo.svg" 
+              src="/logo1.png" 
               alt="DreamPaths" 
               width={450} 
               height={150} 
