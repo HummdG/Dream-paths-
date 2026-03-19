@@ -22,11 +22,18 @@ export async function POST(req: NextRequest) {
   const name = 'Feedback Widget'
   const senderEmail = email?.trim() || 'noreply@feedback.internal'
 
-  prisma.contactSubmission
-    .create({ data: { name, email: senderEmail, type: 'feedback', message: trimmedMessage } })
-    .catch(() => {})
+  try {
+    await prisma.contactSubmission.create({
+      data: { name, email: senderEmail, type: 'feedback', message: trimmedMessage },
+    })
+  } catch (err) {
+    console.error('Failed to save feedback submission:', err)
+    return NextResponse.json({ error: 'Failed to save feedback. Please try again.' }, { status: 500 })
+  }
 
-  await sendContactEmail(name, senderEmail, 'feedback', trimmedMessage)
+  sendContactEmail(name, senderEmail, 'feedback', trimmedMessage).catch((err) =>
+    console.error('Failed to send feedback email:', err)
+  )
 
   return NextResponse.json({ success: true })
 }
