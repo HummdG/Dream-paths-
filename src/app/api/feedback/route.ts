@@ -3,9 +3,19 @@ import { sendContactEmail } from '@/lib/email'
 import { checkRateLimit, getClientIp, rateLimitedResponse } from '@/lib/rate-limit'
 import { prisma } from '@/lib/db'
 
+const MAX_BODY_BYTES = 20_000 // 20 KB — well above any legitimate feedback
+const MAX_MESSAGE_CHARS = 2_000
+const MAX_PAGE_CHARS = 200
+
 export async function POST(req: NextRequest) {
+  // Reject oversized bodies before parsing JSON
+  const contentLength = Number(req.headers.get('content-length') ?? 0)
+  if (contentLength > MAX_BODY_BYTES) {
+    return NextResponse.json({ error: 'Request too large.' }, { status: 413 })
+  }
+
   const ip = getClientIp(req.headers)
-  const rl = checkRateLimit(`feedback:${ip}`, 10, 60 * 60 * 1000)
+  const rl = checkRateLimit(`feedback:${ip}`, 5, 60 * 60 * 1000)
   if (!rl.allowed) return rateLimitedResponse(rl.resetAt)
 
   const body = await req.json()
@@ -15,8 +25,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Please write a message.' }, { status: 400 })
   }
 
-  const trimmedMessage = page
-    ? `[Page: ${page}]\n\n${message.trim()}`
+  if (message.length > MAX_MESSAGE_CHARS) {
+    return NextResponse.json({ error: 'Message is too long.' }, { status: 400 })
+  }
+
+  const safePage =
+    typeof page === 'string' ? page.slice(0, MAX_PAGE_CHARS) : null
+
+  const trimmedMessage = safePage
+    ? `[Page: ${safePage}]\n\n${message.trim()}`
     : message.trim()
 
   const name = 'Feedback Widget'
