@@ -384,44 +384,59 @@ print("Snake customised!")
       "The snake can move on its own, but it needs YOU to steer it! Let's connect the arrow keys to the snake's direction.",
     estimatedMinutes: 35,
     engineType: 'snake',
-    learningOutcomes: ['on_key_down', 'lambda', 'if statement', 'game loop'],
+    learningOutcomes: ['on_key_down', 'named callbacks', 'lambda', 'if statement', 'game loop'],
     steps: [
       {
         stepId: 'sn3_s1_start_game_loop',
-        concepts: ['set_direction', 'on_tick', 'lambda', 'game loop'],
+        concepts: ['set_direction', 'def', 'on_tick', 'named callback', 'game loop'],
         instruction:
 `Mission: Start the snake moving! 🐍
 
 Set the direction and start the game loop.
 
-Write both lines in the starter code below.`,
+Define a tick function, then register it with on_tick().`,
         detailedExplanation:
-`🧭 set_direction() points the snake — try 'RIGHT', 'UP', 'DOWN', or 'LEFT'. (Use capital letters and quotes!)
+`🧭 set_direction() points the snake — try 'RIGHT', 'UP', 'DOWN', or 'LEFT'. (Capital letters and quotes!)
 
-🔄 on_tick(lambda: None) starts the game loop — the snake begins moving as soon as you call it!
+⚙️ def tick(): pass is a small function that keeps the game ticking. pass means "do nothing" for now.
 
-🎮 After clicking Run Code, click on the game area to see your snake go!`,
+🔄 on_tick(tick) registers your function — notice no () after tick! You're handing it to the game to call, not running it yourself.`,
         instructionSlides: [
-          "Let's make the snake actually MOVE! We need to do two things: set a direction and keep the game ticking.",
-          "Find the first blank line. Type: `set_direction('RIGHT')` -- use CAPITAL letters and SINGLE quotes! Try UP, DOWN, or LEFT too.",
-          "Find the next blank line. Type: `on_tick(lambda: None)` -- this keeps the game ticking so the snake keeps moving. Type it exactly!",
-          "Click Run Code!, then click on the game window on the left. Your snake should start slithering!",
+          "Let's make the snake actually MOVE! We need two things: a direction, and a tick function to keep the game running.",
+          "Write: `set_direction('RIGHT')` -- use CAPITAL letters inside single quotes! Try UP, DOWN, or LEFT too.",
+          "Now define a tick function: type `def tick():` then on the next line, 4 spaces then `pass`. `pass` means do nothing for now.",
+          "Below your function (no spaces!): write `on_tick(tick)` -- notice NO `()` after tick! You're handing the function to the game to run, not running it yourself.",
+          "Click Run Code!, then click on the game window. Your snake should start slithering!",
         ],
         starterCode:
 `# Call set_direction() to point the snake — try 'RIGHT', 'UP', 'DOWN', or 'LEFT':
 
 
-# Call on_tick(lambda: None) to start the game loop:
+# Define a tick function — this keeps the game updating:
+def tick():
+    pass
+
+# Register it with on_tick — no () after tick!
+
 `,
         hint:
-`Type: set_direction('RIGHT')  (the direction must be in UPPERCASE and in quotes)
-Then: on_tick(lambda: None)  (this starts the game ticking)`,
+`set_direction('RIGHT')
+
+def tick():
+    pass
+
+on_tick(tick)   ← no () after tick — you're passing it, not calling it!`,
         solutionCode:
 `set_direction('RIGHT')
-on_tick(lambda: None)
+
+def tick():
+    pass
+
+on_tick(tick)
 `,
         successCriteria: [
           'Called set_direction() with a direction',
+          'Defined a tick function',
           'Called on_tick() to start the game loop',
         ],
         validation: {
@@ -429,71 +444,182 @@ on_tick(lambda: None)
           checks: [
             { type: 'ast_calls_function', name: 'set_direction' },
             { type: 'ast_calls_function', name: 'on_tick' },
+            { type: 'ast_has_function', name: 'tick' },
           ],
         },
         reward: { stars: 1 },
       },
       {
         stepId: 'sn3_s2_arrow_keys',
-        concepts: ['on_key_down', 'lambda', 'event handlers'],
+        concepts: ['on_key_down', 'named callback', 'def'],
         instruction:
 `Mission: Add keyboard controls! ⌨️
 
-Add on_key_down() for all 4 arrow keys so you can steer the snake.
+Define a function for each direction and register it with on_key_down.
 
-The game loop is already set up — add the 4 key lines below it.`,
+go_up is already done — write go_down, go_left, and go_right!`,
         detailedExplanation:
-`⌨️ on_key_down() watches for a key press and runs a function when it happens.
+`⌨️ on_key_down() watches for a key press and calls your function when it happens.
 
-🐍 Pattern: on_key_down('UP', lambda: set_direction('UP')) — do this for all 4 directions!
+🐍 You pass the function by name — no () at the end! on_key_down('UP', go_up) says "call go_up when UP is pressed".
 
-🎮 After clicking Run Code, click the game area and use your arrow keys to steer!`,
+✏️ Write go_down, go_left, and go_right using the same pattern as go_up!`,
         instructionSlides: [
-          "The snake moves but we can't steer it! Let's connect the arrow keys.",
-          "Find the blank lines below `on_tick`. You need 4 lines -- one for each arrow direction.",
-          "Type: `on_key_down('UP', lambda: set_direction('UP'))` -- the `lambda:` part is the connector. Just type it exactly as shown!",
-          "Do the same for DOWN, LEFT, and RIGHT -- just change the direction word in both places.",
+          "The snake moves but we can't steer it! Let's connect the arrow keys using named functions.",
+          "Look at `go_up` -- it's already written. `def go_up():` defines it, and `on_key_down('UP', go_up)` registers it. No `()` after `go_up`!",
+          "Now write `def go_down():` then 4 spaces then `set_direction('DOWN')`. Then `on_key_down('DOWN', go_down)` to register it.",
+          "Do the same for go_left and go_right -- just change the direction word and function name in both places.",
           "Click Run Code!, click the game window, then try steering with your arrow keys. You control the snake!",
         ],
         starterCode:
 `set_direction('RIGHT')
-on_tick(lambda: None)
 
-# Add on_key_down() for all 4 arrow keys below.
-# Pattern: on_key_down('UP', lambda: set_direction('UP'))
+def tick():
+    pass
+
+on_tick(tick)
+
+# go_up is done — follow the same pattern for the other 3 directions:
+def go_up():
+    set_direction('UP')
+
+on_key_down('UP', go_up)
+
+# Write go_down below, then register it with on_key_down:
+
+
+# Write go_left below, then register it with on_key_down:
+
+
+# Write go_right below, then register it with on_key_down:
+
 `,
         hint:
-`You need 4 lines — one for each direction:
-on_key_down('UP',    lambda: set_direction('UP'))
-on_key_down('DOWN',  lambda: set_direction('DOWN'))
-on_key_down('LEFT',  lambda: set_direction('LEFT'))
-on_key_down('RIGHT', lambda: set_direction('RIGHT'))`,
+`def go_down():
+    set_direction('DOWN')
+
+on_key_down('DOWN', go_down)
+
+# Then the same pattern for go_left and go_right`,
         solutionCode:
 `set_direction('RIGHT')
-on_tick(lambda: None)
+
+def tick():
+    pass
+
+on_tick(tick)
+
+def go_up():
+    set_direction('UP')
+
+def go_down():
+    set_direction('DOWN')
+
+def go_left():
+    set_direction('LEFT')
+
+def go_right():
+    set_direction('RIGHT')
+
+on_key_down('UP',    go_up)
+on_key_down('DOWN',  go_down)
+on_key_down('LEFT',  go_left)
+on_key_down('RIGHT', go_right)
+`,
+        successCriteria: [
+          'Defined go_down, go_left, and go_right functions',
+          'Registered all 4 directions with on_key_down()',
+        ],
+        validation: {
+          type: 'ast',
+          checks: [
+            { type: 'ast_has_on_key_handler' },
+            { type: 'ast_has_function', name: 'go_up' },
+          ],
+        },
+        reward: { stars: 1 },
+      },
+      {
+        stepId: 'sn3_s3_meet_lambda',
+        concepts: ['lambda', 'shorthand function', 'anonymous function'],
+        instruction:
+`Mission: Meet lambda — the shortcut function! ⚡
+
+lambda is a way to write a tiny function in one line.
+Replace the 4 named functions below with lambda shortcuts.`,
+        detailedExplanation:
+`⚡ lambda: set_direction('UP') is a tiny nameless function — it does the same job as:
+    def go_up():
+        set_direction('UP')
+
+🔗 on_key_down('UP', lambda: set_direction('UP')) — the lambda IS the function. No def, no name needed!
+
+💡 lambda is useful for small one-liners. For bigger code, named def functions are clearer.`,
+        instructionSlides: [
+          "You just wrote 4 named functions. Python has a shortcut for tiny one-liners called lambda!",
+          "Compare these two -- they do EXACTLY the same thing:",
+          "Long way:   def go_up():  then  set_direction('UP')  then  on_key_down('UP', go_up)",
+          "Short way:  on_key_down('UP', lambda: set_direction('UP'))",
+          "The `lambda:` part IS the tiny nameless function. Everything after the colon is what it does.",
+          "Fill in the 4 blank `on_key_down` calls using lambda. The first one is shown as an example!",
+        ],
+        starterCode:
+`set_direction('RIGHT')
+
+def tick():
+    pass
+
+on_tick(tick)
+
+# Rewrite all 4 key handlers using lambda:
+# Example (done for you): on_key_down('UP', lambda: set_direction('UP'))
+
+on_key_down('UP',    lambda: set_direction('UP'))
+on_key_down('DOWN',  )  # fill in the lambda
+on_key_down('LEFT',  )  # fill in the lambda
+on_key_down('RIGHT', )  # fill in the lambda
+`,
+        hint:
+`on_key_down('DOWN',  lambda: set_direction('DOWN'))
+on_key_down('LEFT',  lambda: set_direction('LEFT'))
+on_key_down('RIGHT', lambda: set_direction('RIGHT'))
+
+Pattern: lambda: set_direction('DIRECTION')`,
+        solutionCode:
+`set_direction('RIGHT')
+
+def tick():
+    pass
+
+on_tick(tick)
+
 on_key_down('UP',    lambda: set_direction('UP'))
 on_key_down('DOWN',  lambda: set_direction('DOWN'))
 on_key_down('LEFT',  lambda: set_direction('LEFT'))
 on_key_down('RIGHT', lambda: set_direction('RIGHT'))
 `,
         successCriteria: [
-          'Used on_key_down() to handle key presses',
+          'Used lambda for all 4 on_key_down() calls',
+          'Snake can be steered in all 4 directions',
         ],
         validation: {
           type: 'ast',
           checks: [
             { type: 'ast_has_on_key_handler' },
+            { type: 'ast_calls_function', name: 'on_tick' },
           ],
         },
         reward: { stars: 1 },
       },
       {
-        stepId: 'sn3_s3_anti_reverse_guard',
+        stepId: 'sn3_s4_anti_reverse_guard',
         concepts: ['if statement', 'get_direction', 'guard clause'],
         instruction:
-`Mission: Add safety checks! 🛡️
+`Mission: Add safety checks to all 4 directions! 🛡️
 
-Replace the pass in go_up() and go_down() with if statements so the snake can't reverse into itself.`,
+Replace the pass in each function with an if statement that prevents the snake from reversing.
+
+go_up should refuse if the snake is already going DOWN.`,
         detailedExplanation:
 `⚠️ If the snake is going RIGHT and you press LEFT, the head would crash straight into its own body!
 
@@ -501,41 +627,47 @@ Replace the pass in go_up() and go_down() with if statements so the snake can't 
 
 ❓ The != symbol means "is NOT equal to" — so this says "only go UP if we're not already going DOWN".`,
         instructionSlides: [
-          "Problem: if the snake goes RIGHT and you press LEFT, it crashes into itself! Let's add a safety check.",
-          "Find `go_up()` in the code. The word `pass` inside it is a placeholder -- you'll replace it.",
-          "Delete the word `pass`. Then press Enter and type 4 spaces, then: `if get_direction() != 'DOWN':`",
-          "Now press Enter and type 8 spaces (4 + 4), then: `set_direction('UP')`",
-          "`!=` means 'is NOT equal to' -- so this says: only go UP if we're not already going DOWN. Smart!",
-          "Do the same for `go_down()` -- use `!= 'UP'` as the check and `set_direction('DOWN')` inside.",
+          "Problem: if the snake goes RIGHT and you press LEFT, it crashes into itself! Let's add a safety check to all 4 directions.",
+          "Find `go_up()`. Delete the word `pass`. Then with 4 spaces, write: `if get_direction() != 'DOWN':`",
+          "Press Enter and type 8 spaces (4 + 4 more), then: `set_direction('UP')`. This says: only go UP if we're not already going DOWN!",
+          "`!=` means 'is NOT equal to'. So `get_direction() != 'DOWN'` means 'are we not going down right now?'",
+          "Do the same for go_down (guard: not 'UP'), go_left (guard: not 'RIGHT'), and go_right (guard: not 'LEFT').",
+          "Click Run Code! and try pressing opposite directions. The snake should refuse to reverse into itself!",
         ],
         starterCode:
 `set_direction('RIGHT')
 on_tick(lambda: None)
 
 def go_up():
-    # Replace 'pass' with an if statement:
-    # if get_direction() != 'DOWN':
-    #     set_direction('UP')
+    # Replace pass — only go UP if we're not currently going DOWN:
     pass
 
 def go_down():
-    # Replace 'pass' with an if statement:
-    # if get_direction() != 'UP':
-    #     set_direction('DOWN')
+    # Replace pass — only go DOWN if we're not currently going UP:
     pass
 
-on_key_down('UP', go_up)
-on_key_down('DOWN', go_down)
-on_key_down('LEFT',  lambda: set_direction('LEFT') if get_direction() != 'RIGHT' else None)
-on_key_down('RIGHT', lambda: set_direction('RIGHT') if get_direction() != 'LEFT' else None)
+def go_left():
+    # Replace pass — only go LEFT if we're not currently going RIGHT:
+    pass
+
+def go_right():
+    # Replace pass — only go RIGHT if we're not currently going LEFT:
+    pass
+
+on_key_down('UP',    go_up)
+on_key_down('DOWN',  go_down)
+on_key_down('LEFT',  go_left)
+on_key_down('RIGHT', go_right)
 `,
         hint:
-`Delete the \`pass\` line and write the if statement:
-def go_up():
-    if get_direction() != 'DOWN':   ← 4 spaces before if
-        set_direction('UP')          ← 8 spaces before set_direction
+`Inside each function, delete 'pass' and write:
+    if get_direction() != 'OPPOSITE':
+        set_direction('THIS_DIRECTION')
 
-Do the same for go_down() using 'UP' as the guard.`,
+go_up guard:    != 'DOWN'
+go_down guard:  != 'UP'
+go_left guard:  != 'RIGHT'
+go_right guard: != 'LEFT'`,
         solutionCode:
 `set_direction('RIGHT')
 on_tick(lambda: None)
@@ -548,14 +680,22 @@ def go_down():
     if get_direction() != 'UP':
         set_direction('DOWN')
 
-on_key_down('UP', go_up)
-on_key_down('DOWN', go_down)
-on_key_down('LEFT',  lambda: set_direction('LEFT') if get_direction() != 'RIGHT' else None)
-on_key_down('RIGHT', lambda: set_direction('RIGHT') if get_direction() != 'LEFT' else None)
+def go_left():
+    if get_direction() != 'RIGHT':
+        set_direction('LEFT')
+
+def go_right():
+    if get_direction() != 'LEFT':
+        set_direction('RIGHT')
+
+on_key_down('UP',    go_up)
+on_key_down('DOWN',  go_down)
+on_key_down('LEFT',  go_left)
+on_key_down('RIGHT', go_right)
 `,
         successCriteria: [
-          "Added 'if' statements to guard direction changes",
-          "go_up() and go_down() now work correctly",
+          "Added if statements to all 4 direction functions",
+          "Each function guards against the opposite direction",
         ],
         validation: {
           type: 'ast',
@@ -616,18 +756,34 @@ def ate_food():
 
 
 on_tick(lambda: None)
-on_key_down('UP',    lambda: set_direction('UP') if get_direction() != 'DOWN' else None)
-on_key_down('DOWN',  lambda: set_direction('DOWN') if get_direction() != 'UP' else None)
-on_key_down('LEFT',  lambda: set_direction('LEFT') if get_direction() != 'RIGHT' else None)
-on_key_down('RIGHT', lambda: set_direction('RIGHT') if get_direction() != 'LEFT' else None)
+def go_up():
+    if get_direction() != 'DOWN':
+        set_direction('UP')
+
+def go_down():
+    if get_direction() != 'UP':
+        set_direction('DOWN')
+
+def go_left():
+    if get_direction() != 'RIGHT':
+        set_direction('LEFT')
+
+def go_right():
+    if get_direction() != 'LEFT':
+        set_direction('RIGHT')
+
+on_key_down('UP',    go_up)
+on_key_down('DOWN',  go_down)
+on_key_down('LEFT',  go_left)
+on_key_down('RIGHT', go_right)
 `,
         hint:
-`Inside ate_food() (delete the 'pass' first):
-    global score
-    score += 1
-    show_message(f"Score: {score}")
+`Inside ate_food() (delete 'pass' first, use 4 spaces):
+1. Tell Python you want the score from outside: global score
+2. Add 1: score += 1
+3. Show it: show_message(f"Score: {score}")
 
-Then below the function: on_food_eaten(ate_food)  (no () after ate_food!)`,
+Below the function: on_food_eaten(ate_food)  ← no () after ate_food`,
         solutionCode:
 `score = 0
 
@@ -638,10 +794,26 @@ def ate_food():
 
 on_food_eaten(ate_food)
 on_tick(lambda: None)
-on_key_down('UP',    lambda: set_direction('UP') if get_direction() != 'DOWN' else None)
-on_key_down('DOWN',  lambda: set_direction('DOWN') if get_direction() != 'UP' else None)
-on_key_down('LEFT',  lambda: set_direction('LEFT') if get_direction() != 'RIGHT' else None)
-on_key_down('RIGHT', lambda: set_direction('RIGHT') if get_direction() != 'LEFT' else None)
+def go_up():
+    if get_direction() != 'DOWN':
+        set_direction('UP')
+
+def go_down():
+    if get_direction() != 'UP':
+        set_direction('DOWN')
+
+def go_left():
+    if get_direction() != 'RIGHT':
+        set_direction('LEFT')
+
+def go_right():
+    if get_direction() != 'LEFT':
+        set_direction('RIGHT')
+
+on_key_down('UP',    go_up)
+on_key_down('DOWN',  go_down)
+on_key_down('LEFT',  go_left)
+on_key_down('RIGHT', go_right)
 `,
         successCriteria: [
           "Used 'global score' inside ate_food()",
@@ -692,17 +864,32 @@ def ate_food():
 
 on_food_eaten(ate_food)
 on_tick(lambda: None)
-on_key_down('UP',    lambda: set_direction('UP') if get_direction() != 'DOWN' else None)
-on_key_down('DOWN',  lambda: set_direction('DOWN') if get_direction() != 'UP' else None)
-on_key_down('LEFT',  lambda: set_direction('LEFT') if get_direction() != 'RIGHT' else None)
-on_key_down('RIGHT', lambda: set_direction('RIGHT') if get_direction() != 'LEFT' else None)
+def go_up():
+    if get_direction() != 'DOWN':
+        set_direction('UP')
+
+def go_down():
+    if get_direction() != 'UP':
+        set_direction('DOWN')
+
+def go_left():
+    if get_direction() != 'RIGHT':
+        set_direction('LEFT')
+
+def go_right():
+    if get_direction() != 'LEFT':
+        set_direction('RIGHT')
+
+on_key_down('UP',    go_up)
+on_key_down('DOWN',  go_down)
+on_key_down('LEFT',  go_left)
+on_key_down('RIGHT', go_right)
 `,
         hint:
-`Write the function:
-def died():
-    show_message(f"Game Over! Final score: {score}")
+`def died():
+    show_message(...)   ← use an f-string showing the final score
 
-Then register it: on_game_over(died)  (no () after died!)`,
+on_game_over(died)   ← no () after died — passing it, not calling it`,
         solutionCode:
 `score = 0
 
@@ -717,10 +904,26 @@ def died():
 on_food_eaten(ate_food)
 on_game_over(died)
 on_tick(lambda: None)
-on_key_down('UP',    lambda: set_direction('UP') if get_direction() != 'DOWN' else None)
-on_key_down('DOWN',  lambda: set_direction('DOWN') if get_direction() != 'UP' else None)
-on_key_down('LEFT',  lambda: set_direction('LEFT') if get_direction() != 'RIGHT' else None)
-on_key_down('RIGHT', lambda: set_direction('RIGHT') if get_direction() != 'LEFT' else None)
+def go_up():
+    if get_direction() != 'DOWN':
+        set_direction('UP')
+
+def go_down():
+    if get_direction() != 'UP':
+        set_direction('DOWN')
+
+def go_left():
+    if get_direction() != 'RIGHT':
+        set_direction('LEFT')
+
+def go_right():
+    if get_direction() != 'LEFT':
+        set_direction('RIGHT')
+
+on_key_down('UP',    go_up)
+on_key_down('DOWN',  go_down)
+on_key_down('LEFT',  go_left)
+on_key_down('RIGHT', go_right)
 `,
         successCriteria: [
           "Defined a function called 'died'",
@@ -772,10 +975,26 @@ def died():
 on_food_eaten(ate_food)
 on_game_over(died)
 on_tick(lambda: None)
-on_key_down('UP',    lambda: set_direction('UP') if get_direction() != 'DOWN' else None)
-on_key_down('DOWN',  lambda: set_direction('DOWN') if get_direction() != 'UP' else None)
-on_key_down('LEFT',  lambda: set_direction('LEFT') if get_direction() != 'RIGHT' else None)
-on_key_down('RIGHT', lambda: set_direction('RIGHT') if get_direction() != 'LEFT' else None)
+def go_up():
+    if get_direction() != 'DOWN':
+        set_direction('UP')
+
+def go_down():
+    if get_direction() != 'UP':
+        set_direction('DOWN')
+
+def go_left():
+    if get_direction() != 'RIGHT':
+        set_direction('LEFT')
+
+def go_right():
+    if get_direction() != 'LEFT':
+        set_direction('RIGHT')
+
+on_key_down('UP',    go_up)
+on_key_down('DOWN',  go_down)
+on_key_down('LEFT',  go_left)
+on_key_down('RIGHT', go_right)
 `,
         hint:
 `Add these two lines inside ate_food(), after score += 1:
@@ -797,10 +1016,26 @@ def died():
 on_food_eaten(ate_food)
 on_game_over(died)
 on_tick(lambda: None)
-on_key_down('UP',    lambda: set_direction('UP') if get_direction() != 'DOWN' else None)
-on_key_down('DOWN',  lambda: set_direction('DOWN') if get_direction() != 'UP' else None)
-on_key_down('LEFT',  lambda: set_direction('LEFT') if get_direction() != 'RIGHT' else None)
-on_key_down('RIGHT', lambda: set_direction('RIGHT') if get_direction() != 'LEFT' else None)
+def go_up():
+    if get_direction() != 'DOWN':
+        set_direction('UP')
+
+def go_down():
+    if get_direction() != 'UP':
+        set_direction('DOWN')
+
+def go_left():
+    if get_direction() != 'RIGHT':
+        set_direction('LEFT')
+
+def go_right():
+    if get_direction() != 'LEFT':
+        set_direction('RIGHT')
+
+on_key_down('UP',    go_up)
+on_key_down('DOWN',  go_down)
+on_key_down('LEFT',  go_left)
+on_key_down('RIGHT', go_right)
 `,
         successCriteria: [
           "Added an 'if score >= 5' check inside ate_food()",

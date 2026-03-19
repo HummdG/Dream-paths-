@@ -701,13 +701,15 @@ __captured_output__
   const goToPrevStep = () => {
     if (currentStepIndex > 0) {
       setCurrentStepIndex(currentStepIndex - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const goToNextStep = () => {
-    if (currentStepIndex < mission.steps.length - 1 && 
+    if (currentStepIndex < mission.steps.length - 1 &&
         completedSteps.has(currentStep.stepId)) {
       setCurrentStepIndex(currentStepIndex + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 

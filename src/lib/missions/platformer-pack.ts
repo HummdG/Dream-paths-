@@ -288,7 +288,6 @@ show_message('Welcome to my game!')`,
         validation: {
           type: 'runtime',
           checks: [
-            { type: 'stdout_contains', text: '' },
             { type: 'ui_message_shown' }
           ]
         },
@@ -345,7 +344,7 @@ show_message('Welcome to my game!')`,
     title: 'Mission 3: Move with Functions',
     purpose: 'Teach functions, def, and calling move() with parameters.',
     storyIntro: "Your player is in the game! 🏃 Let's write a function that makes them run. A function is like a named recipe — write it once, call it whenever you want!",
-    estimatedMinutes: 30,
+    estimatedMinutes: 40,
     learningOutcomes: ['functions', 'def keyword', 'parameters'],
     steps: [
       {
@@ -383,6 +382,49 @@ print('Player moved!')`,
           ]
         },
         reward: { stars: 2, badge: 'Function Builder' }
+      },
+      {
+        stepId: 'm3_s2_function_with_parameter',
+        concepts: ['parameters', 'def', 'calling with arguments'],
+        instruction: "Mission: Make your function flexible! 🎯\n\nWrite a go_left(distance) function that takes a parameter, then call both functions.\n\nParameters let you control HOW FAR the player moves each time you call the function.",
+        detailedExplanation: "🎯 A parameter is a value you pass into a function when you call it.\n\n💡 def go_left(distance): means the function expects a number — call it with go_left(100) and 100 becomes distance inside.\n\n🕹️ move(-distance) moves LEFT — the minus sign makes the player go the other way!",
+        starterCode: `# go_right already works — now write go_left with a distance parameter!
+def go_right(distance):
+    move(distance)
+
+# Write go_left(distance) below — use move(-distance) to go left:
+
+
+# Call both functions to make the player dance left and right:
+go_right(150)
+# Now call go_left with any distance:
+
+print('Parameters let you control the distance each call!')
+`,
+        hint: "def go_left(distance):\n    move(-distance)\n\nThen call it: go_left(100)  — negative move goes left!",
+        solutionCode: `def go_right(distance):
+    move(distance)
+
+def go_left(distance):
+    move(-distance)
+
+go_right(150)
+go_left(100)
+print('Parameters let you control the distance each call!')`,
+        successCriteria: [
+          "Define go_left(distance) with a parameter",
+          "Call move(-distance) inside it to move left",
+          "Call both go_right() and go_left() to test them"
+        ],
+        validation: {
+          type: 'ast',
+          checks: [
+            { type: 'ast_has_function', name: 'go_left' },
+            { type: 'ast_calls_function', name: 'move' },
+            { type: 'ast_calls_function', name: 'go_left' }
+          ]
+        },
+        reward: { stars: 2, badge: 'Parameter Pro' }
       }
     ]
   },
@@ -522,14 +564,28 @@ platforms = [
     (700, 200, 150, 40),  # High platform
 ]
 
-# Loop through each platform and add it to the game
-for p in platforms:
-    add_platform(p[0], p[1], p[2], p[3])
-    print(f'Added platform at x={p[0]}')
+# Write a for loop to add each platform to the game:
+# Pattern:
+#   for p in platforms:
+#       add_platform(p[0], p[1], p[2], p[3])
+#       print(f'Added platform at x={p[0]}')
+
 
 print(f'Total platforms: {len(platforms)}')
 `,
-        hint: "Try adding a new platform! Add a new line like (200, 350, 150, 40) inside the list.",
+        hint: `for p in platforms:
+    add_platform(p[0], p[1], p[2], p[3])
+    print(f'Added platform at x={p[0]}')
+
+4 spaces before add_platform and print — they're inside the loop!
+After the loop works, try adding a 4th platform to the list!`,
+        instructionSlides: [
+          "The platforms list is ready! Now you need to write a loop that goes through it and adds each platform to the game.",
+          "A `for` loop goes through every item in a list. Write: `for p in platforms:` -- each time through, `p` is the next platform.",
+          "With 4 spaces (inside the loop!): `add_platform(p[0], p[1], p[2], p[3])` -- `p[0]` is x, `p[1]` is y, `p[2]` is width, `p[3]` is height.",
+          "On the next line (still 4 spaces): `print(f'Added platform at x={p[0]}')` -- shows what the loop is doing.",
+          "Click Run Code! -- 3 platforms should appear. Then try adding a 4th tuple to the list and re-running!",
+        ],
         solutionCode: `# List of platforms: (x position, y position, width, height)
 platforms = [
     (0, 300, 400, 40),    # Ground platform
@@ -753,64 +809,68 @@ print('Ground check added! No more double-jumping! 🛡️')`,
       },
       {
         stepId: 'm6_s3_tune_jump',
-        concepts: ['variables', 'experimentation'],
-        instruction: "Mission: Tune your jump! 🎛️\n\nChange JUMP_STRENGTH to find the perfect jump height for your level.\n\nTry different numbers between -8 and -30 and see which feels best!",
-        detailedExplanation: "🎛️ Game designers call this \"tuning\" — testing numbers until the game feels just right!\n\n🔢 -10 = small hop, -15 = normal jump, -20 = high jump, -25 = huge leap.\n\n🎯 Pick a value that lets you reach your highest platform without flying off the top of the screen.",
-        starterCode: `# ✅ Smooth movement from Mission 4 (hold the key to keep moving!)
-speed = 5
+        concepts: ['constants', 'UPPER_CASE naming', 'game feel', 'variables'],
+        instruction: "Mission: Add a speed constant and tune your game! 🎛️\n\nCreate a MOVE_SPEED constant for the movement function, then set both MOVE_SPEED and JUMP_STRENGTH to values that fit your level.\n\nConstants in Python are written in ALL_CAPS to show they're settings, not changing values.",
+        detailedExplanation: "🎛️ A constant is a variable you set once at the top and use throughout your code — change it in ONE place and it updates everywhere!\n\n📝 Python convention: write constants in ALL_CAPS like MOVE_SPEED and JUMP_STRENGTH.\n\n🎯 Game designers call testing different values 'tuning' — try numbers until your level feels just right.",
+        starterCode: `# ── GAME SETTINGS ──────────────────────────────────────
+# Set a movement speed — change this ONE number to tune everywhere it's used:
+MOVE_SPEED =     # try 3 (slow), 5 (normal), 8 (fast)
+
+# Set jump height — negative = upward force:
+JUMP_STRENGTH =  # try -10 (hop), -15 (normal), -20 (high)
+# ────────────────────────────────────────────────────────
+
 def movement():
     if is_key_pressed('LEFT'):
-        move(-speed)
+        move(-MOVE_SPEED)    # uses your constant!
     if is_key_pressed('RIGHT'):
-        move(speed)
-on_update(movement)
+        move(MOVE_SPEED)     # uses your constant!
 
-# Try different values here and see how they feel!
-# -10 = small hop, -15 = normal jump, -20 = high jump, -25 = huge leap
-JUMP_STRENGTH = -15
+on_update(movement)
 
 def jump():
     if is_on_ground():
         set_player_vy(JUMP_STRENGTH)
-        print(f'Jump! Strength: {JUMP_STRENGTH}')
+        print(f'Jump! Speed={MOVE_SPEED}, Strength={JUMP_STRENGTH}')
 
 on_key_down('SPACE', jump)
-print(f'Jump strength is {JUMP_STRENGTH} — try changing it!')
+print(f'Settings: speed={MOVE_SPEED}, jump={JUMP_STRENGTH}')
 `,
-        hint: "Change -15 to any number between -8 and -30. Run Code and press SPACE to test it!",
-        solutionCode: `# ✅ Smooth movement from Mission 4
-speed = 5
+        hint: "Set both constants to numbers that feel right:\nMOVE_SPEED = 5\nJUMP_STRENGTH = -15\n\nThen run, test, and adjust until your level plays well!",
+        solutionCode: `MOVE_SPEED = 5
+JUMP_STRENGTH = -15
+
 def movement():
     if is_key_pressed('LEFT'):
-        move(-speed)
+        move(-MOVE_SPEED)
     if is_key_pressed('RIGHT'):
-        move(speed)
-on_update(movement)
+        move(MOVE_SPEED)
 
-# Try different values here and see how they feel!
-# -10 = small hop, -15 = normal jump, -20 = high jump, -25 = huge leap
-JUMP_STRENGTH = -15
+on_update(movement)
 
 def jump():
     if is_on_ground():
         set_player_vy(JUMP_STRENGTH)
-        print(f'Jump! Strength: {JUMP_STRENGTH}')
+        print(f'Jump! Speed={MOVE_SPEED}, Strength={JUMP_STRENGTH}')
 
 on_key_down('SPACE', jump)
-print(f'Jump strength is {JUMP_STRENGTH} — try changing it!')`,
+print(f'Settings: speed={MOVE_SPEED}, jump={JUMP_STRENGTH}')`,
         successCriteria: [
-          "JUMP_STRENGTH is set to a value you chose",
-          "The jump feels good for your level"
+          "Create a MOVE_SPEED constant",
+          "Create a JUMP_STRENGTH constant",
+          "Movement function uses MOVE_SPEED",
+          "Jump function uses JUMP_STRENGTH"
         ],
         validation: {
           type: 'ast',
           checks: [
+            { type: 'ast_has_assignment', variable: 'MOVE_SPEED' },
             { type: 'ast_has_assignment', variable: 'JUMP_STRENGTH' },
-            { type: 'ast_calls_function', name: 'set_player_vy' },
-            { type: 'ast_has_if' }
+            { type: 'ast_calls_function', name: 'on_update' },
+            { type: 'ast_has_on_key_handler' }
           ]
         },
-        reward: { stars: 3, badge: 'Game Designer' }
+        reward: { stars: 3, badge: 'Game Tuner' }
       }
     ]
   },
