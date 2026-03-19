@@ -16,9 +16,15 @@ interface GameClientProps {
 
 export function GameClient({ pack, completedMissionIds, totalStars, badges }: GameClientProps) {
   return (
-    <div className="min-h-screen bg-[var(--color-cream)]">
+    <div
+      className="min-h-screen"
+      style={{
+        background: `linear-gradient(rgba(253,248,240,0.92) 0%, rgba(253,248,240,0.92) 100%), url('/children_dashboard_bg_img.png') center/cover fixed`,
+      }}
+    >
       {/* Header */}
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
+      <header className="bg-white sticky top-0 z-50 relative">
+        <div className="absolute left-0 right-0 top-full h-6 bg-gradient-to-b from-white to-transparent pointer-events-none z-10" />
         <div className="max-w-4xl mx-auto px-6 py-2 flex justify-between items-center">
           <Link href="/dashboard" className="flex items-center">
             <Image

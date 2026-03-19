@@ -54,9 +54,16 @@ export function DashboardClient({
   );
 
   return (
-    <div className="min-h-screen bg-[var(--color-cream)]">
+    <div
+      className="min-h-screen"
+      style={{
+        background: `linear-gradient(rgba(253,248,240,0.92) 0%, rgba(253,248,240,0.92) 100%), url('/children_dashboard_bg_img.png') center/cover fixed`,
+      }}
+    >
       {/* Header */}
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
+      <header className="bg-white sticky top-0 z-50">
+        {/* gradient fade into page content */}
+        <div className="absolute left-0 right-0 top-full h-6 bg-gradient-to-b from-white to-transparent pointer-events-none z-10" />
         <div className="max-w-4xl mx-auto px-6 py-2 flex justify-between items-center">
           <Link href="/dashboard" className="flex items-center">
             <Image
@@ -86,7 +93,7 @@ export function DashboardClient({
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6 flex items-center gap-5"
+          className="bg-white rounded-2xl shadow-xl border border-gray-200 p-5 mb-6 flex items-center gap-5"
         >
           {/* Hero avatar */}
           <div className="relative shrink-0">

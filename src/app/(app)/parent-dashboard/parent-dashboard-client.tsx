@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { signOut } from "next-auth/react";
@@ -81,9 +82,15 @@ export function ParentDashboardClient({
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-cream)]">
+    <div
+      className="min-h-screen"
+      style={{
+        background: `linear-gradient(rgba(253,248,240,0.92) 0%, rgba(253,248,240,0.92) 100%), url('/choose_your_path_bg.png') center/cover fixed`,
+      }}
+    >
       {/* Header */}
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
+      <header className="bg-white sticky top-0 z-50 relative">
+        <div className="absolute left-0 right-0 top-full h-6 bg-gradient-to-b from-white to-transparent pointer-events-none z-10" />
         <div className="max-w-4xl mx-auto px-6 py-2 flex justify-between items-center">
           <Link href="/dashboard" className="flex items-center">
             <Image
@@ -170,29 +177,37 @@ export function ParentDashboardClient({
         </div>
 
         {/* Tab content */}
-        {activeTab === "progress" && (
-          childrenData.length === 0 ? (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center">
-              <p className="text-gray-500">No children added yet.</p>
-              <Link
-                href="/dashboard"
-                className="mt-4 inline-block text-sm text-violet-600 hover:underline"
-              >
-                Go to dashboard to get started
-              </Link>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {childrenData.map((child) => (
-                <ChildProgressCard key={child.childId} child={child} />
-              ))}
-            </div>
-          )
-        )}
-
-        {activeTab === "calendar" && (
-          <CalendarTab childrenData={childrenData} />
-        )}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+          >
+            {activeTab === "progress" ? (
+              childrenData.length === 0 ? (
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center">
+                  <p className="text-gray-500">No children added yet.</p>
+                  <Link
+                    href="/dashboard"
+                    className="mt-4 inline-block text-sm text-violet-600 hover:underline"
+                  >
+                    Go to dashboard to get started
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {childrenData.map((child) => (
+                    <ChildProgressCard key={child.childId} child={child} />
+                  ))}
+                </div>
+              )
+            ) : (
+              <CalendarTab childrenData={childrenData} />
+            )}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {/* Add Child Modal */}

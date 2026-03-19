@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Lock, ArrowRight } from "lucide-react";
 import type { PackProgress } from "@/lib/missions";
-import { CAREER_PATHS, FREE_PACK_IDS } from "@/lib/plans";
+import { CAREER_PATHS } from "@/lib/plans";
 import type { CareerPathEntry } from "./career-path-grid";
 
 const DEFAULT_META = {
@@ -24,12 +24,6 @@ export function PathCard({ entry }: PathCardProps) {
   const { pathId, packsProgress } = entry;
   const meta = CAREER_PATHS[pathId] ?? DEFAULT_META;
 
-  const freePacks = packsProgress.filter((pp) =>
-    FREE_PACK_IDS.includes(pp.pack.packId)
-  );
-  const paidPacks = packsProgress.filter(
-    (pp) => !FREE_PACK_IDS.includes(pp.pack.packId)
-  );
   const totalCompleted = packsProgress.reduce(
     (sum, pp) => sum + pp.completedMissionIds.length,
     0
@@ -38,7 +32,7 @@ export function PathCard({ entry }: PathCardProps) {
   const hasProgress = totalCompleted > 0;
 
   return (
-    <div className="rounded-2xl overflow-hidden shadow-md border border-gray-100 flex flex-col h-full hover:shadow-lg transition-shadow duration-200">
+    <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-200 flex flex-col h-full hover:shadow-2xl transition-shadow duration-200">
       {/* Header */}
       <div className={`relative overflow-hidden bg-gradient-to-br ${meta.gradient} p-5`}>
         {meta.heroBackground && (
@@ -71,11 +65,8 @@ export function PathCard({ entry }: PathCardProps) {
 
       {/* Body */}
       <div className="bg-white p-4 flex flex-col flex-1 gap-3">
-        {freePacks.map((pp) => (
-          <PackRow key={pp.pack.packId} pp={pp} isFree />
-        ))}
-        {paidPacks.map((pp) => (
-          <PackRow key={pp.pack.packId} pp={pp} isFree={false} />
+        {packsProgress.map((pp) => (
+          <PackRow key={pp.pack.packId} pp={pp} />
         ))}
 
         <div className="mt-auto pt-2 flex flex-col gap-2">
@@ -87,7 +78,7 @@ export function PathCard({ entry }: PathCardProps) {
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
           >
-            {hasProgress ? "Continue" : "Start Free"}
+            {hasProgress ? "Continue" : "Start"}
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
 
@@ -103,13 +94,7 @@ export function PathCard({ entry }: PathCardProps) {
   );
 }
 
-function PackRow({
-  pp,
-  isFree,
-}: {
-  pp: PackProgress;
-  isFree: boolean;
-}) {
+function PackRow({ pp }: { pp: PackProgress }) {
   const { pack, completedMissionIds, locked, lockReason } = pp;
   const completed = completedMissionIds.length;
   const total = pack.missions.length;
@@ -128,11 +113,6 @@ function PackRow({
           >
             {pack.packTitle}
           </span>
-          {isFree && !isSubLocked && (
-            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full shrink-0">
-              FREE
-            </span>
-          )}
         </div>
         <span className={isSubLocked ? "text-gray-400" : "text-gray-500"}>
           {isSubLocked ? "Locked" : `${completed}/${total}`}

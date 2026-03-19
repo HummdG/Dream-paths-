@@ -36,7 +36,7 @@ function DigitalSweepEffect() {
       style={{
         position: "absolute",
         inset: 0,
-        background: "#000",
+        background: "#ffffff",
         overflow: "hidden",
       }}
       initial={{ opacity: 0 }}
@@ -53,10 +53,10 @@ function DigitalSweepEffect() {
           gridTemplateRows: "repeat(13, 1fr)",
           alignItems: "center",
           justifyItems: "center",
-          color: "#00ff41",
+          color: "#6366f1",
           fontFamily: "monospace",
           fontSize: 18,
-          opacity: 0.35,
+          opacity: 0.25,
           userSelect: "none",
         }}
       >
@@ -73,7 +73,7 @@ function DigitalSweepEffect() {
           bottom: 0,
           width: "28%",
           background:
-            "linear-gradient(90deg, transparent 0%, rgba(0,255,65,0.15) 25%, rgba(0,255,65,0.85) 50%, rgba(0,255,65,0.15) 75%, transparent 100%)",
+            "linear-gradient(90deg, transparent 0%, rgba(99,102,241,0.15) 25%, rgba(99,102,241,0.7) 50%, rgba(99,102,241,0.15) 75%, transparent 100%)",
           filter: "blur(3px)",
         }}
         initial={{ left: "-28%" }}
@@ -89,7 +89,7 @@ function DigitalSweepEffect() {
           bottom: 0,
           width: "18%",
           background:
-            "linear-gradient(90deg, transparent 0%, rgba(0,255,65,0.08) 25%, rgba(0,255,65,0.5) 50%, rgba(0,255,65,0.08) 75%, transparent 100%)",
+            "linear-gradient(90deg, transparent 0%, rgba(99,102,241,0.08) 25%, rgba(99,102,241,0.4) 50%, rgba(99,102,241,0.08) 75%, transparent 100%)",
         }}
         initial={{ left: "-18%" }}
         animate={{ left: "115%" }}

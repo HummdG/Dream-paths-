@@ -221,7 +221,7 @@ export default function Home() {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/signup" className="btn-primary text-center flex items-center justify-center gap-2">
-                  Start Free
+                  Get Started
                   <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link href="#how-it-works" className="btn-secondary text-center">
@@ -229,9 +229,6 @@ export default function Home() {
                 </Link>
               </div>
 
-              <p className="mt-4 text-sm text-gray-500">
-                ✓ No credit card required &nbsp; ✓ Starter missions free forever
-              </p>
 
               {/* Codog mascot — desktop only */}
               <div className="hidden lg:flex items-center gap-3 mt-6">

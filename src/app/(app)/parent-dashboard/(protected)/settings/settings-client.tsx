@@ -267,7 +267,12 @@ export function SettingsClient({ email, name, subscription }: SettingsClientProp
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[var(--color-cream)]">
+    <div
+      className="min-h-screen"
+      style={{
+        background: `linear-gradient(rgba(253,248,240,0.92) 0%, rgba(253,248,240,0.92) 100%), url('/choose_your_path_bg.png') center/cover fixed`,
+      }}
+    >
       <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center">
           <Link

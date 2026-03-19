@@ -29,8 +29,8 @@ const features = [
     desc: "Every concept broken into small steps with instant, encouraging feedback.",
   },
   {
-    title: "Three career paths to explore",
-    desc: "Computer Scientist, Astronaut, or Doctor. Every path teaches real programming skills.",
+    title: "Career paths to explore",
+    desc: "Choose a path that excites your child and learn real programming skills along the way.",
   },
   {
     title: "Safe and built for ages 8-14",
