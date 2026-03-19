@@ -109,6 +109,10 @@ else:
 
 print(f"Best launch angle: {angle} degrees")
 print(f"Pump speed: {speed}")
+
+# Point the rocket at the ideal angle and launch!
+set_direction(angle)
+launch()
 `,
         hint:
 `if speed > 80:
@@ -129,6 +133,9 @@ else:
 
 print(f"Best launch angle: {angle} degrees")
 print(f"Pump speed: {speed}")
+
+set_direction(angle)
+launch()
 `,
         successCriteria: [
           'Use if/elif/else',
@@ -141,6 +148,7 @@ print(f"Pump speed: {speed}")
             { type: 'ast_has_if' },
             { type: 'ast_has_assignment', variable: 'angle' },
             { type: 'stdout_contains', text: 'degrees' },
+            { type: 'rocket_launched' },
           ],
         },
         reward: { stars: 2 },
@@ -415,6 +423,9 @@ print(f"Sirius:          {sirius} light years")
 print(f"Vega:            {vega} light years")
 print(f"Rigel:           {rigel} light years")
 print(f"Betelgeuse:      {betelgeuse} light years")
+
+# Show the closest star on the rocket HUD
+show_message(f"Closest: Proxima Centauri {proxima_centauri} ly")
 `,
         hint:
 `proxima_centauri = 4.2
@@ -433,6 +444,8 @@ print(f"Sirius:          {sirius} light years")
 print(f"Vega:            {vega} light years")
 print(f"Rigel:           {rigel} light years")
 print(f"Betelgeuse:      {betelgeuse} light years")
+
+show_message(f"Closest: Proxima Centauri {proxima_centauri} ly")
 `,
         successCriteria: [
           'Create star distance variables',
@@ -904,6 +917,9 @@ greetings = ["Zorp!", "Beep boop!", "Greetings, Earthling!", "Bzzzt!", "Meeble w
 # Pick a random one
 greeting = random.choice(greetings)
 print(f"The alien says: {greeting}")
+
+# Display the greeting on the rocket HUD
+show_message(f"Alien: {greeting}")
 `,
         hint:
 `import random
@@ -915,6 +931,8 @@ greetings = ["Zorp!", "Beep boop!", "Greetings, Earthling!", "Bzzzt!", "Meeble w
 
 greeting = random.choice(greetings)
 print(f"The alien says: {greeting}")
+
+show_message(f"Alien: {greeting}")
 `,
         successCriteria: [
           'Import random',
@@ -963,6 +981,9 @@ else:
     response = "Hello! I come in peace."
 
 print(f"You say: {response}")
+
+# Show the response on the rocket HUD
+show_message(f"You: {response}")
 `,
         hint:
 `if greeting == "Zorp!":
@@ -986,6 +1007,8 @@ else:
     response = "Hello! I come in peace."
 
 print(f"You say: {response}")
+
+show_message(f"You: {response}")
 `,
         successCriteria: [
           'Use if/elif/else',
@@ -1112,6 +1135,9 @@ def mission_log(message):
 mission_log(f"Pilot: {pilot_name}")
 mission_log(f"Target: {target_altitude} km")
 mission_log("Systems ready. Prepare for launch!")
+
+# Show mission briefing on the rocket HUD
+show_message(f"{mission_name}: Ready!")
 `,
         hint:
 `def mission_log(message):
@@ -1127,6 +1153,8 @@ def mission_log(message):
 mission_log(f"Pilot: {pilot_name}")
 mission_log(f"Target: {target_altitude} km")
 mission_log("Systems ready. Prepare for launch!")
+
+show_message(f"{mission_name}: Ready!")
 `,
         successCriteria: [
           'Define mission variables',

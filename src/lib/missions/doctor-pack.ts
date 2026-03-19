@@ -195,6 +195,10 @@ else:
     print(f"❌ Not quite — it was the {correct}!")
 
 print(f"Score: {score}/1")
+
+# Show result on monitor — correct = calm heart rate, wrong = elevated
+set_heart_rate(72 if score >= 1 else 95)
+start_monitor()
 `,
         hint:
 `if answer == correct:
@@ -216,6 +220,9 @@ else:
     print(f"❌ Not quite — it was the {correct}!")
 
 print(f"Score: {score}/1")
+
+set_heart_rate(72 if score >= 1 else 95)
+start_monitor()
 `,
         successCriteria: [
           'Track score variable',
@@ -272,6 +279,11 @@ for i in range(len(questions)):
         print(f"Q{i+1}: ❌ Answer was: {c}")
 
 print(f"Final score: {score}/{len(questions)}")
+
+# Heart rate reflects how well you did — higher score = calmer monitor
+set_heart_rate(60 + score * 8)
+start_monitor()
+show_message(f"Quiz done: {score}/{len(questions)}")
 `,
         hint:
 `for i in range(len(questions)):
@@ -298,6 +310,10 @@ for i in range(len(questions)):
         print(f"Q{i+1}: ❌ Answer was: {correct_answers[i]}")
 
 print(f"Final score: {score}/{len(questions)}")
+
+set_heart_rate(60 + score * 8)
+start_monitor()
+show_message(f"Quiz done: {score}/{len(questions)}")
 `,
         successCriteria: [
           'Use a list of questions',
@@ -343,6 +359,11 @@ else:
     rank = "Keep studying! 📚"
 
 print(f"Your rank: {rank}")
+
+# Show the rank on the patient monitor
+set_heart_rate(60 + score * 8)
+start_monitor()
+show_message(rank)
 `,
         hint:
 `if score == 5:
@@ -367,6 +388,10 @@ else:
     rank = "Keep studying! 📚"
 
 print(f"Your rank: {rank}")
+
+set_heart_rate(60 + score * 8)
+start_monitor()
+show_message(rank)
 `,
         successCriteria: [
           'Calculate score',
@@ -459,6 +484,10 @@ for part, function in flower_parts.items():
     print(f"{part.capitalize()}: {function}")
 
 print(f"\\nTotal parts studied: {len(flower_parts)}")
+
+# Show study progress on the monitor
+start_monitor()
+show_message(f"Cell systems: {len(flower_parts)}")
 `,
         hint:
 `for part, function in flower_parts.items():
@@ -477,6 +506,9 @@ for part, function in flower_parts.items():
     print(f"{part.capitalize()}: {function}")
 
 print(f"\\nTotal parts studied: {len(flower_parts)}")
+
+start_monitor()
+show_message(f"Cell systems: {len(flower_parts)}")
 `,
         successCriteria: [
           'Create a dictionary of flower parts',
@@ -531,6 +563,11 @@ print(f"Heart Rate Analysis")
 print(f"Lowest:  {lowest} bpm")
 print(f"Highest: {highest} bpm")
 print(f"Readings taken: {len(readings)}")
+
+# Show peak reading on the monitor
+set_heart_rate(highest)
+start_monitor()
+show_message(f"Peak: {highest} bpm | Low: {lowest} bpm")
 `,
         hint:
 `lowest = min(readings)
@@ -545,6 +582,10 @@ print(f"Heart Rate Analysis")
 print(f"Lowest:  {lowest} bpm")
 print(f"Highest: {highest} bpm")
 print(f"Readings taken: {len(readings)}")
+
+set_heart_rate(highest)
+start_monitor()
+show_message(f"Peak: {highest} bpm | Low: {lowest} bpm")
 `,
         successCriteria: [
           'Use min() and max()',
@@ -586,6 +627,14 @@ for reading in readings:
 print(f"\\nTotal abnormal readings: {len(abnormal)}")
 if len(abnormal) == 0:
     print("All readings normal!")
+
+# Show analysis on the monitor
+set_heart_rate(int(readings[0]))
+start_monitor()
+if len(abnormal) > 0:
+    show_alert(f"{len(abnormal)} abnormal readings!")
+else:
+    show_message("All readings normal!")
 `,
         hint:
 `if reading > 100 or reading < 55:
@@ -602,6 +651,13 @@ for reading in readings:
 print(f"\\nTotal abnormal readings: {len(abnormal)}")
 if len(abnormal) == 0:
     print("All readings normal!")
+
+set_heart_rate(int(readings[0]))
+start_monitor()
+if len(abnormal) > 0:
+    show_alert(f"{len(abnormal)} abnormal readings!")
+else:
+    show_message("All readings normal!")
 `,
         successCriteria: [
           'Loop through readings',
@@ -729,6 +785,10 @@ else:
 
 print(f"Symptom: {symptom}")
 print(f"First Aid: {advice}")
+
+# Show the case on the patient monitor
+start_monitor()
+show_message(f"Case: {symptom}")
 `,
         hint:
 `if symptom == "cut":
@@ -749,6 +809,9 @@ else:
 
 print(f"Symptom: {symptom}")
 print(f"First Aid: {advice}")
+
+start_monitor()
+show_message(f"Case: {symptom}")
 `,
         successCriteria: [
           'Create an if/elif chain',
@@ -795,6 +858,10 @@ Call it: get_advice("burn"), get_advice("cut")`,
 for s in ["cut", "burn", "nosebleed", "headache"]:
     advice = get_advice(s)
     print(f"{s}: {advice}")
+
+# Show first aid guide is ready on the monitor
+start_monitor()
+show_message("First aid guide ready")
 `,
         hint:
 `def get_advice(symptom):
@@ -814,6 +881,9 @@ for s in ["cut", "burn", "nosebleed", "headache"]:
 for s in ["cut", "burn", "nosebleed", "headache"]:
     advice = get_advice(s)
     print(f"{s}: {advice}")
+
+start_monitor()
+show_message("First aid guide ready")
 `,
         successCriteria: [
           'Define get_advice function',
@@ -935,6 +1005,10 @@ test_symptoms = ["fever", "cough"]
 result = diagnose(test_symptoms)
 print(f"Symptoms: {test_symptoms}")
 print(f"Diagnosis: {result}")
+
+# Show the diagnosis on the patient monitor
+start_monitor()
+show_message(f"Diagnosis: {result}")
 `,
         hint:
 `def diagnose(symptoms):
@@ -955,6 +1029,9 @@ test_symptoms = ["fever", "cough"]
 result = diagnose(test_symptoms)
 print(f"Symptoms: {test_symptoms}")
 print(f"Diagnosis: {result}")
+
+start_monitor()
+show_message(f"Diagnosis: {result}")
 `,
         successCriteria: [
           'Define diagnose function',
@@ -1003,6 +1080,10 @@ patients = [
 for i, symptoms in enumerate(patients):
     diagnosis = diagnose(symptoms)
     print(f"Patient {i+1}: {diagnosis}")
+
+# Show ward summary on the monitor
+start_monitor()
+show_message(f"Saw {len(patients)} patients")
 `,
         hint:
 `for i, symptoms in enumerate(patients):
@@ -1029,6 +1110,9 @@ patients = [
 for i, symptoms in enumerate(patients):
     diagnosis = diagnose(symptoms)
     print(f"Patient {i+1}: {diagnosis}")
+
+start_monitor()
+show_message(f"Saw {len(patients)} patients")
 `,
         successCriteria: [
           'Create list of patient symptom lists',
@@ -1170,6 +1254,10 @@ for patient in patients:
     hr = patient["heart_rate"]
     o2 = patient["oxygen"]
     print(f"{name}: HR={hr} bpm, O2={o2}%")
+
+# Show ward on the monitor
+start_monitor()
+show_message(f"Ward: {len(patients)} patients")
 `,
         hint:
 `for patient in patients:
@@ -1187,6 +1275,9 @@ for patient in patients:
     hr = patient["heart_rate"]
     o2 = patient["oxygen"]
     print(f"{name}: HR={hr} bpm, O2={o2}%")
+
+start_monitor()
+show_message(f"Ward: {len(patients)} patients")
 `,
         successCriteria: [
           'Create list of patient dictionaries',

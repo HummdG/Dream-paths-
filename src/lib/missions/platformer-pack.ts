@@ -1895,9 +1895,10 @@ print('Reach the flag to WIN! 🚩')`,
           'Next level unlocks'
         ],
         validation: {
-          type: 'runtime',
+          type: 'ast',
           checks: [
-            { type: 'win_triggered' }
+            { type: 'ast_calls_function', name: 'you_win' },
+            { type: 'ast_calls_function', name: 'collides_with' }
           ]
         },
         reward: { stars: 5, badge: 'Platformer Complete' }
