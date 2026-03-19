@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import { ArrowRight, ArrowLeft, Loader2, CheckCircle } from "lucide-react";
 
 const steps = [
@@ -313,7 +314,16 @@ export default function OnboardingPage() {
               className="space-y-6"
             >
               <div className="text-center mb-8">
-                <div className="text-5xl mb-4">👋</div>
+                <div className="flex justify-center mb-4">
+                  <Image
+                    src="/codog_3.png"
+                    width={96}
+                    height={96}
+                    alt=""
+                    aria-hidden="true"
+                    className="w-20 sm:w-24 h-auto drop-shadow-lg"
+                  />
+                </div>
                 <h1 className="text-2xl font-bold text-[var(--color-navy)] mb-2">
                   Welcome! Let&apos;s get started
                 </h1>

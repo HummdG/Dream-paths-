@@ -180,22 +180,22 @@ export default function Home() {
           className="object-cover object-center"
           priority
         />
-        {/* Mobile overlay: near-opaque so text is readable over the background image */}
-        <div className="absolute inset-0 md:hidden" style={{ background: 'rgba(255,248,240,0.92)' }} />
+        {/* Mobile/tablet overlay: near-opaque so text is readable over the background image */}
+        <div className="absolute inset-0 lg:hidden" style={{ background: 'rgba(255,248,240,0.92)' }} />
         {/* Desktop overlay: gradient fading left→right so characters show through on the right */}
         <div
-          className="absolute inset-0 hidden md:block"
+          className="absolute inset-0 hidden lg:block"
           style={{
             background: 'linear-gradient(to right, var(--color-cream) 35%, rgba(255,248,240,0.85) 55%, rgba(255,248,240,0.3) 75%, transparent 100%)',
           }}
         />
 
         <div className="relative z-10 max-w-6xl mx-auto px-6 pb-16">
-          <div className="flex flex-col md:flex-row md:items-center md:gap-12" style={{ minHeight: '500px' }}>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:gap-12" style={{ minHeight: '500px' }}>
 
             {/* Left: text content */}
             <motion.div
-              className="w-full md:w-[460px] md:shrink-0"
+              className="w-full lg:w-[460px] lg:shrink-0"
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
@@ -232,11 +232,24 @@ export default function Home() {
               <p className="mt-4 text-sm text-gray-500">
                 ✓ No credit card required &nbsp; ✓ Starter missions free forever
               </p>
+
+              {/* Codog mascot — desktop only */}
+              <div className="hidden lg:flex items-center gap-3 mt-6">
+                <Image
+                  src="/codog_1.png"
+                  width={80}
+                  height={80}
+                  alt=""
+                  aria-hidden="true"
+                  className="w-16 xl:w-20 h-auto drop-shadow-lg"
+                />
+                <p className="text-sm text-gray-400 italic">Your coding companion!</p>
+              </div>
             </motion.div>
 
             {/* Mobile character row — visible only on small screens */}
             <motion.div
-              className="flex md:hidden justify-around items-end w-full pt-4 pb-6"
+              className="flex lg:hidden justify-around items-end w-full pt-4 pb-6"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
@@ -303,7 +316,7 @@ export default function Home() {
 
             {/* Right: character cardboard cutouts — hidden on mobile */}
             <motion.div
-              className="hidden md:block flex-1 relative self-stretch"
+              className="hidden lg:block flex-1 relative self-stretch"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.3 }}
@@ -427,9 +440,19 @@ export default function Home() {
         />
         <div className="relative z-10 max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-navy)] mb-4">
-              Choose Your Dream Path
-            </h2>
+            <div className="inline-flex items-center gap-3 justify-center mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-navy)]">
+                Choose Your Dream Path
+              </h2>
+              <Image
+                src="/codog_5.png"
+                width={64}
+                height={64}
+                alt=""
+                aria-hidden="true"
+                className="hidden sm:block w-12 md:w-16 h-auto drop-shadow-md shrink-0 -mb-2"
+              />
+            </div>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Each path takes your child from complete beginner to something they've actually built.
             </p>
@@ -529,9 +552,19 @@ export default function Home() {
         />
         <div className="relative z-10 max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-navy)] mb-4">
-              How it works
-            </h2>
+            <div className="inline-flex items-center gap-3 justify-center mb-4">
+              <Image
+                src="/codog_3.png"
+                width={64}
+                height={64}
+                alt=""
+                aria-hidden="true"
+                className="hidden sm:block w-12 md:w-16 h-auto drop-shadow-md shrink-0"
+              />
+              <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-navy)]">
+                How it works
+              </h2>
+            </div>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Three steps from zero to something you built yourself.
             </p>
@@ -574,9 +607,19 @@ export default function Home() {
         <section className="relative z-10 py-20 px-6">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-navy)] mb-4">
-                Why parents choose DreamPaths
-              </h2>
+              <div className="inline-flex items-center gap-3 justify-center mb-4">
+                <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-navy)]">
+                  Why parents choose DreamPaths
+                </h2>
+                <Image
+                  src="/codog_4.png"
+                  width={64}
+                  height={64}
+                  alt=""
+                  aria-hidden="true"
+                  className="hidden sm:block w-12 md:w-16 h-auto drop-shadow-md shrink-0"
+                />
+              </div>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">

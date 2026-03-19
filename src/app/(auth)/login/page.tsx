@@ -59,23 +59,48 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--color-cream)] bg-dots flex items-center justify-center p-6">
+    <div className="min-h-screen relative flex items-center justify-center p-6 overflow-hidden">
+      {/* Full-bleed background — behind absolutely everything */}
+      <Image
+        src="/computer_scientist_hero_background.png"
+        alt=""
+        fill
+        className="object-cover object-center"
+        priority
+        aria-hidden="true"
+      />
+      {/* Fade layer — softens the image uniformly */}
+      <div className="absolute inset-0 bg-indigo-950/70" />
+      {/* Subtle vignette */}
+      <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at center, transparent 30%, rgba(0,0,15,0.45) 100%)" }} />
+
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
-        className="card max-w-md w-full"
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="card max-w-md w-full relative z-10"
       >
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center mb-6">
-            <Image 
-              src="/logo1.png" 
-              alt="DreamPaths" 
-              width={450} 
-              height={150} 
+          <Link href="/" className="inline-flex items-center mb-4">
+            <Image
+              src="/logo1.png"
+              alt="DreamPaths"
+              width={450}
+              height={150}
               priority
               className="h-20 sm:h-24 md:h-32 w-auto"
             />
           </Link>
+          <div className="flex justify-center mb-4">
+            <Image
+              src="/codog_1.png"
+              width={80}
+              height={80}
+              alt=""
+              aria-hidden="true"
+              className="w-16 sm:w-20 h-auto drop-shadow-md"
+            />
+          </div>
           <h1 className="text-2xl font-bold text-[var(--color-navy)] mb-2">
             Welcome back!
           </h1>
@@ -175,8 +200,8 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[var(--color-cream)] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[var(--color-violet)]" />
+      <div className="min-h-screen bg-indigo-950 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-white/50" />
       </div>
     }>
       <LoginForm />

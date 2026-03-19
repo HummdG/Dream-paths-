@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function VerifyEmailPage() {
   return (
@@ -11,7 +12,16 @@ export default function VerifyEmailPage() {
         animate={{ opacity: 1, scale: 1 }}
         className="card max-w-md w-full text-center"
       >
-        <div className="text-6xl mb-6">📧</div>
+        <div className="flex justify-center mb-6">
+          <Image
+            src="/codog_2.png"
+            width={96}
+            height={96}
+            alt=""
+            aria-hidden="true"
+            className="w-20 sm:w-24 h-auto drop-shadow-lg"
+          />
+        </div>
         <h1 className="text-2xl font-bold text-[var(--color-navy)] mb-4">
           Check your email
         </h1>

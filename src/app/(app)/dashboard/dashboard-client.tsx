@@ -140,6 +140,14 @@ export function DashboardClient({
               <h1 className="text-xl font-bold text-[var(--color-navy)]">
                 {childName}&apos;s Journey
               </h1>
+              <Image
+                src="/codog_1.png"
+                width={36}
+                height={36}
+                alt=""
+                aria-hidden="true"
+                className="w-7 sm:w-9 h-auto drop-shadow-sm shrink-0"
+              />
               {isFree ? (
                 <span className="text-xs text-amber-600 font-medium bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
                   Free
