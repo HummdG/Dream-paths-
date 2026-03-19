@@ -108,19 +108,19 @@ const CAREER_PATHS = [
 const HOW_IT_WORKS = [
   {
     step: '1',
-    emoji: '🎯',
+    image: '/codog_target.png',
     title: 'Pick a dream career',
     description: 'Choose from Computer Scientist, Astronaut, AI Engineer, and more paths coming soon.',
   },
   {
     step: '2',
-    emoji: '🚀',
+    image: '/codog_rocket.png',
     title: 'Complete one mission a week',
     description: 'Each mission fits around school life. Write real code, see it run instantly, and unlock the next mission when you\'re done.',
   },
   {
     step: '3',
-    emoji: '🏆',
+    image: '/codog_trophy.png',
     title: 'Build a real portfolio',
     description: 'Every mission produces something real: a working game, a program, a project to be proud of.',
   },
@@ -570,8 +570,8 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8 mb-16">
             {HOW_IT_WORKS.map((item, i) => (
               <div key={item.step} className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-[var(--color-indigo)] to-[var(--color-violet)] rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl">
-                  {item.emoji}
+                <div className="w-20 h-20 mx-auto mb-4">
+                  <Image src={item.image} alt="" aria-hidden="true" width={80} height={80} className="w-full h-full object-contain drop-shadow-md" />
                 </div>
                 <div className="text-xs font-bold text-[var(--color-violet)] mb-1 uppercase tracking-wide">
                   Step {item.step}
@@ -622,8 +622,8 @@ export default function Home() {
             <div className="grid md:grid-cols-3 gap-8">
               {/* Card 1 — Learning by doing */}
               <div className="card text-center">
-                <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-[var(--color-indigo)] to-[var(--color-violet)] flex items-center justify-center text-2xl">
-                  🚀
+                <div className="w-20 h-20 mx-auto mb-5">
+                  <Image src="/codog_rocket.png" alt="" aria-hidden="true" width={80} height={80} className="w-full h-full object-contain drop-shadow-md" />
                 </div>
                 <h3 className="text-lg font-bold text-[var(--color-navy)] mb-2">
                   They build something real
@@ -635,8 +635,8 @@ export default function Home() {
 
               {/* Card 2 — Transparency */}
               <div className="card text-center">
-                <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-2xl">
-                  👀
+                <div className="w-20 h-20 mx-auto mb-5">
+                  <Image src="/codog_magnify.png" alt="" aria-hidden="true" width={80} height={80} className="w-full h-full object-contain drop-shadow-md" />
                 </div>
                 <h3 className="text-lg font-bold text-[var(--color-navy)] mb-2">
                   Full visibility for parents
@@ -648,8 +648,8 @@ export default function Home() {
 
               {/* Card 3 — Value */}
               <div className="card text-center">
-                <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-2xl">
-                  💡
+                <div className="w-20 h-20 mx-auto mb-5">
+                  <Image src="/codog_lightbulb.png" alt="" aria-hidden="true" width={80} height={80} className="w-full h-full object-contain drop-shadow-md" />
                 </div>
                 <h3 className="text-lg font-bold text-[var(--color-navy)] mb-2">
                   Better value than a tutor
