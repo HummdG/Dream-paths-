@@ -165,14 +165,9 @@ export function SnakePreview({ onEngineReady, runTrigger, onPlayClicked }: Snake
 
       {/* Controls legend */}
       <div className="bg-slate-900 px-4 py-2 flex items-center justify-center gap-4 text-xs text-white/50 shrink-0">
-        <span className="flex items-center gap-1">
-          <kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-white/70">↑↓←→</kbd>
-          Steer snake
-        </span>
-        <span className="flex items-center gap-1">
-          <kbd className="px-1 py-0.5 bg-slate-800 rounded text-white/70">R</kbd>
-          Reset
-        </span>
+        <span>use on_key_down() to steer</span>
+        <span>•</span>
+        <span>use on_tick() to move each step</span>
       </div>
     </div>
   );

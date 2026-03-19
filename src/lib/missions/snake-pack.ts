@@ -339,6 +339,7 @@ Pick a colour and a speed for your snake using the two function calls below.`,
 
 
 print("Snake customised!")
+start_game()
 `,
         hint:
 `Type: set_snake_color("cyan")  (replace cyan with any colour from the list)
@@ -347,6 +348,7 @@ Then: set_game_speed(150)  (replace 150 with any number between 100–300)`,
 `set_snake_color("lime")
 set_game_speed(150)
 print("Snake customised!")
+start_game()
 `,
         successCriteria: [
           'Called set_snake_color() with a colour',
@@ -388,35 +390,41 @@ print("Snake customised!")
     steps: [
       {
         stepId: 'sn3_s1_start_game_loop',
-        concepts: ['set_direction', 'def', 'on_tick', 'named callback', 'game loop'],
+        concepts: ['set_direction', 'def', 'on_tick', 'start_game', 'named callback', 'game loop'],
         instruction:
 `Mission: Start the snake moving! 🐍
 
-Set the direction and start the game loop.
+Three things to write:
+1. set_direction() to point the snake
+2. on_tick(tick) to register the game loop
+3. start_game() to launch it
 
-Define a tick function, then register it with on_tick().`,
+Fill in all 3 missing lines below.`,
         detailedExplanation:
 `🧭 set_direction() points the snake — try 'RIGHT', 'UP', 'DOWN', or 'LEFT'. (Capital letters and quotes!)
 
-⚙️ def tick(): pass is a small function that keeps the game ticking. pass means "do nothing" for now.
+🔄 on_tick(tick) registers your tick function — no () after tick! You're handing it to the game to call, not running it yourself.
 
-🔄 on_tick(tick) registers your function — notice no () after tick! You're handing it to the game to call, not running it yourself.`,
+🚀 start_game() is what actually launches the snake. Without it, nothing moves — the snake waits for you!`,
         instructionSlides: [
-          "Let's make the snake actually MOVE! We need two things: a direction, and a tick function to keep the game running.",
+          "Let's make the snake move! Three things need to happen: point it, register a tick loop, then launch it.",
           "Write: `set_direction('RIGHT')` -- use CAPITAL letters inside single quotes! Try UP, DOWN, or LEFT too.",
-          "Now define a tick function: type `def tick():` then on the next line, 4 spaces then `pass`. `pass` means do nothing for now.",
-          "Below your function (no spaces!): write `on_tick(tick)` -- notice NO `()` after tick! You're handing the function to the game to run, not running it yourself.",
-          "Click Run Code!, then click on the game window. Your snake should start slithering!",
+          "The tick function is already there. Below it (no spaces!), write: `on_tick(tick)` -- no `()` after tick! You're handing the function to the game, not running it.",
+          "Finally, on the last blank line, write: `start_game()` -- this is what actually launches the snake. Without it, nothing moves!",
+          "Click Run Code! and watch the game. Your snake should start slithering right!",
         ],
         starterCode:
 `# Call set_direction() to point the snake — try 'RIGHT', 'UP', 'DOWN', or 'LEFT':
 
 
-# Define a tick function — this keeps the game updating:
+# This tick function keeps the game updating each step:
 def tick():
     pass
 
 # Register it with on_tick — no () after tick!
+
+
+# Launch the snake — nothing moves without this!
 
 `,
         hint:
@@ -425,7 +433,8 @@ def tick():
 def tick():
     pass
 
-on_tick(tick)   ← no () after tick — you're passing it, not calling it!`,
+on_tick(tick)    ← no () after tick — you're passing it, not calling it!
+start_game()     ← this launches the snake!`,
         solutionCode:
 `set_direction('RIGHT')
 
@@ -433,11 +442,12 @@ def tick():
     pass
 
 on_tick(tick)
+start_game()
 `,
         successCriteria: [
           'Called set_direction() with a direction',
-          'Defined a tick function',
-          'Called on_tick() to start the game loop',
+          'Defined a tick function and registered it with on_tick()',
+          'Called start_game() to launch the snake',
         ],
         validation: {
           type: 'ast',
@@ -445,6 +455,7 @@ on_tick(tick)
             { type: 'ast_calls_function', name: 'set_direction' },
             { type: 'ast_calls_function', name: 'on_tick' },
             { type: 'ast_has_function', name: 'tick' },
+            { type: 'ast_calls_function', name: 'start_game', errorHint: "Don't forget start_game() at the end — that's what actually launches the snake!" },
           ],
         },
         reward: { stars: 1 },
@@ -478,6 +489,7 @@ def tick():
     pass
 
 on_tick(tick)
+start_game()
 
 # go_up is done — follow the same pattern for the other 3 directions:
 def go_up():
@@ -508,6 +520,7 @@ def tick():
     pass
 
 on_tick(tick)
+start_game()
 
 def go_up():
     set_direction('UP')
@@ -570,6 +583,7 @@ def tick():
     pass
 
 on_tick(tick)
+start_game()
 
 # Rewrite all 4 key handlers using lambda:
 # Example (done for you): on_key_down('UP', lambda: set_direction('UP'))
@@ -592,6 +606,7 @@ def tick():
     pass
 
 on_tick(tick)
+start_game()
 
 on_key_down('UP',    lambda: set_direction('UP'))
 on_key_down('DOWN',  lambda: set_direction('DOWN'))
@@ -637,6 +652,7 @@ go_up should refuse if the snake is already going DOWN.`,
         starterCode:
 `set_direction('RIGHT')
 on_tick(lambda: None)
+start_game()
 
 def go_up():
     # Replace pass — only go UP if we're not currently going DOWN:
@@ -671,6 +687,7 @@ go_right guard: != 'LEFT'`,
         solutionCode:
 `set_direction('RIGHT')
 on_tick(lambda: None)
+start_game()
 
 def go_up():
     if get_direction() != 'DOWN':
@@ -756,6 +773,7 @@ def ate_food():
 
 
 on_tick(lambda: None)
+start_game()
 def go_up():
     if get_direction() != 'DOWN':
         set_direction('UP')
@@ -794,6 +812,7 @@ def ate_food():
 
 on_food_eaten(ate_food)
 on_tick(lambda: None)
+start_game()
 def go_up():
     if get_direction() != 'DOWN':
         set_direction('UP')
@@ -864,6 +883,7 @@ def ate_food():
 
 on_food_eaten(ate_food)
 on_tick(lambda: None)
+start_game()
 def go_up():
     if get_direction() != 'DOWN':
         set_direction('UP')
@@ -904,6 +924,7 @@ def died():
 on_food_eaten(ate_food)
 on_game_over(died)
 on_tick(lambda: None)
+start_game()
 def go_up():
     if get_direction() != 'DOWN':
         set_direction('UP')
@@ -975,6 +996,7 @@ def died():
 on_food_eaten(ate_food)
 on_game_over(died)
 on_tick(lambda: None)
+start_game()
 def go_up():
     if get_direction() != 'DOWN':
         set_direction('UP')
@@ -1016,6 +1038,7 @@ def died():
 on_food_eaten(ate_food)
 on_game_over(died)
 on_tick(lambda: None)
+start_game()
 def go_up():
     if get_direction() != 'DOWN':
         set_direction('UP')

@@ -115,6 +115,12 @@ def set_game_speed(ms):
     if snake:
         snake.setGameSpeed(int(ms))
 
+def start_game():
+    """Launch the snake — nothing moves until you call this!"""
+    snake = _get_snake()
+    if snake:
+        snake.start()
+
 def stop_game():
     """Stop (pause) the snake game"""
     snake = _get_snake()

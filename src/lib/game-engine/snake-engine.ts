@@ -331,13 +331,7 @@ export class SnakeEngine {
       e.preventDefault();
     }
 
-    // Built-in direction steering — works even before Python registers callbacks
-    // (mirrors what on_key_down handlers would do)
-    if (this.isRunning) {
-      this.setDirection(mapped as 'UP' | 'DOWN' | 'LEFT' | 'RIGHT');
-    }
-
-    // Also fire any Python-registered callbacks
+    // Only fire Python-registered callbacks — direction must be set by kid's code
     const cbs = this.keyCallbacks.get(mapped) ?? [];
     cbs.forEach(cb => { try { cb(); } catch { /* ignore */ } });
   }

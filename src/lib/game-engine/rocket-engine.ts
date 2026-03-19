@@ -188,10 +188,13 @@ export class RocketEngine {
 
     // Apply thrust if fuel remains
     if (this.fuel > 0 && this.thrust > 0) {
+      // direction=90 means straight up.
+      // rad = (direction-90)*PI/180, so at direction=90, rad=0.
+      // vx uses -sin (0 at straight-up), vy uses cos (1 at straight-up).
       const rad = (this.direction - 90) * (Math.PI / 180);
-      const thrustMag = this.thrust * 0.004;
-      this.vx += Math.cos(rad) * thrustMag;
-      this.vy += Math.sin(rad) * thrustMag;
+      const thrustMag = this.thrust * 0.020;
+      this.vx += -Math.sin(rad) * thrustMag;
+      this.vy += Math.cos(rad) * thrustMag;
       this.fuel = Math.max(0, this.fuel - (this.thrust / 100) * FUEL_DRAIN_RATE);
     }
 

@@ -308,7 +308,7 @@ export function MissionWorkspace({
           rocketEng.clearCallbacks();
           rocketEng.clearEvents();
           rocketEng.restart();
-          rocketEng.start();
+          // Do NOT start here — Python's launch() must be the trigger
         }
 
         wrappedCode = wrapRocketUserCode(code);
@@ -332,10 +332,11 @@ __captured_output__
         const result = await pyodide.runPythonAsync(rocketRunner);
         const printOutput = result || "";
 
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        events = rocketEng?.getEvents() ?? [];
-
+        // Reveal the rocket canvas immediately so kids see it fly during validation
         setRocketRunTrigger(t => t + 1);
+
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        events = rocketEng?.getEvents() ?? [];
 
         if (currentStep) {
           const validation = validateStep(code, printOutput, events, currentStep.validation);
@@ -365,7 +366,7 @@ __captured_output__
           patientEng.clearCallbacks();
           patientEng.clearEvents();
           patientEng.restart();
-          patientEng.start();
+          // Do NOT start here — Python's start_monitor() must be the trigger
         }
 
         wrappedCode = wrapPatientUserCode(code);
@@ -389,10 +390,11 @@ __captured_output__
         const result = await pyodide.runPythonAsync(patientRunner);
         const printOutput = result || "";
 
+        // Reveal the monitor canvas immediately so kids see it respond during validation
+        setPatientRunTrigger(t => t + 1);
+
         await new Promise(resolve => setTimeout(resolve, 1000));
         events = patientEng?.getEvents() ?? [];
-
-        setPatientRunTrigger(t => t + 1);
 
         if (currentStep) {
           const validation = validateStep(code, printOutput, events, currentStep.validation);
@@ -422,7 +424,7 @@ __captured_output__
           snakeEng.clearCallbacks();
           snakeEng.clearEvents();
           snakeEng.restart();
-          snakeEng.start();
+          // Do NOT start here — Python's start_game() must be the trigger
         }
 
         wrappedCode = wrapSnakeUserCode(code);
@@ -446,12 +448,12 @@ __captured_output__
         const result = await pyodide.runPythonAsync(snakeRunner);
         const printOutput = result || "";
 
+        // Reveal the snake canvas immediately so kids see it running during validation
+        setSnakeRunTrigger(t => t + 1);
+
         // Wait for a few ticks to fire before collecting events
         await new Promise(resolve => setTimeout(resolve, 1000));
         events = snakeEng?.getEvents() ?? [];
-
-        // Tell SnakePreview the game is now running (removes "click to play" overlay)
-        setSnakeRunTrigger(t => t + 1);
 
         if (currentStep) {
           const validation = validateStep(code, printOutput, events, currentStep.validation);
@@ -481,20 +483,10 @@ __captured_output__
         activeEngine.start(); // no-op if already running (double-start guard in place)
 
         // Reset platforms before Python runs to prevent stacking across multiple runs.
+        // Python's add_platform() calls are the source of truth for placement.
+        // Only add a fallback ground when the kid's code has no add_platform() yet.
         activeEngine.clearPlatforms();
-        const pythonAddsPlatforms = code.includes('add_platform(');
-        if (pythonAddsPlatforms) {
-          activeLevelData.objects
-            .filter((o) => o.type === 'platform')
-            .forEach((p) =>
-              activeEngine.addPlatform(
-                p.x * GRID_SIZE,
-                p.y * GRID_SIZE,
-                p.width * GRID_SIZE,
-                p.height * GRID_SIZE,
-              )
-            );
-        } else {
+        if (!code.includes('add_platform(')) {
           activeEngine.addPlatform(0, 380, 800, 20);
         }
       }
