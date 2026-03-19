@@ -12,6 +12,14 @@ type Submission = {
   createdAt: Date
 }
 
+// Feedback widget embeds the source page as "[Page: /path]\n\n..." at the top of the message.
+// Parse it out so we can render it as a badge rather than raw text.
+function parseMessage(raw: string): { page: string | null; body: string } {
+  const match = raw.match(/^\[Page: ([^\]]+)\]\n\n([\s\S]*)$/)
+  if (match) return { page: match[1], body: match[2] }
+  return { page: null, body: raw }
+}
+
 export function ContactList({ submissions }: { submissions: Submission[] }) {
   const [items, setItems] = useState(submissions)
 
@@ -26,41 +34,49 @@ export function ContactList({ submissions }: { submissions: Submission[] }) {
 
   return (
     <div className="space-y-4">
-      {items.map((s) => (
-        <div
-          key={s.id}
-          className={`rounded-xl border p-5 ${s.isRead ? 'border-gray-800 bg-gray-900' : 'border-indigo-700 bg-gray-900'}`}
-        >
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-semibold text-white">{s.name}</span>
-                <span className="text-gray-400 text-sm">{s.email}</span>
-                <span className="rounded-full bg-gray-800 px-2 py-0.5 text-xs text-gray-300 capitalize">
-                  {s.type}
-                </span>
-                {!s.isRead && (
-                  <span className="rounded-full bg-indigo-600 px-2 py-0.5 text-xs text-white">
-                    Unread
+      {items.map((s) => {
+        const { page, body } = parseMessage(s.message)
+        return (
+          <div
+            key={s.id}
+            className={`rounded-xl border p-5 ${s.isRead ? 'border-gray-800 bg-gray-900' : 'border-indigo-700 bg-gray-900'}`}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-semibold text-white">{s.name}</span>
+                  <span className="text-gray-400 text-sm">{s.email}</span>
+                  <span className="rounded-full bg-gray-800 px-2 py-0.5 text-xs text-gray-300 capitalize">
+                    {s.type}
                   </span>
-                )}
+                  {page && (
+                    <span className="rounded-full bg-violet-900/60 border border-violet-700 px-2 py-0.5 text-xs text-violet-300 font-mono">
+                      {page}
+                    </span>
+                  )}
+                  {!s.isRead && (
+                    <span className="rounded-full bg-indigo-600 px-2 py-0.5 text-xs text-white">
+                      Unread
+                    </span>
+                  )}
+                </div>
+                <p className="mt-2 text-sm text-gray-300 whitespace-pre-wrap">{body}</p>
+                <p className="mt-2 text-xs text-gray-500">
+                  {new Date(s.createdAt).toLocaleString()}
+                </p>
               </div>
-              <p className="mt-2 text-sm text-gray-300 whitespace-pre-wrap">{s.message}</p>
-              <p className="mt-2 text-xs text-gray-500">
-                {new Date(s.createdAt).toLocaleString()}
-              </p>
+              {!s.isRead && (
+                <button
+                  onClick={() => markRead(s.id)}
+                  className="shrink-0 rounded-lg border border-gray-700 px-3 py-1.5 text-xs text-gray-300 hover:border-indigo-500 hover:text-white transition-colors"
+                >
+                  Mark read
+                </button>
+              )}
             </div>
-            {!s.isRead && (
-              <button
-                onClick={() => markRead(s.id)}
-                className="shrink-0 rounded-lg border border-gray-700 px-3 py-1.5 text-xs text-gray-300 hover:border-indigo-500 hover:text-white transition-colors"
-              >
-                Mark read
-              </button>
-            )}
           </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
