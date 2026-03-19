@@ -43,6 +43,13 @@ Text goes in quotes: patient_name = "Jamie"
 Numbers don't: age = 10, heart_rate = 72
 
 Create all three variables to continue!`,
+        instructionSlides: [
+          "Welcome to DreamPaths Hospital! As a junior medic, you'll use Python to look after patients.",
+          "First, let's fill in the patient card. A variable stores information -- like a box with a label on it.",
+          "Find `patient_name =` and complete it: `patient_name = \"Jamie\"` -- text values always need quotes!",
+          "Find `age =` and add a number: `age = 10` -- numbers don't need quotes.",
+          "Find `heart_rate =` and set it to 72 -- that's a normal heart rate in beats per minute. Then click Run Code!",
+        ],
         starterCode:
 `# Patient card — fill in the details!
 
@@ -91,6 +98,12 @@ Use print() and an f-string to display the patient's information nicely.`,
   print(f"Patient: {patient_name}, Age: {age}")
 
 The {} curly braces are replaced with the variable's value!`,
+        instructionSlides: [
+          "The patient card data is ready! Let's print it in a readable format.",
+          "Look at the print line: `print(f\"Patient: {patient_name}, Age: {age}, HR: {heart_rate} bpm\")`",
+          "See the `f` before the `\"`? The `{ }` are fill-in blanks -- Python swaps each one for the real value when the code runs!",
+          "Click Run Code! -- the output should show Jamie's details filled in. Your first patient record!",
+        ],
         starterCode:
 `patient_name = "Jamie"
 age = 10
@@ -133,6 +146,12 @@ Watch the EKG waveform change!`,
 `📺 The monitor shows the patient's vitals visually.
 Call set_heart_rate(72) to update the display.
 Try different values — normal is 60–100 bpm!`,
+        instructionSlides: [
+          "Now let's hook up the heart monitor! `set_heart_rate()` updates the display on the monitor screen.",
+          "The code already has `set_heart_rate(heart_rate)` -- this passes the heart_rate variable to the monitor.",
+          "Then `start_monitor()` turns on the monitor and shows the EKG waveform.",
+          "Click Run Code! -- watch the monitor panel on the left. The EKG line should appear!",
+        ],
         starterCode:
 `patient_name = "Jamie"
 heart_rate = 72
@@ -201,6 +220,14 @@ Define a function called check_patient that sets the patient's vitals on the mon
       set_oxygen(98)
 
 Call start_monitor() after to see the results!`,
+        instructionSlides: [
+          "In Python, you can write a group of steps, give them a name, and run them all just by typing that name. That's what `def` is for!",
+          "Look at `def check_patient():` -- `def` means you're creating a new group of steps. This one is called `check_patient`.",
+          "Inside (with 4 spaces!), we have `set_heart_rate(75)`, `set_oxygen(98)`, and `set_blood_pressure(120, 80)` -- all the vital signs!",
+          "Then `check_patient()` RUNS it -- without that line, nothing happens!",
+          "Then `start_monitor()` turns on the display. Click Run Code! and check the monitor!",
+          "Try changing the numbers inside `check_patient`. What happens if you set heart rate to 120?",
+        ],
         starterCode:
 `def check_patient():
     set_heart_rate(75)
@@ -252,6 +279,13 @@ Add a parameter so you can pass the heart rate when calling the function.`,
 
 Now call it: check_patient(80) or check_patient(60)
 Try different heart rates!`,
+        instructionSlides: [
+          "What if we want to check different patients with different heart rates? We can add a setting to `check_patient`!",
+          "Look at `def check_patient(hr):` -- `hr` is a setting. When you run `check_patient`, you fill in that setting.",
+          "Inside: `set_heart_rate(hr)` -- uses whatever number you passed in. Not stuck on one value!",
+          "The call `check_patient(80)` passes 80 in. `hr` becomes 80 inside `check_patient`.",
+          "Try changing 80 to different numbers. What's a dangerous heart rate? What's too slow?",
+        ],
         starterCode:
 `def check_patient(hr):
     set_heart_rate(hr)
@@ -298,6 +332,12 @@ Print the reading to show it's working!`,
 After setting the heart rate, read it back:
   hr = get_reading("heart_rate")
   print(f"Current HR: {hr}")`,
+        instructionSlides: [
+          "We can SET the heart rate -- but can we READ it back from the monitor? Yes, with `get_reading()`!",
+          "Look at: `hr = get_reading(\"heart_rate\")` -- this asks the monitor for the current heart rate value.",
+          "Then `print(f\"Current heart rate: {hr} bpm\")` shows it in the output.",
+          "Click Run Code! -- the output should show the heart rate you set. The monitor is talking back!",
+        ],
         starterCode:
 `set_heart_rate(85)
 start_monitor()
@@ -359,6 +399,13 @@ Use an if statement to check:
       show_alert("High heart rate!")
 
 show_alert() flashes a red banner on the monitor!`,
+        instructionSlides: [
+          "Doctors need to know when something's wrong! An if check lets Python make decisions automatically.",
+          "Look at `if heart_rate > 100:` -- this checks if the number in the heart_rate box is over 100 (dangerously high bpm).",
+          "`show_alert(\"High heart rate!\")` flashes a red warning on the monitor. It's inside the if check (4 spaces before it!).",
+          "The code has `heart_rate = 120` to trigger the alert. Click Run Code! and watch the monitor!",
+          "Try changing 120 to 75. Does the alert still appear? (It shouldn't -- 75 is normal.)",
+        ],
         starterCode:
 `heart_rate = 120  # Try changing this value!
 
@@ -408,6 +455,13 @@ Add elif after your if:
       show_alert("High heart rate!")
   elif heart_rate < 50:
       show_alert("Low heart rate!")`,
+        instructionSlides: [
+          "A heart rate that's too LOW is also dangerous! `elif` adds a second condition after the first `if`.",
+          "`elif` means 'else if' -- it only checks when the first `if` was false. Order matters!",
+          "Look at: `elif heart_rate < 50:` -- checks for a dangerously slow heart rate.",
+          "The code has `heart_rate = 40` which is too low. Click Run Code! -- a different alert should appear!",
+          "Try heart_rate = 75. Does either alert fire? (No -- 75 is in the normal range.)",
+        ],
         starterCode:
 `heart_rate = 40  # Low heart rate — try different values!
 
@@ -460,6 +514,12 @@ Normal heart rate is 50–100 bpm.
       show_message("Vitals normal ✓")
 
 Try heart_rate = 75 to see the normal message!`,
+        instructionSlides: [
+          "What happens when the heart rate is perfectly normal? `else` handles everything the `if` and `elif` missed!",
+          "`else` has no condition -- it runs when ALL the conditions above were false.",
+          "Look at the code: `else:` then `show_message(\"Vitals normal!\")` -- this runs when 50 to 100 bpm.",
+          "Click Run Code! with heart_rate = 75. You should see the normal message instead of an alert!",
+        ],
         starterCode:
 `heart_rate = 75  # Normal — try 40, 75, and 120!
 
@@ -532,6 +592,12 @@ A list uses square brackets: [ ]`,
 
 Items are separated by commas inside [ ]
 Create your symptoms list to continue!`,
+        instructionSlides: [
+          "Our patient needs multiple treatments! A list lets us store many values in one variable.",
+          "Look at: `symptoms = [\"fever\", \"headache\", \"cough\"]` -- square brackets `[ ]` hold the items.",
+          "Items inside a list are separated by commas. You can have as many as you want!",
+          "Click Run Code! -- `print(symptoms)` shows the whole list, and `len(symptoms)` counts the items.",
+        ],
         starterCode:
 `# Create a list of symptoms
 symptoms = ["fever", "headache", "cough"]
@@ -576,6 +642,13 @@ Use a for loop to apply a treatment for each symptom.`,
 
 Each time through the loop, symptom is the next item.
 The treatment log on the monitor will fill up!`,
+        instructionSlides: [
+          "We could treat each symptom one by one... or use a `for` loop to do them ALL automatically!",
+          "Look at: `for symptom in symptoms:` -- this says 'for each item in the list, call it `symptom`'.",
+          "With 4 spaces: `add_treatment(symptom)` -- applies a treatment for that symptom. Runs once per item!",
+          "Then `print(f\"Applied treatment for: {symptom}\")` logs what was done.",
+          "Click Run Code! -- you should see three treatment lines appear. The loop did all the work!",
+        ],
         starterCode:
 `symptoms = ["fever", "headache", "cough"]
 
@@ -628,6 +701,12 @@ The patient is on the road to recovery!`,
   show_message("Treatment complete!")
 
 A heart rate of 72 and oxygen of 98 means the patient is stable!`,
+        instructionSlides: [
+          "After all treatments are done, we need to confirm the patient is stable. Let's check the vitals!",
+          "After the loop, `set_heart_rate(72)` and `set_oxygen(98)` set normal values on the monitor.",
+          "`show_message(\"Treatment complete!\")` displays the good news on the monitor screen.",
+          "Click Run Code! -- treatments apply, then the monitor shows normal vitals. Patient is stable!",
+        ],
         starterCode:
 `symptoms = ["fever", "headache", "cough"]
 

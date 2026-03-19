@@ -107,7 +107,8 @@ export interface MissionStep {
   stepId: string;
   concepts: string[];
   instruction: string;
-  detailedExplanation?: string; // Kid-friendly explanation of the concept
+  detailedExplanation?: string; // Kid-friendly explanation of the concept (legacy fallback)
+  instructionSlides?: string[]; // Mascot-guided slide-by-slide instructions (preferred)
   starterCode: string;
   hint?: string;
   solutionCode?: string; // Gated behind confirmation

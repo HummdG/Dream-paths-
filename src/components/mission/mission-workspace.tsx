@@ -9,6 +9,7 @@ import {
   PartyPopper
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { Confetti } from "@/components/confetti";
 import { GamePreview } from "@/components/coding-journey/game-preview";
 import { SnakePreview } from "@/components/game-preview/snake-preview";
@@ -16,7 +17,8 @@ import { RocketPreview } from "@/components/game-preview/rocket-preview";
 import { PatientPreview } from "@/components/game-preview/patient-preview";
 import { ExperimentGuide } from "@/components/mission/experiment-guide";
 import { StepPanel } from "@/components/mission/step-panel";
-import { Mission } from "@/lib/missions/schema";
+import { StepTools } from "@/components/mission/step-tools";
+import { Mission, MissionStep } from "@/lib/missions/schema";
 import { PlatformerEngine } from "@/lib/game-engine";
 import { wrapUserCode } from "@/lib/game-engine/python-api";
 import { wrapSnakeUserCode } from "@/lib/game-engine/snake-python-api";
@@ -31,6 +33,76 @@ import { LevelDesigner, LevelData } from "@/components/level-designer";
 import { SpriteDesigner } from "@/components/sprite-designer";
 import { SimpleEditor } from "@/components/code-editor/simple-editor";
 import { PackTour } from "@/components/mission/pack-tour";
+// =============================================================================
+// SPELLING HINT HELPERS
+// =============================================================================
+
+function levenshtein(a: string, b: string): number {
+  const dp: number[][] = Array.from({ length: a.length + 1 }, (_, i) =>
+    Array.from({ length: b.length + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0))
+  );
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      dp[i][j] =
+        a[i - 1] === b[j - 1]
+          ? dp[i - 1][j - 1]
+          : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+    }
+  }
+  return dp[a.length][b.length];
+}
+
+const ENGINE_API_NAMES: Record<string, string[]> = {
+  snake: [
+    'set_direction', 'on_tick', 'on_key_down', 'get_direction',
+    'set_snake_color', 'set_game_speed', 'get_snake_length',
+    'show_message', 'on_food_eaten', 'on_game_over',
+  ],
+  rocket: [
+    'set_thrust', 'launch', 'set_direction', 'on_update',
+    'get_altitude', 'get_fuel', 'show_message',
+  ],
+  patient_monitor: [
+    'set_heart_rate', 'set_oxygen', 'set_blood_pressure',
+    'get_reading', 'start_monitor', 'show_alert', 'on_reading', 'add_treatment',
+  ],
+  platformer: [
+    'add_platform', 'add_coin', 'on_key_down',
+    'show_message', 'get_score', 'set_player_position',
+  ],
+};
+
+function getSpellingHint(output: string, step: MissionStep, engineType?: string): string | null {
+  const match = output.match(/NameError: name '(\w+)' is not defined/);
+  if (!match) return null;
+  const wrongName = match[1];
+
+  // Collect expected names from validation checks
+  const checkNames: string[] = step.validation.checks.flatMap(check => {
+    const c = check as Record<string, unknown>;
+    const names: string[] = [];
+    if (typeof c.variable === 'string') names.push(c.variable);
+    if (typeof c.name === 'string') names.push(c.name);
+    return names;
+  });
+
+  const apiNames = ENGINE_API_NAMES[engineType ?? 'platformer'] ?? [];
+  const allExpected = [...new Set([...checkNames, ...apiNames])];
+
+  let best: string | null = null;
+  let bestDist = 3; // threshold: only suggest if distance <= 2
+  for (const name of allExpected) {
+    if (name === wrongName) return null; // exact match — not a mistake
+    const dist = levenshtein(wrongName, name);
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = name;
+    }
+  }
+
+  if (!best) return null;
+  return `\n\nCodog says: Did you mean \`${best}\`? It looks like \`${wrongName}\` might be a spelling mistake!`;
+}
 
 // Grid size must match game-preview.tsx's gridSize constant.
 const GRID_SIZE = 20;
@@ -114,6 +186,13 @@ export function MissionWorkspace({
   // that is partially or fully done doesn't re-trigger validation incorrectly.
   const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set(completedStepIds));
   const [showCelebration, setShowCelebration] = useState(false);
+  const [celebrationCodog, setCelebrationCodog] = useState('/codog_1.png');
+
+  const triggerCelebration = () => {
+    const imgs = ['/codog_1.png', '/codog_2.png', '/codog_3.png', '/codog_4.png', '/codog_5.png'];
+    setCelebrationCodog(imgs[Math.floor(Math.random() * imgs.length)]);
+    setShowCelebration(true);
+  };
   const [engine, setEngine] = useState<PlatformerEngine | null>(null);
   const [currentCode, setCurrentCode] = useState("");
   // Tracks the current display code per step so "Start Over" survives step navigation.
@@ -269,13 +348,14 @@ __captured_output__
             onStepComplete?.(currentStep.stepId, currentStep.reward.stars, currentStep.reward.badge);
 
             if (newCompleted.size === mission.steps.length) {
-              setShowCelebration(true);
+              triggerCelebration();
               onMissionComplete?.(mission.missionId);
             }
           }
         }
 
-        return { output: printOutput.trim() };
+        const rocketHint = currentStep ? getSpellingHint(printOutput, currentStep, 'rocket') : null;
+        return { output: printOutput.trim() + (rocketHint ?? '') };
       }
 
       if (isPatientMission) {
@@ -325,13 +405,14 @@ __captured_output__
             onStepComplete?.(currentStep.stepId, currentStep.reward.stars, currentStep.reward.badge);
 
             if (newCompleted.size === mission.steps.length) {
-              setShowCelebration(true);
+              triggerCelebration();
               onMissionComplete?.(mission.missionId);
             }
           }
         }
 
-        return { output: printOutput.trim() };
+        const patientHint = currentStep ? getSpellingHint(printOutput, currentStep, 'patient_monitor') : null;
+        return { output: printOutput.trim() + (patientHint ?? '') };
       }
 
       if (isSnakeMission) {
@@ -383,13 +464,14 @@ __captured_output__
             onStepComplete?.(currentStep.stepId, currentStep.reward.stars, currentStep.reward.badge);
 
             if (newCompleted.size === mission.steps.length) {
-              setShowCelebration(true);
+              triggerCelebration();
               onMissionComplete?.(mission.missionId);
             }
           }
         }
 
-        return { output: printOutput.trim() };
+        const snakeHint = currentStep ? getSpellingHint(printOutput, currentStep, 'snake') : null;
+        return { output: printOutput.trim() + (snakeHint ?? '') };
       }
 
       // ── Platformer execution path (unchanged) ─────────────────────────────
@@ -460,13 +542,14 @@ __captured_output__
           onStepComplete?.(currentStep.stepId, currentStep.reward.stars, currentStep.reward.badge);
 
           if (newCompleted.size === mission.steps.length) {
-            setShowCelebration(true);
+            triggerCelebration();
             onMissionComplete?.(mission.missionId);
           }
         }
       }
 
-      return { output: printOutput.trim() };
+      const platformerHint = currentStep ? getSpellingHint(printOutput, currentStep, 'platformer') : null;
+      return { output: printOutput.trim() + (platformerHint ?? '') };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Something went wrong!";
       return { output: "", error: friendlyError(errorMessage) };
@@ -582,7 +665,7 @@ __captured_output__
 
       // Check if this was the last step
       if (currentStepIndex === mission.steps.length - 1) {
-        setShowCelebration(true);
+        triggerCelebration();
         onMissionComplete?.(mission.missionId);
       }
     }
@@ -600,7 +683,7 @@ __captured_output__
     }
 
     setCompletedSteps(newCompleted);
-    setShowCelebration(true);
+    triggerCelebration();
     onMissionComplete?.(mission.missionId);
   };
 
@@ -657,9 +740,9 @@ __captured_output__
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.2, type: "spring" }}
-                className="text-8xl mb-6"
+                className="flex justify-center mb-6"
               >
-                🎉
+                <Image src={celebrationCodog} alt="Codog" width={140} height={140} className="drop-shadow-xl" />
               </motion.div>
 
               <motion.h2
@@ -852,23 +935,41 @@ __captured_output__
           {/* Right side: sticky so step instructions stay in view as user scrolls */}
           <div
             data-tour="step-panel"
-            className="lg:sticky lg:top-[72px] lg:self-start lg:max-h-[calc(100vh-88px)] lg:overflow-y-auto"
+            className="lg:sticky lg:top-[72px] lg:self-start"
           >
-            <StepPanel
-              step={currentStep}
-              stepNumber={currentStepIndex + 1}
-              totalSteps={mission.steps.length}
-              missionTitle={mission.title.replace(/^Mission \d+:\s*/i, '')}
-              validationResult={validationResult || undefined}
-              isCompleted={completedSteps.has(currentStep.stepId)}
-              onCompleteStep={handleCompleteStep}
-              onPrevStep={goToPrevStep}
-              onNextStep={goToNextStep}
-              hasPrevStep={currentStepIndex > 0}
-              hasNextStep={currentStepIndex < mission.steps.length - 1}
-              nextMissionId={nextMissionId}
-              allStepsComplete={completedSteps.size === mission.steps.length}
-            />
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentStep.stepId}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.12 }}
+                className="flex flex-col gap-3"
+              >
+                <StepPanel
+                  step={currentStep}
+                  stepNumber={currentStepIndex + 1}
+                  totalSteps={mission.steps.length}
+                  missionTitle={mission.title.replace(/^Mission \d+:\s*/i, '')}
+                  validationResult={validationResult || undefined}
+                  isCompleted={completedSteps.has(currentStep.stepId)}
+                  onCompleteStep={handleCompleteStep}
+                  onPrevStep={goToPrevStep}
+                  onNextStep={goToNextStep}
+                  hasPrevStep={currentStepIndex > 0}
+                  hasNextStep={currentStepIndex < mission.steps.length - 1}
+                  nextMissionId={nextMissionId}
+                  allStepsComplete={completedSteps.size === mission.steps.length}
+                />
+                {currentStep?.instructionSlides?.length ? (
+                  <StepTools
+                    step={currentStep}
+                    validationResult={validationResult || undefined}
+                    isCompleted={completedSteps.has(currentStep.stepId)}
+                  />
+                ) : null}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
         )}

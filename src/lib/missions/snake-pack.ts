@@ -49,6 +49,13 @@ Add your comment and print() call in the starter code below.`,
 🖨️ print() shows a message on screen. Whatever's inside the quotes appears in the Output below.
 
 ✏️ Try it: print("Hello, snake!") — include the word "Hello" to pass the check!`,
+        instructionSlides: [
+          "Hi! I'm Codog, your coding guide! Today we'll write our very first Python code together!",
+          "See those lines starting with # in the editor? Those are COMMENTS. Python ignores them -- they're like sticky notes to yourself.",
+          "Click on the empty line at the bottom of the editor so your cursor is blinking there.",
+          "Now type: `print(\"Hello, snake!\")` -- you need the round brackets ( ) and the double quotes \" \" around the words!",
+          "Click the green Run Code! button. Look at the Output section below -- your message should appear!",
+        ],
         starterCode:
 `# This is a comment! Python ignores lines that start with #
 # Add a comment below explaining what this program does:
@@ -92,6 +99,13 @@ Add both lines in the starter code below.`,
 🐍 Try it: snake_name = "Slimy"  (text values need quotes around them)
 
 🖨️ To print the value: print(snake_name) — no quotes around the variable name!`,
+        instructionSlides: [
+          "A variable is like a labelled box -- you give it a name and store something inside!",
+          "Click on the first empty line. Type: `snake_name = \"Slimy\"` -- the = puts the value in the box. Quotes mean it's text!",
+          "On the NEXT line, type: `print(snake_name)` -- no quotes! We want what's IN the box, not the word.",
+          "Click Run Code! -- your snake's name should appear. Try changing \"Slimy\" to your own name!",
+          "If you get an error, double-check the spelling of `snake_name` -- Python is very picky!",
+        ],
         starterCode:
 `# Create a variable called snake_name and store your snake's name in it:
 # (text values need quotes around them, like "Slimy")
@@ -134,6 +148,13 @@ The starter code is almost complete — replace ___ with the right function call
 🐍 Wrap any variable (or function call) in { } curly braces and Python fills it in for you.
 
 💡 There's a built-in function called get_snake_length() — it tells you how many segments the snake has.`,
+        instructionSlides: [
+          "Cool trick! Put `f` before the `\"` and your message becomes a fill-in template. Anything you put inside `{ }` gets swapped for the real value!",
+          "Look at the editor -- there's a line with `___` in it. That gap is yours to fill in!",
+          "Replace `___` with `get_snake_length()` -- that's the built-in counter that knows how many body parts your snake has.",
+          "Your finished line: `print(f\"My snake is {snake_name} and has {get_snake_length()} segments!\")` -- each `{ }` is a fill-in blank!",
+          "Click Run Code! -- Python fills in `{snake_name}` with the actual name, and `{get_snake_length()}` with the real count!",
+        ],
         starterCode:
 `snake_name = "Slimy"
 
@@ -192,6 +213,14 @@ The shell is ready in the starter code — fill it in!`,
 📝 Start with def, then the name, then (): — then indent 4 spaces to write the code inside.
 
 ▶️ After defining it, you must call it: greet() — otherwise it just sits there and never runs!`,
+        instructionSlides: [
+          "You can bundle a bunch of code, give it a name, and run it all just by typing that name! That's what `def` does.",
+          "Look at the editor -- `def greet():` is already there. `def` means you're creating a new bundle of code. This one is called `greet`.",
+          "To put code INSIDE `greet`, press Enter after the colon, then press Space 4 times. Count them: 1, 2, 3, 4!",
+          "Now type: `print(\"Let's play!\")` -- because you pressed Space 4 times, this line is inside `greet`.",
+          "Scroll below `greet` and on a new line (no spaces!), type: `greet()` -- typing the name with `()` is how you run it!",
+          "Click Run Code! -- you should see Let's play! in the output. If not, check you have exactly 4 spaces before print.",
+        ],
         starterCode:
 `# Define the function — add a print() inside it (4 spaces before print!)
 def greet():
@@ -242,6 +271,13 @@ There's a deliberate indentation error in the starter code. Can you fix it?`,
 🔍 Find the line with only 2 spaces before print — it should have 4 spaces.
 
 💡 Press Tab to add 4 spaces automatically, or count them out by hand.`,
+        instructionSlides: [
+          "There's a BUG hiding in the code! A bug is a mistake that stops Python working. Can you spot it?",
+          "Look at the two `print()` lines inside `greet()`. Both should have exactly 4 spaces before them.",
+          "Count the spaces before the SECOND `print()` line -- it only has 2 spaces! That's the bug.",
+          "Click right before the word `print` on that line. Delete 2 spaces, then add 2 more -- so there are 4 total.",
+          "Click Run Code! -- if both messages appear without any error, you fixed the bug! Great detective work!",
+        ],
         starterCode:
 `def greet():
     print("Welcome to Snake!")
@@ -287,6 +323,12 @@ Pick a colour and a speed for your snake using the two function calls below.`,
 ⚡ set_game_speed() controls how fast the snake moves. Lower number = faster snake!
 
 🐍 Click Run Code and watch your snake change instantly!`,
+        instructionSlides: [
+          "Fun time! Let's change your snake's colour and speed. Both are just one line of code each!",
+          "Find the first blank line. Type: `set_snake_color(\"lime\")` -- replace lime with any colour from the list on the right!",
+          "Find the next blank line. Type: `set_game_speed(150)` -- lower numbers = faster snake, higher = slower!",
+          "Click Run Code! and watch the game -- your snake should change colour and speed right away!",
+        ],
         starterCode:
 `# Pick a colour from the list on the right and call set_snake_color():
 # Example: set_snake_color("lime")
@@ -359,6 +401,12 @@ Write both lines in the starter code below.`,
 🔄 on_tick(lambda: None) starts the game loop — the snake begins moving as soon as you call it!
 
 🎮 After clicking Run Code, click on the game area to see your snake go!`,
+        instructionSlides: [
+          "Let's make the snake actually MOVE! We need to do two things: set a direction and keep the game ticking.",
+          "Find the first blank line. Type: `set_direction('RIGHT')` -- use CAPITAL letters and SINGLE quotes! Try UP, DOWN, or LEFT too.",
+          "Find the next blank line. Type: `on_tick(lambda: None)` -- this keeps the game ticking so the snake keeps moving. Type it exactly!",
+          "Click Run Code!, then click on the game window on the left. Your snake should start slithering!",
+        ],
         starterCode:
 `# Call set_direction() to point the snake — try 'RIGHT', 'UP', 'DOWN', or 'LEFT':
 
@@ -400,6 +448,13 @@ The game loop is already set up — add the 4 key lines below it.`,
 🐍 Pattern: on_key_down('UP', lambda: set_direction('UP')) — do this for all 4 directions!
 
 🎮 After clicking Run Code, click the game area and use your arrow keys to steer!`,
+        instructionSlides: [
+          "The snake moves but we can't steer it! Let's connect the arrow keys.",
+          "Find the blank lines below `on_tick`. You need 4 lines -- one for each arrow direction.",
+          "Type: `on_key_down('UP', lambda: set_direction('UP'))` -- the `lambda:` part is the connector. Just type it exactly as shown!",
+          "Do the same for DOWN, LEFT, and RIGHT -- just change the direction word in both places.",
+          "Click Run Code!, click the game window, then try steering with your arrow keys. You control the snake!",
+        ],
         starterCode:
 `set_direction('RIGHT')
 on_tick(lambda: None)
@@ -445,6 +500,14 @@ Replace the pass in go_up() and go_down() with if statements so the snake can't 
 🛡️ Use an if statement to check first: if get_direction() != 'DOWN': — then set_direction('UP')
 
 ❓ The != symbol means "is NOT equal to" — so this says "only go UP if we're not already going DOWN".`,
+        instructionSlides: [
+          "Problem: if the snake goes RIGHT and you press LEFT, it crashes into itself! Let's add a safety check.",
+          "Find `go_up()` in the code. The word `pass` inside it is a placeholder -- you'll replace it.",
+          "Delete the word `pass`. Then press Enter and type 4 spaces, then: `if get_direction() != 'DOWN':`",
+          "Now press Enter and type 8 spaces (4 + 4), then: `set_direction('UP')`",
+          "`!=` means 'is NOT equal to' -- so this says: only go UP if we're not already going DOWN. Smart!",
+          "Do the same for `go_down()` -- use `!= 'UP'` as the check and `set_direction('DOWN')` inside.",
+        ],
         starterCode:
 `set_direction('RIGHT')
 on_tick(lambda: None)
@@ -532,6 +595,14 @@ Fill in the ate_food() function to update the score when the snake eats, then re
 ➕ score += 1 is a shortcut for score = score + 1 — it adds 1 each time the snake eats.
 
 📺 show_message() displays text on the game screen. Use an f-string to show the current score!`,
+        instructionSlides: [
+          "Let's add scoring! `ate_food()` is a `def` block that the game runs FOR YOU every time the snake eats.",
+          "Find `ate_food()` in the code. Delete the word `pass`. Then with 4 spaces before it, type: `global score`",
+          "Why `global score`? The score box was created outside `ate_food`. Without this line, Python ignores the real one and makes a new empty box!",
+          "Next line (4 spaces): `score += 1` -- this is a shortcut for `score = score + 1`. Adds 1 each time!",
+          "Next line (4 spaces): `show_message(f\"Score: {score}\")` -- shows the score on screen using the `f` trick!",
+          "Below `ate_food` (no spaces!): `on_food_eaten(ate_food)` -- no `()` after `ate_food`! We're passing it to the game to run, not running it ourselves.",
+        ],
         starterCode:
 `score = 0
 
@@ -598,6 +669,13 @@ Write a died() function that shows a message when the snake crashes, then regist
 🖨️ Use show_message() to display a "Game Over" message — include the final score with an f-string!
 
 💡 You don't need global inside died() — you're only reading score, not changing it!`,
+        instructionSlides: [
+          "Now let's make something happen when the snake crashes! We'll write a `def died():` block that the game runs for us automatically.",
+          "Find the blank lines below `ate_food()`. Type: `def died():` to start the new block.",
+          "Press Enter, then 4 spaces, then: `show_message(f\"Game Over! Final score: {score}\")`",
+          "On a new line below `died` (no spaces!): `on_game_over(died)` -- no `()` after `died`! We're passing it to the game to run.",
+          "Click Run Code! and play. When the snake crashes, your Game Over message should appear!",
+        ],
         starterCode:
 `score = 0
 
@@ -670,6 +748,13 @@ Add an if statement inside ate_food() that speeds the snake up when the score re
 🔢 score >= 5 means "score is 5 or more". The >= symbol means "greater than or equal to".
 
 🎯 Add the if statement after score += 1 — remember to indent it 4 spaces inside ate_food()!`,
+        instructionSlides: [
+          "The game is too easy! Let's make the snake speed up when you reach 5 points using an if check.",
+          "Find `ate_food()`. After the `score += 1` line, add a new line at the SAME level (4 spaces before it).",
+          "Type: `if score >= 5:` -- `>=` means 'greater than or equal to'. So: when score reaches 5 or more...",
+          "Press Enter and type 8 spaces (4 + 4), then: `set_game_speed(120)` -- lower number = faster snake!",
+          "Click Run Code! and play until you get 5 points. Feel the snake speed up? You just added a difficulty jump!",
+        ],
         starterCode:
 `score = 0
 

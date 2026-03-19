@@ -43,6 +43,13 @@ Just write: pilot_name = "Alex"
 
 Numbers don't need quotes: fuel = 100
 ✏️ Create all three variables to continue!`,
+        instructionSlides: [
+          "Welcome, Space Cadet! Before we can blast off, we need to set up our mission variables.",
+          "A variable is like a labelled box -- you give it a name and store something inside. Text uses quotes!",
+          "Find the line `pilot_name =` and complete it: `pilot_name = \"Alex\"` -- replace Alex with your name!",
+          "Find `fuel =` and add a number (0 to 100). We start full, so try: `fuel = 100`",
+          "Find `altitude =` and set it to 0 -- we start on the ground! Then click Run Code!",
+        ],
         starterCode:
 `# Mission variables — fill these in!
 
@@ -91,6 +98,12 @@ Print the pilot_name, fuel, and altitude variables.`,
 `🖨️ print() sends a message to the output panel below.
 You can print variables directly: print(pilot_name)
 Or text in quotes: print("Launching now!")`,
+        instructionSlides: [
+          "Great mission variables! Now let's report them to Mission Control using `print()`.",
+          "The first `print(pilot_name)` is already there. You need to add two more lines below it.",
+          "Type: `print(fuel)` -- this prints the fuel number. Then on the next line: `print(altitude)`",
+          "Click Run Code! -- you should see three values appear in the Output. Mission Control is watching!",
+        ],
         starterCode:
 `pilot_name = "Alex"
 fuel = 100
@@ -140,6 +153,12 @@ Print a nice briefing message using an f-string.`,
 
 The curly braces {} insert the variable's value.
 Make your mission briefing personal!`,
+        instructionSlides: [
+          "Raw numbers are hard to read! Let's build a proper briefing message that fills in your values automatically.",
+          "Here's the trick: put `f` before the `\"` to make a fill-in template. Anywhere you write `{name}`, Python swaps it for the real value!",
+          "The briefing line is already written: `print(f\"Pilot {pilot_name}, fuel is {fuel}%, altitude {altitude} km\")`",
+          "Click Run Code! -- Python fills in each `{...}` blank with the real value. Much clearer!",
+        ],
         starterCode:
 `pilot_name = "Alex"
 fuel = 100
@@ -201,6 +220,13 @@ Write a function called launch_rocket that prints "3... 2... 1... Launch!".`,
       print("3... 2... 1... Launch!")
 
 Don't forget the colon and the indent!`,
+        instructionSlides: [
+          "In Python, you can write a group of steps, give them a name, and run them all just by typing that name. That's what `def` is for!",
+          "Look at the editor -- `def launch_rocket():` is already there. `def` means you're creating a new group of steps. This one is called `launch_rocket`.",
+          "To put code INSIDE `launch_rocket`, press Enter after the colon, then press Space 4 times.",
+          "Now type: `print(\"3... 2... 1... Launch!\")` -- with 4 spaces before it, this line is inside `launch_rocket`.",
+          "Click Run Code! -- wait, nothing happens yet! `launch_rocket` won't run until you USE IT. We'll fix that next!",
+        ],
         starterCode:
 `# Define a function called launch_rocket
 def launch_rocket():
@@ -238,6 +264,12 @@ Call launch_rocket() to see it in action.`,
   launch_rocket()
 
 You can call it multiple times — try calling it twice!`,
+        instructionSlides: [
+          "We wrote `launch_rocket()` but it's just sitting there waiting! We need to USE IT to make it run.",
+          "Find the blank line below `launch_rocket`. Type: `launch_rocket()` -- make sure there are NO spaces before it!",
+          "Click Run Code! -- you should see your countdown appear in the Output. 3... 2... 1... Launch!",
+          "Try typing `launch_rocket()` again on the next line. You can run it as many times as you want!",
+        ],
         starterCode:
 `def launch_rocket():
     print("3... 2... 1... Launch!")
@@ -282,6 +314,13 @@ Write a function status_report(power) that prints the thrust power.`,
       print(f"Thrust: {power}%")
 
 When you call it: status_report(75) — power becomes 75.`,
+        instructionSlides: [
+          "Right now `status_report()` always uses the same power level. Let's give it a setting so it can work with any number!",
+          "Look at: `def status_report(power):` -- `power` is a setting. When you run `status_report`, you fill in that setting.",
+          "Inside: `print(f\"Thrust: {power}%\")` -- `{power}` gets swapped for whatever number you pass in.",
+          "Look at the two calls: `status_report(50)` and `status_report(100)` -- each runs `status_report` with a different number.",
+          "Click Run Code! -- you'll see two lines, one for each power level. Try changing 50 and 100 to other numbers!",
+        ],
         starterCode:
 `# Define a function with a parameter
 def status_report(power):
@@ -349,6 +388,12 @@ Set the thrust to 80 and watch the rocket rise!`,
   100 = full blast
 
 Call set_thrust(80) and then launch() to start the simulation!`,
+        instructionSlides: [
+          "Time to actually fly a rocket! `set_thrust()` controls how much engine power we use.",
+          "Look at the code -- `set_thrust(80)` sets the engines to 80% power. 0 = off, 100 = full blast!",
+          "Then `launch()` starts the rocket simulation. Both lines are already there!",
+          "Click Run Code! and watch the rocket on the left. It should start rising. Try changing 80 to other numbers!",
+        ],
         starterCode:
 `# Set the rocket's thrust power (0-100)
 set_thrust(80)
@@ -391,6 +436,12 @@ use set_direction() to control which way the rocket points.
   0 = straight right
 
 Try set_direction(90) for the best altitude climb!`,
+        instructionSlides: [
+          "The rocket is flying but maybe not straight up! `set_direction()` controls the angle.",
+          "90 degrees = straight up. 45 = diagonal right. 0 = straight sideways. We want 90 for maximum altitude!",
+          "The code already has `set_direction(90)`, `set_thrust(100)`, and `launch()`. All set!",
+          "Click Run Code! and watch the rocket climb straight up. Try changing 90 to 45 and see what happens!",
+        ],
         starterCode:
 `# Point the rocket straight up
 set_direction(90)
@@ -438,6 +489,14 @@ Show a message when the rocket is flying!`,
 Inside the function, use get_altitude() to read the height.
 
 Try showing a message when altitude > 50!`,
+        instructionSlides: [
+          "What if we want to CHECK the altitude while the rocket is flying? We need a `def` block that the game runs for us automatically every moment!",
+          "Look at `def check_flight():` -- inside it, `get_altitude()` reads the current height and saves it as `alt`.",
+          "The `if alt > 50:` check runs every moment. If the height is more than 50 km, `show_message()` pops up on screen!",
+          "Then `on_update(check_flight)` tells the game: run `check_flight` every moment while flying.",
+          "Notice: no `()` after `check_flight` in `on_update(check_flight)` -- we're passing it to the game to run, not running it ourselves!",
+          "Click Run Code! and watch the rocket. When it passes 50 km, the message should appear!",
+        ],
         starterCode:
 `set_thrust(90)
 set_direction(90)
@@ -512,6 +571,12 @@ Use an if statement inside on_update to show a message when altitude > 100 km.`,
 Use an if statement to check it:
   if get_altitude() > 100:
       show_message("Approaching orbit!")`,
+        instructionSlides: [
+          "`monitor` already has an if check: `if alt > 100`. An if check is a decision -- Python only runs the code inside when it's true!",
+          "`alt > 100` means 'the altitude number is more than 100'. When it's true, Python runs the code with 4 spaces before it.",
+          "When the rocket passes 100 km, `show_message(\"Approaching orbit!\")` appears on screen.",
+          "Click Run Code! and watch -- the message should appear as the rocket climbs past 100 km!",
+        ],
         starterCode:
 `set_thrust(100)
 set_direction(90)
@@ -569,6 +634,12 @@ Add an elif to check when altitude >= 400 and show "Orbit reached!".`,
       show_message("Orbit reached!")
 
 Run it and let the rocket fly up to 400 km!`,
+        instructionSlides: [
+          "Now we want TWO different messages -- one for approaching orbit, one for actually reaching it at 400 km!",
+          "`elif` means 'else if' -- a second condition that only checks when the first `if` was false.",
+          "Look at the code: `if alt >= 400:` checks for orbit first, then `elif alt > 100:` for approaching.",
+          "Click Run Code! and let the rocket fly all the way to 400 km. Watch for the message to change!",
+        ],
         starterCode:
 `set_thrust(100)
 set_direction(90)
@@ -628,6 +699,12 @@ Every astronaut needs to watch the fuel gauge!`,
 Add another condition to your monitor function:
   if get_fuel() <= 0:
       show_message("Out of fuel!")`,
+        instructionSlides: [
+          "Every rocket has limited fuel! `get_fuel()` returns how much fuel is left (0 to 100).",
+          "Look at `fuel = get_fuel()` inside `monitor`. We save the reading into a box called `fuel`.",
+          "Then `if fuel <= 0:` checks if we've run out. `<=` means 'less than or equal to'.",
+          "`show_message(\"Out of fuel!\")` appears when fuel hits zero. Let the rocket fly until it runs out!",
+        ],
         starterCode:
 `set_thrust(100)
 set_direction(90)
